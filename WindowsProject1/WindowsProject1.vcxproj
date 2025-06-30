@@ -108,6 +108,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,6 +140,13 @@
     <ResourceCompile Include="WindowsProject1.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\1.bmp" />
+    <Image Include="..\..\..\2.bmp" />
+    <Image Include="..\..\..\3.bmp" />
+    <Image Include="..\..\..\4.bmp" />
+    <Image Include="..\..\..\Chicken Blonde  Green.bmp" />
+    <Image Include="..\..\..\Idle.bmp" />
+    <Image Include="bitmap1.bmp" />
     <Image Include="small.ico" />
     <Image Include="WindowsProject1.ico" />
   </ItemGroup>

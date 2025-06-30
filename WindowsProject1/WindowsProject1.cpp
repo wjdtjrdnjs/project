@@ -3,9 +3,10 @@
 
 #include "framework.h"
 #include "WindowsProject1.h"
+#include <wingdi.h> 
+#include <math.h> 
 
 #define MAX_LOADSTRING 100
-
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
@@ -122,27 +123,35 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 // 
 
-#define map_y 30
+#define map_y 20
 #define map_x 30
 #define Inventory_x 3
 #define Inventory_y 3
+#define Inventory_main 5
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
-   static int playerX = 100;
-   static int playerY = 100;
-   static bool Inventory = FALSE;
-   const int TILE_SIZE = 16;
-   static int map[map_y][map_x] = { 0 };
-   static int Inventory_tile[Inventory_x][Inventory_y] = { 0 };
-
-    const int playerSize = 16;
-
+   static int playerX = 100;         //플레이어 x위치
+   static int playerY = 100;         //플레이어 y위치
+   static bool Inventory = FALSE;    //인벤토리 온 오프
+   const int TILE_SIZE = 16;         //바닥 사이즈
+   static int map[map_y][map_x] = { 0 }; //맵
+   static int Inventory_tile[Inventory_x][Inventory_y] = { 0 }; //3x3칸
+   static int Inventory_m[Inventory_main] = { 0 };  // 아래 9줄
+   static HBITMAP hPlayerBitmap, chicken, onion;
+   const int playerSize = 25;           
+   static int chicken_x = 150;         //닭 x위치
+   static int chicken_y = 150;         //닭 x위치
     switch (message)
     {
     case WM_CREATE:
     {
-        SetTimer(hWnd, 1, 16, NULL);
+        SetTimer(hWnd, 1, 16, NULL); //플레이어
+        SetTimer(hWnd, 2, 300, NULL); // 닭
+        hPlayerBitmap = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BITMAP2), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR); //사람
+        chicken = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BITMAP3), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR); //닭
+        onion = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BITMAP4), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);//양파
+       
         break;
     }
 
@@ -167,20 +176,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           }
           break;
         case WM_TIMER:
-         {
-            switch (wParam) {  //움직임
-            case 1:
-                if (GetKeyState(0x41) & 0x8000)
-                    playerX -= 5;
-                if (GetKeyState(0x44) & 0x8000)
-                    playerX += 5;
-                if (GetKeyState(0x57) & 0x8000)
-                    playerY -= 5;
-                if (GetKeyState(0x53) & 0x8000)
-                    playerY += 5;
+        {
+            switch (wParam){ //플레이어 움직임
                
-                InvalidateRect(hWnd, NULL, FALSE); // 화면 다시 그리기
+                case 1:
+                {
+                    if (GetKeyState(0x41) & 0x8000)
+                        playerX -= 5;
+                    if (GetKeyState(0x44) & 0x8000)
+                        playerX += 5;
+                    if (GetKeyState(0x57) & 0x8000)
+                        playerY -= 5;
+                    if (GetKeyState(0x53) & 0x8000)
+                        playerY += 5;
+
+                    //나중에 범위 설정
+
+                    break;
+                }             
+                case 2: 
+                {
+                    //닭 움직임
+                    chicken_x += (rand() % 10) - 5;
+                    chicken_y += (rand() % 10) - 5;
+                    break;
+                    //나중에 범위 설정
+                }
+                case 3:
+                {
+                   
+                    onion = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BITMAP3), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);//양파
+                    break;
+                }
             }
+            InvalidateRect(hWnd, NULL, FALSE); // 화면 다시 그리기
+
 
         }
            break;
@@ -208,7 +238,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 if (tileX >= 0 && tileX < map_x && tileY >= 0 && tileY < map_y)
                 {
-                    map[tileY][tileX] = (map[tileY][tileX] == 0) ? 1 : 0; // 클릭한 타일이 흙이면 벽으로, 벽이면 흙으로
+                    if (map[tileY][tileX] == 0)// 클릭한 타일이 흙이면 벽으로, 벽이면 흙으로
+                    {
+                       
+                        map[tileY][tileX] = 1;
+                        SetTimer(hWnd, 3, 500, NULL); //양파
+                    }
+                    else if (map[tileY][tileX] == 1)
+                    {
+                        map[tileY][tileX] = 0;
+                    }
                     InvalidateRect(hWnd, NULL, FALSE);
                 }
             }
@@ -228,6 +267,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             GetClientRect(hWnd, &clientRect);
             HBITMAP memBitmap = CreateCompatibleBitmap(hdc, clientRect.right, clientRect.bottom);
             HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, memBitmap);
+            HBRUSH hBrush;
+
+
 
             // 3. 메모리 DC에 먼저 그림
             // 타일맵 그리기
@@ -241,17 +283,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         (x + 1) * TILE_SIZE,
                         (y + 1) * TILE_SIZE
                     };
-                    HBRUSH hBrush;
-
+                    
                     if (map[y][x] == 0)
+                    {
                         hBrush = CreateSolidBrush(RGB(180, 255, 180));
+                        FillRect(memDC, &tileRect, hBrush);
+                        DeleteObject(hBrush);
+                    }
                     else
+                    {
                         hBrush = CreateSolidBrush(RGB(139, 69, 19));
+                        FillRect(memDC, &tileRect, hBrush);
+                        DeleteObject(hBrush);
 
-                    FillRect(memDC, &tileRect, hBrush);
-                    DeleteObject(hBrush);
+                        HDC onionDC = CreateCompatibleDC(hdc);
+                        HBITMAP hOldonionBmp = (HBITMAP)SelectObject(onionDC, onion);
+
+                        BITMAP onion_bmp;
+                        GetObject(onion, sizeof(BITMAP), &onion_bmp);
+
+                        // 실제 크기로 투명처리해서 출력
+                        BOOL success_onion = TransparentBlt(
+                            memDC,          // 출력 DC
+                            x * TILE_SIZE,       // 출력 위치 X
+                            y * TILE_SIZE-5,        // 출력 위치 Y
+                            onion_bmp.bmWidth,    // 출력 너비 (21)
+                            onion_bmp.bmHeight,   // 출력 높이 (28)
+                            onionDC,      // 원본 DC
+                            0, 0,          // 원본 비트맵 좌상단 좌표
+                            onion_bmp.bmWidth,
+                            onion_bmp.bmHeight,
+                            RGB(255, 255, 255)  // 투명 처리할 색 (흰색)
+                        );
+
+                        SelectObject(onionDC, hOldonionBmp);
+                        DeleteDC(onionDC);
+                    }
+
+                   
                 }
             }
+           
+
+            //임시로 만든 인벤
             if (Inventory == TRUE)
             {
                 for (int y = 0; y < Inventory_y; ++y)
@@ -264,7 +338,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                             (x + 1) * (TILE_SIZE * 2),
                             ( y + 1) * (TILE_SIZE * 2)
                         };
-                        HBRUSH hBrush;
 
                         hBrush = CreateSolidBrush(RGB(139, 69, 19));
 
@@ -276,15 +349,60 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
             }
            
+           
             // 캐릭터 그리기
-            HBRUSH playerBrush = CreateSolidBrush(RGB(0, 128, 255));
-            RECT playerRect = { playerX, playerY, playerX + playerSize, playerY + playerSize };
-            FillRect(memDC, &playerRect, playerBrush);
-            DeleteObject(playerBrush);
+            HDC hPlayerDC = CreateCompatibleDC(hdc);
+            HBITMAP hOldPlayerBmp = (HBITMAP)SelectObject(hPlayerDC, hPlayerBitmap);
+
+            BITMAP bmp;
+            GetObject(hPlayerBitmap, sizeof(BITMAP), &bmp);
+
+            // 실제 크기로 투명처리해서 출력
+            BOOL success = TransparentBlt(
+               memDC,          // 출력 DC
+                playerX,       // 출력 위치 X
+                playerY,        // 출력 위치 Y
+                bmp.bmWidth,    // 출력 너비 (21)
+                bmp.bmHeight,   // 출력 높이 (28)
+                hPlayerDC,      // 원본 DC
+                0, 0,          // 원본 비트맵 좌상단 좌표
+                bmp.bmWidth,
+                bmp.bmHeight,
+                RGB(255, 255, 255)  // 투명 처리할 색 (흰색)
+            );
+            SelectObject(hPlayerDC, hOldPlayerBmp);
+            DeleteDC(hPlayerDC);
+
+
+            //e닭
+            HDC chickenDC = CreateCompatibleDC(hdc);
+            HBITMAP hOldchickenBmp = (HBITMAP)SelectObject(chickenDC, chicken);
+
+            BITMAP c_bmp;
+            GetObject(chicken, sizeof(BITMAP), &c_bmp);
+
+            // 실제 크기로 투명처리해서 출력
+            BOOL success_chicken = TransparentBlt(
+                memDC,          // 출력 DC
+                chicken_x,       // 출력 위치 X
+                chicken_y,        // 출력 위치 Y
+                c_bmp.bmWidth,    // 출력 너비 (21)
+                c_bmp.bmHeight,   // 출력 높이 (28)
+                chickenDC,      // 원본 DC
+                0, 0,          // 원본 비트맵 좌상단 좌표
+                c_bmp.bmWidth,
+                c_bmp.bmHeight,
+                RGB(255, 255, 255)  // 투명 처리할 색 (흰색)
+            );
+            SelectObject(chickenDC, hOldchickenBmp);
+            DeleteDC(chickenDC);
+
+
+            
 
             // 4. 메모리 DC를 실제 DC에 복사
             BitBlt(hdc, 0, 0, clientRect.right, clientRect.bottom, memDC, 0, 0, SRCCOPY);
-
+            
             // 5. 리소스 정리
             SelectObject(memDC, oldBitmap);
             DeleteObject(memBitmap);
@@ -295,7 +413,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_DESTROY:
-        KillTimer(hWnd, 1);
+        KillTimer(hWnd, 1); //플레이어 이동
+        KillTimer(hWnd, 2); //닭 이동
+        KillTimer(hWnd, 3); //양파 
+        
+        DeleteObject(hPlayerBitmap); //비트맵 이미지 제거
         PostQuitMessage(0);
         break;
     default:

@@ -45,5 +45,26 @@
     <Image Include="WindowsProject1.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="..\..\..\Idle.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="bitmap1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\Chicken Blonde  Green.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\4.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

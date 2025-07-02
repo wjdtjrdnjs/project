@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="리소스 파일\o">
+      <UniqueIdentifier>{003c8b62-7f26-4b26-a39c-f0b226fee9c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="리소스 파일\s">
+      <UniqueIdentifier>{7e4e3344-549a-41f1-b414-782f8108d7fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="리소스 파일\c">
+      <UniqueIdentifier>{24a657a3-317e-44cc-9277-93e8968106ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -45,25 +54,70 @@
     <Image Include="WindowsProject1.ico">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="..\..\..\Idle.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
     <Image Include="bitmap1.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="..\..\..\Chicken Blonde  Green.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="..\..\..\1.bmp">
+    <Image Include="..\..\..\res\Farm Animals\Chicken\Chicken Blonde  Green.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="..\..\..\2.bmp">
+    <Image Include="..\..\..\res\Tileset\Tile_1.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="..\..\..\3.bmp">
-      <Filter>리소스 파일</Filter>
+    <Image Include="..\..\..\res\Objects\Strawberry\2_1.bmp">
+      <Filter>리소스 파일\s</Filter>
     </Image>
-    <Image Include="..\..\..\4.bmp">
+    <Image Include="..\..\..\res\Objects\Strawberry\2_2.bmp">
+      <Filter>리소스 파일\s</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\Strawberry\2_3.bmp">
+      <Filter>리소스 파일\s</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\Strawberry\2_4.bmp">
+      <Filter>리소스 파일\s</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\Strawberry\2_5.bmp">
+      <Filter>리소스 파일\s</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\Strawberry\2_6.bmp">
+      <Filter>리소스 파일\s</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\onion\1.bmp">
+      <Filter>리소스 파일\o</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\onion\2.bmp">
+      <Filter>리소스 파일\o</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\onion\3.bmp">
+      <Filter>리소스 파일\o</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\onion\4.bmp">
+      <Filter>리소스 파일\o</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\onion\5.bmp">
+      <Filter>리소스 파일\o</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Objects\onion\6.bmp">
+      <Filter>리소스 파일\o</Filter>
+    </Image>
+    <Image Include="..\..\..\Idle.bmp">
+      <Filter>리소스 파일\c</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Character\Idle.bmp">
+      <Filter>리소스 파일\c</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Character\Idle_1.bmp">
+      <Filter>리소스 파일\c</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Character\Idle_2.bmp">
+      <Filter>리소스 파일\c</Filter>
+    </Image>
+    <Image Include="..\..\..\res\Character\Idle_3.bmp">
+      <Filter>리소스 파일\c</Filter>
+    </Image>
+    <Image Include="..\..\..\ono.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

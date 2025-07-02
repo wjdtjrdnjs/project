@@ -140,12 +140,27 @@
     <ResourceCompile Include="WindowsProject1.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\1.bmp" />
-    <Image Include="..\..\..\2.bmp" />
-    <Image Include="..\..\..\3.bmp" />
-    <Image Include="..\..\..\4.bmp" />
     <Image Include="..\..\..\Chicken Blonde  Green.bmp" />
     <Image Include="..\..\..\Idle.bmp" />
+    <Image Include="..\..\..\ono.bmp" />
+    <Image Include="..\..\..\res\Character\Idle.bmp" />
+    <Image Include="..\..\..\res\Character\Idle_1.bmp" />
+    <Image Include="..\..\..\res\Character\Idle_2.bmp" />
+    <Image Include="..\..\..\res\Character\Idle_3.bmp" />
+    <Image Include="..\..\..\res\Farm Animals\Chicken\Chicken Blonde  Green.bmp" />
+    <Image Include="..\..\..\res\Objects\onion\1.bmp" />
+    <Image Include="..\..\..\res\Objects\onion\2.bmp" />
+    <Image Include="..\..\..\res\Objects\onion\3.bmp" />
+    <Image Include="..\..\..\res\Objects\onion\4.bmp" />
+    <Image Include="..\..\..\res\Objects\onion\5.bmp" />
+    <Image Include="..\..\..\res\Objects\onion\6.bmp" />
+    <Image Include="..\..\..\res\Objects\Strawberry\2_1.bmp" />
+    <Image Include="..\..\..\res\Objects\Strawberry\2_2.bmp" />
+    <Image Include="..\..\..\res\Objects\Strawberry\2_3.bmp" />
+    <Image Include="..\..\..\res\Objects\Strawberry\2_4.bmp" />
+    <Image Include="..\..\..\res\Objects\Strawberry\2_5.bmp" />
+    <Image Include="..\..\..\res\Objects\Strawberry\2_6.bmp" />
+    <Image Include="..\..\..\res\Tileset\Tile_1.bmp" />
     <Image Include="bitmap1.bmp" />
     <Image Include="small.ico" />
     <Image Include="WindowsProject1.ico" />

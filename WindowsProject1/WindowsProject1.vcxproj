@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -128,40 +128,67 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animal.h" />
+    <ClInclude Include="BitmapManager.h" />
+    <ClInclude Include="Box.h" />
+    <ClInclude Include="Crop.h" />
+    <ClInclude Include="Fence.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="RenderManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TimeManager.h" />
     <ClInclude Include="WindowsProject1.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Animal.cpp" />
+    <ClCompile Include="BitmapManager.cpp" />
+    <ClCompile Include="Box.cpp" />
+    <ClCompile Include="Crop.cpp" />
+    <ClCompile Include="Fence.cpp" />
+    <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="TimeManager.cpp" />
     <ClCompile Include="WindowsProject1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WindowsProject1.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Chicken Blonde  Green.bmp" />
-    <Image Include="..\..\..\Idle.bmp" />
-    <Image Include="..\..\..\ono.bmp" />
-    <Image Include="..\..\..\res\Character\Idle.bmp" />
-    <Image Include="..\..\..\res\Character\Idle_1.bmp" />
-    <Image Include="..\..\..\res\Character\Idle_2.bmp" />
-    <Image Include="..\..\..\res\Character\Idle_3.bmp" />
-    <Image Include="..\..\..\res\Farm Animals\Chicken\Chicken Blonde  Green.bmp" />
-    <Image Include="..\..\..\res\Objects\onion\1.bmp" />
-    <Image Include="..\..\..\res\Objects\onion\2.bmp" />
-    <Image Include="..\..\..\res\Objects\onion\3.bmp" />
-    <Image Include="..\..\..\res\Objects\onion\4.bmp" />
-    <Image Include="..\..\..\res\Objects\onion\5.bmp" />
-    <Image Include="..\..\..\res\Objects\onion\6.bmp" />
-    <Image Include="..\..\..\res\Objects\Strawberry\2_1.bmp" />
-    <Image Include="..\..\..\res\Objects\Strawberry\2_2.bmp" />
-    <Image Include="..\..\..\res\Objects\Strawberry\2_3.bmp" />
-    <Image Include="..\..\..\res\Objects\Strawberry\2_4.bmp" />
-    <Image Include="..\..\..\res\Objects\Strawberry\2_5.bmp" />
-    <Image Include="..\..\..\res\Objects\Strawberry\2_6.bmp" />
-    <Image Include="..\..\..\res\Tileset\Tile_1.bmp" />
-    <Image Include="bitmap1.bmp" />
+    <Image Include="..\..\..\1122.bmp" />
+    <Image Include="..\..\..\box.bmp" />
+    <Image Include="..\..\..\Fence%27s copiar.bmp" />
+    <Image Include="..\..\..\Stone Axe.bmp" />
+    <Image Include="..\..\..\t1.bmp" />
+    <Image Include="..\..\..\tttle.bmp" />
+    <Image Include="res\Character\Idle.bmp" />
+    <Image Include="res\Character\Idle_1.bmp" />
+    <Image Include="res\Character\Idle_2.bmp" />
+    <Image Include="res\Character\Idle_3.bmp" />
+    <Image Include="res\Farm Animals\Chicken\Chicken Blonde  Green.bmp" />
+    <Image Include="res\Objects\onion\1.bmp" />
+    <Image Include="res\Objects\onion\2.bmp" />
+    <Image Include="res\Objects\onion\3.bmp" />
+    <Image Include="res\Objects\onion\4.bmp" />
+    <Image Include="res\Objects\onion\5.bmp" />
+    <Image Include="res\Objects\onion\6.bmp" />
+    <Image Include="res\Objects\onion\on.bmp" />
+    <Image Include="res\Objects\onion\ono.bmp" />
+    <Image Include="res\Objects\Strawberry\2_1.bmp" />
+    <Image Include="res\Objects\Strawberry\2_2.bmp" />
+    <Image Include="res\Objects\Strawberry\2_3.bmp" />
+    <Image Include="res\Objects\Strawberry\2_4.bmp" />
+    <Image Include="res\Objects\Strawberry\2_5.bmp" />
+    <Image Include="res\Objects\Strawberry\2_6.bmp" />
+    <Image Include="res\Objects\Strawberry\st.bmp" />
+    <Image Include="res\Objects\Strawberry\str.bmp" />
+    <Image Include="res\Tileset\t1.bmp" />
+    <Image Include="res\Tileset\tttle.bmp" />
     <Image Include="small.ico" />
     <Image Include="WindowsProject1.ico" />
   </ItemGroup>

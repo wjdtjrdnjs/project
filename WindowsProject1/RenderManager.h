@@ -1,0 +1,47 @@
+#pragma once
+#include <windows.h>
+#include <iostream>
+#include <vector>
+#include "Player.h"
+#include "Crop.h"
+#include "Animal.h"
+#include "Map.h"
+#include "Box.h"
+#include "BitmapManager.h"
+//그릴 클래스들 전방 선언
+class Player;
+class Animal;
+class Crop;
+class Map;
+class Box;
+
+class RenderManager //그리기 담당
+{
+public:
+	//업데이트
+	static void RenderAll(HDC hdc, HWND hWnd);
+	static void UpdateAll();
+
+	//플레이어
+	static Player* GetPlayer() { return player; }
+	static void SetPlayer(Player* player);
+	
+	//작물
+	static Crop* GetCropAt(int tileX, int tileY);
+	static void AddCrop(Crop* crop);
+	static void RemoveCrop(Crop* crop);
+
+	//동물
+	static void AddAnimal(Animal* animal);
+
+	////////////////
+	static void SetMap(Map* map);
+	static void SetBox(Box* box);
+private:
+	static Player* player;
+	static Map* map;
+	static Box* box;
+	static std::vector<Animal*> animals;
+	static std::vector<Crop*> crops;
+};
+

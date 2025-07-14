@@ -6,12 +6,14 @@ Box* RenderManager::box = nullptr; //상자
 
 std::vector<Crop*> RenderManager::crops;  //작물
 std::vector<Animal*> RenderManager::animals; //동물
+std::vector<Fence*> RenderManager::fences; //울타리(임시)
 
 void RenderManager::SetPlayer(Player* p) { player = p; }
 void RenderManager::SetMap(Map* m) { map = m; }
 void RenderManager::SetBox(Box* b) { box = b; }
 void RenderManager::AddCrop(Crop* crop) { crops.push_back(crop); }
 void RenderManager::AddAnimal(Animal* animal) { animals.push_back(animal); }
+void RenderManager::AddFence(Fence* fence) { fences.push_back(fence); } //울타리(임시)
 
 void RenderManager::RenderAll(HDC hdc, HWND hWnd)
 {
@@ -20,7 +22,12 @@ void RenderManager::RenderAll(HDC hdc, HWND hWnd)
     if (map) map->Render(hdc); //맵
     for (auto& crop : crops) crop->Render(hdc); //작물
     for (auto& animal : animals) animal->Render(hdc); //동물 
+    for (auto& fence : fences) fence->Render(hdc);//울타리(임시) 
     if (box) box->Render(hdc); //박스 
+
+    if (player->IsInventoryOpen()) {
+        player->RenderFullInventory(hdc);
+    }
 
     if (box->IsOpen()) box->RenderUI(hdc); //박스 아이템 창
 

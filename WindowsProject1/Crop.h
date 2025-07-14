@@ -1,19 +1,10 @@
 #pragma once
 #include <windows.h>
 #include "resource.h"
-#include "Map.h"
 #include <vector>
-enum class CropType {
-    None = -1,       // ºó ½½·Ô
+#include "Map.h"
+#include "CropType.h"
 
-    Strawberry = 0,   //µþ±â
-    Strawberry_1 = 1, //µþ±â¾¾¾ÑºÀÅõ
-    
-    Onion = 2,   //¾çÆÄ
-    Onion_1 = 3, //¾çÆÄ¾¾¾Ñ ºÀÅõ
-    
-    Stone = 4, //±ªÀÌ     
-};
 
 class Crop {
 public:

@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\WindowsProject1"
+    "\\WindowsProject1",
+    "\\WindowsProject1\\x64"
   ],
-  "SelectedNode": "\\WindowsProject1\\WindowsProject1.cpp",
+  "SelectedNode": "\\WindowsProject1\\WindowsProject1.ico",
   "PreviewInSolutionExplorer": false
 }

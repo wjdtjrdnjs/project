@@ -1,7 +1,9 @@
     #pragma once
     #include <windows.h>
     #include <map>
-    #include "Crop.h"
+    #include "CropType.h"
+    #include "resource.h"
+
     class BitmapManager
     {
     public:

@@ -11,12 +11,15 @@
 #include "Player.h"
 #include "Animal.h"
 #include "Crop.h"
+#include "Fence.h"
 #include "Map.h"
 #include "RenderManager.h"
 #include "BitmapManager.h"
 #include "InputManager.h"
 #include "Box.h"
 #include <windowsx.h>
+#include "Inventory.h"
+
 #define MAX_LOADSTRING 100
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -138,7 +141,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 #define Inventory_x 3
 #define Inventory_y 3
 Box* box = nullptr; 
-
+Player* player = nullptr;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -148,14 +151,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         InputManager::Init(hWnd);
 
-        Player* player = new Player();                 //플레이어 생성
+        player = new Player();                //플레이어 생성
         Animal* animal = new Animal();                 //동물 생성
+        Fence* fence = new Fence();                 //울타리 생성(임시)
         Map* map = new Map();                          //맵 생성
         box = new Box(300, 5);                         //상자 위치 전달
 
         //렌더 매니저에 등록
         RenderManager::SetPlayer(player);             
         RenderManager::AddAnimal(animal);
+        RenderManager::AddFence(fence);
         RenderManager::SetMap(map);
         RenderManager::SetBox(box);
 
@@ -190,6 +195,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case 999:
         {                            
+            InputManager::Update();  //모든 객체 업데이트
             RenderManager::UpdateAll();  //모든 객체 업데이트
             InvalidateRect(hWnd, NULL, FALSE); // 화면 다시 그리
             break;
@@ -198,112 +204,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
     }
-    break;
-    case WM_LBUTTONUP:
-    {
-        POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-        //타일 위치x,y
-        int tileX = pt.x / tileSize;
-        int tileY = pt.y / tileSize;
-
-        Player* player = RenderManager::GetPlayer();  //플레이어 정보 호출
-        if (!player) break; //생성죄지 않았다면 브레이크
-
-        int tool = player->GetSelectedTool();  //선택된 아이템(슬롯)
-
-        //플레이어 범위 x,y
-        int playerTileX = (player->GetX() + tileSize / 2) / tileSize;
-        int playerTileY = (player->GetY() + tileSize / 2) / tileSize;
-
-        if (abs(tileX - playerTileX) > 1 || abs(tileY - playerTileY) > 1) break; // 범위 밖 클릭 무시
-
-        if (tool == 3)  // 괭이일 때만 땅 교체 가능
-        {
-            Crop* crop = RenderManager::GetCropAt(tileX, tileY);
-            if (crop)
-            {
-                RenderManager::RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
-                delete crop;
-            }
-            Map::ToggleTile(tileX, tileY); //땅 교체
-            InvalidateRect(hWnd, NULL, FALSE);
-        }
-        else // 맨손 수확
-        {
-            Crop* crop = RenderManager::GetCropAt(tileX, tileY); // 선택된 타일 위에 무엇이 있는지 확인
-            if (crop && crop->IsFullyGrown()) //작물이 있고 성장이 끝았을 때
-            {
-                CropType type = crop->GetType(); //작물 정보 가져옴
-                RenderManager::RemoveCrop(crop);//작물 삭제
-                delete crop;//작물 삭제
-                player->AddItem(type); //인벤토리에 추가
-                InvalidateRect(hWnd, NULL, FALSE);
-            }
-        }    
-        return 0;
-    }
-    case WM_RBUTTONDOWN:
-    {
-        int mouseX = GET_X_LPARAM(lParam);
-        int mouseY = GET_Y_LPARAM(lParam);
-        
-        //클릭한 타일 위치 
-        int tileX = mouseX / tileSize;
-        int tileY = mouseY / tileSize;
-
-        Player* player = RenderManager::GetPlayer();//플레이어 정보 호출
-        if (!player) break; //생성되지 않았다면 브레이크
-
-        int tool = player->GetSelectedTool();  //선택된 아이템(슬롯)
-        CropType selectedCrop = player->GetSelectedCrop(); //선택된 작물(1,2)번 딸기와 양파
-
-        if (abs(tileX - (player->GetX() + tileSize / 2) / tileSize) > 1 || abs(tileY - (player->GetY() + tileSize / 2) / tileSize) > 1) break;
-        
-        if (tool == 1 || tool == 2) // 현재는 1,2번이지만 나중에 들고있는 아이템으로 교체
-        {
-            if (Map::GetTile(tileX, tileY) == TILE_FARMLAND && !RenderManager::GetCropAt(tileX, tileY)) //타일이 밭(농지)이고 
-            {
-                InventoryItem* inv = player->GetInventory();  //아이템 타입을 가져옴
-
-                for (int i = 0; i < 9; ++i)  //인벤토리 9칸
-                {
-                    if (inv[i].type == selectedCrop && inv[i].count > 0) //타입이 선택되고 1개 이상일 때
-                    {
-                        CropType baseCropType = CropType::None; //처음은 빈손
-                        if (selectedCrop == CropType::Strawberry_1) baseCropType = CropType::Strawberry; //딸기씨앗 봉투면 딸기 
-                        else if (selectedCrop == CropType::Onion_1) baseCropType = CropType::Onion;     //양파씨앗 봉투면 양파 
-
-                        if (baseCropType != CropType::None) { //빈손이 아닐 때
-                            Crop* crop = new Crop(baseCropType);  //선택된 작물 정보 가져옴
-                            crop->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
-                            RenderManager::AddCrop(crop);  //작물 추가
-                            InvalidateRect(hWnd, NULL, FALSE);
-
-                            inv[i].count--;  // 들고있는 아이템 -1
-                            if (inv[i].count == 0) //들고있는 아이템 개수가 0개이다
-                                inv[i].type = CropType::None; //아이템이 0개면 빈 슬롯
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        else // 맨손 수확(우클릭 1,2번으로 수확 x)
-        {
-            Crop* crop = RenderManager::GetCropAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
-            if (crop && crop->IsFullyGrown()) { //작물이 있고 성장이 끝았을 때
-                CropType type = crop->GetType();  //작물 정보 가져옴
-                RenderManager::RemoveCrop(crop);  //작물 삭제
-                delete crop;  //작물 삭제
-                player->AddItem(type);  //인벤토리에 추가
-            }
-           
-        }
-        return 0;
-    }
-
+    break;  
     case WM_KEYDOWN: //상자 열기
     {
+
         Player* player = RenderManager::GetPlayer();
         if (!player || !box) break;
 
@@ -325,6 +229,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             box->Close();
             player->SetBoxOpen(false); //닫으면 플레이어 이동 가능
         }
+
+        if (wParam == VK_TAB || wParam == 'I') {
+            static bool inventoryOpen = false;
+            inventoryOpen = !inventoryOpen;
+
+            // 이 상태는 렌더 함수나 업데이트 루프에 반영해야 함
+            player->SetInventoryOpen(inventoryOpen); 
+        }
+
         break;
     }
 

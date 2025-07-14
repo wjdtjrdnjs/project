@@ -28,7 +28,7 @@ public:
         return tiles[y][x];
     };
 
-    
+
     void Render(HDC hdc);
 
 private:

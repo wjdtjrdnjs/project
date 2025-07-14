@@ -1,4 +1,3 @@
-
 #include "Box.h"
 
 Box::Box(int xPos, int yPos) : x(xPos), y(yPos), isOpen(false)
@@ -94,7 +93,6 @@ void Box::RenderUI(HDC hdc)
 
             DeleteObject(brush);
 
-            FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
 
         }
     }

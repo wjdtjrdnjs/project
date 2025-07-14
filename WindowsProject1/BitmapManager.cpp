@@ -1,6 +1,4 @@
 ﻿#include "BitmapManager.h"
-#include "resource.h"
-#include "Crop.h"  // CropType enum 선언 위치
 
 std::map<int, HBITMAP> BitmapManager::bitmapMap;
 
@@ -19,6 +17,8 @@ void BitmapManager::Load(HINSTANCE hInstance)
     bitmapMap[IDB_BITMAP17] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP17), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     //임시 괭이
     bitmapMap[IDB_BITMAP16] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP16), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+    //울타리
+    bitmapMap[IDB_BITMAP39] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP39), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
 
  
 }
@@ -42,6 +42,8 @@ HBITMAP BitmapManager::GetBitmapForCrop(CropType type) { //가져온 타입으�
         return GetBitmap(IDB_BITMAP18);
     case CropType::Onion_1: //양파봉투
         return GetBitmap(IDB_BITMAP17);
+    case CropType::Fence: //양파봉투
+        return GetBitmap(IDB_BITMAP39);
     default: //없음
         return nullptr;
     }

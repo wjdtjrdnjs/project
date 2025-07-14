@@ -7,10 +7,12 @@
 #include "Animal.h"
 #include "Map.h"
 #include "Box.h"
+#include "Fence.h"
 #include "BitmapManager.h"
 //그릴 클래스들 전방 선언
 class Player;
 class Animal;
+class Fence;
 class Crop;
 class Map;
 class Box;
@@ -33,7 +35,8 @@ public:
 
 	//동물
 	static void AddAnimal(Animal* animal);
-
+	static void AddFence(Fence* fence);
+	
 	////////////////
 	static void SetMap(Map* map);
 	static void SetBox(Box* box);
@@ -42,6 +45,7 @@ private:
 	static Map* map;
 	static Box* box;
 	static std::vector<Animal*> animals;
+	static std::vector<Fence*> fences;
 	static std::vector<Crop*> crops;
 };
 

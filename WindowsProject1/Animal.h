@@ -12,10 +12,10 @@ public:
 	void Render(HDC hdc);
 	void Update();
 private:
-	int image = IDB_BITMAP19;
-	int x = 350;
-	int y = 300;
-	int Animalsize = 8;
+	int image = IDB_BITMAP38;
+	int x = 39;
+	int y = 150;
+	int Animalsize = 37;
 	HBITMAP hBmp = nullptr; // 비트맵 핸들 저장용
 	HDC memDC = nullptr;
 };

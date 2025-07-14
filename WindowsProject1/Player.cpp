@@ -5,7 +5,7 @@
 #include <string>
 #include "RenderManager.h"
 #include "BitmapManager.h"
-Player::Player() : x(0), y(0), selectedCrop(CropType::Strawberry) 
+Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry) 
 {
     selectedCrop = CropType::Strawberry_1;
     selectedTool = -1;
@@ -27,6 +27,8 @@ Player::Player() : x(0), y(0), selectedCrop(CropType::Strawberry)
     inventory[1].count = 5;
     inventory[2].type = CropType::Stone;        //괭이
     inventory[2].count = 1;
+    inventory[3].type = CropType::Fence;        //울타리
+    inventory[3].count = 1;
     if (hBmp)
     {
         // 메모리 DC 생성 후 비트맵 선택
@@ -61,7 +63,7 @@ void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플�
 
     for (int i = 0; i < 9; i++) { //9칸
         HBRUSH brush = nullptr;
-        if (i == selectedTool - 1)   //선택된 번호
+        if (i == selectedTool)   //선택된 번호
             brush = CreateSolidBrush(RGB(150, 150, 150)); // 선택된 슬롯 강조
         else
             brush = CreateSolidBrush(RGB(200, 200, 200)); // 기본 색
@@ -73,7 +75,6 @@ void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플�
 
         DeleteObject(brush);
 
-        FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
         if (inventory[i].type != CropType::None) {
             HBITMAP bmp = BitmapManager::GetBitmapForCrop(inventory[i].type);
 
@@ -148,54 +149,151 @@ void Player::Render(HDC hdc)
 void Player::PlayerUpdate()
 {
     if (isBoxOpen) return;
+    Playermove(); //플레이어 이동 처리
+    HandleToolSelection(); //아이템창 아래(툴바) 번호 선택
+    if (InputManager::IsLeftClickDown()) { //좌클릭
+        HandleLeftClickAction();
+    }
+    if (InputManager::IsRightClickDown()) { //우클릭
+        HandleRightClickAction();
+    }
+    UpdateBitmap(); //비트맵 갱신
+  
+
+}
+
+void Player::Playermove()
+{
     // 이동 처리
-    if (GetKeyState('A') & 0x8000) {
+    if (InputManager::IsKeyHeld('A')) {
         x -= 5;
         currentDir = LEFT;
     }
-    else if (GetKeyState('D') & 0x8000) {
+    else if (InputManager::IsKeyHeld('D')) {
         x += 5;
         currentDir = RIGHT;
     }
-    else if (GetKeyState('W') & 0x8000) {
+    else if (InputManager::IsKeyHeld('W')) {
         y -= 5;
         currentDir = UP;
     }
-    else if (GetKeyState('S') & 0x8000) {
+    else if (InputManager::IsKeyHeld('S')) {
         y += 5;
         currentDir = DOWN;
     }
+   
+}
 
-    // 작물 선택 (1, 2)
-    if (GetKeyState('1') & 0x8000) {
-        selectedTool = 1; // 딸기 선택
-        selectedCrop = CropType::Strawberry_1;
-    }
-    else if (GetKeyState('2') & 0x8000) {
-        selectedTool = 2; // 양파 선택
-        selectedCrop = CropType::Onion_1;
-    }
-    else if (GetKeyState('3') & 0x8000) {
-        selectedTool = 3; // 괭이
-    }
-    else if (GetKeyState('4') & 0x8000) {
-        selectedTool = 4; // 맨손
-    }
-    else if (GetKeyState('5') & 0x8000) {
-        selectedTool = 5; // 맨손
-    }
-    else if (GetKeyState('6') & 0x8000) {
-        selectedTool = 6; // 맨손
-    }
-    else if (GetKeyState('7') & 0x8000) {
-        selectedTool = 7; // 맨손
-    }
-    else if (GetKeyState('8') & 0x8000) {
-        selectedTool = 8; // 맨손
-    }
+void Player::HandleToolSelection() {
+    if (InputManager::IsKeyDown('1')) selectedTool = 0;      
+    else if (InputManager::IsKeyDown('2')) selectedTool = 1;     
+    else if (InputManager::IsKeyDown('3')) selectedTool = 2;
+    else if (InputManager::IsKeyDown('4')) selectedTool = 3;
+    else if (InputManager::IsKeyDown('5')) selectedTool = 4;
+    else if (InputManager::IsKeyDown('6')) selectedTool = 5;
+    else if (InputManager::IsKeyDown('7')) selectedTool = 6;
+    else if (InputManager::IsKeyDown('8')) selectedTool = 7;
+    else if (InputManager::IsKeyDown('9')) selectedTool = 8;
+}
 
-  
+void Player::HandleLeftClickAction()
+{
+        POINT pt =  InputManager::GetMousePosition();
+         //타일 위치x,y
+         int tileX = pt.x / tileSize;
+         int tileY = pt.y / tileSize;
 
+         Player* player = RenderManager::GetPlayer();  //플레이어 정보 호출
+         if (!player) return; //생성죄지 않았다면 브레이크
+
+         int tool = player->GetSelectedTool();  //선택된 아이템(슬롯)
+
+         //플레이어 범위 x,y
+         int playerTileX = (player->GetX() + tileSize / 2) / tileSize;
+         int playerTileY = (player->GetY() + tileSize / 2) / tileSize;
+
+         if (abs(tileX - playerTileX) > 1 || abs(tileY - playerTileY) > 1) return;// 범위 밖 클릭 무시
+
+         if (inventory[tool].type == CropType::Stone)  // 괭이일 때만 땅 교체 가능
+         {
+             Crop* crop = RenderManager::GetCropAt(tileX, tileY);
+             if (crop)
+             {
+                 RenderManager::RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
+                 delete crop;
+             }
+             Map::ToggleTile(tileX, tileY); //땅 교체
+         }
+         else // 맨손 수확
+         {
+             Crop* crop = RenderManager::GetCropAt(tileX, tileY); // 선택된 타일 위에 무엇이 있는지 확인
+             if (crop && crop->IsFullyGrown()) //작물이 있고 성장이 끝았을 때
+             {
+                 CropType type = crop->GetType(); //작물 정보 가져옴
+                 RenderManager::RemoveCrop(crop);//작물 삭제
+                 delete crop;//작물 삭제
+                 player->AddItem(type); //인벤토리에 추가
+             }
+         }
+}
+
+void Player::HandleRightClickAction()
+{
+    POINT pt = InputManager::GetMousePosition();  //마우스가 클릭된 좌표를 가져옴
+
+
+    //클릭한 타일 위치 
+    int tileX = pt.x / tileSize;
+    int tileY = pt.y / tileSize;
+
+    Player* player = RenderManager::GetPlayer();//플레이어 정보 호출
+    if (!player) return; //플레이어 정보가 존재하지 않는다면 종료
+
+    int tool = player->GetSelectedTool();  //선택된 아이템(슬롯)
+    
+    //CropType selectedCrop = player->GetSelectedCrop(); //선택된 작물(1,2)번 딸기와 양파  //사용x
+
+    if (abs(tileX - (player->GetX() + tileSize / 2) / tileSize) > 1 || abs(tileY - (player->GetY() + tileSize / 2) / tileSize) > 1) return;
+
+    if (inventory[tool].type == CropType::Onion_1 || inventory[tool].type == CropType::Strawberry_1) //선택한 슬롯의 아이템이 씨앗봉투라면 실행    
+    {
+        if (Map::GetTile(tileX, tileY) == TILE_FARMLAND && !RenderManager::GetCropAt(tileX, tileY)) //타일이 밭(농지)이고 
+        {
+            InventoryItem* inv = player->GetInventory();  //인벤토리를 가져옴
+            CropType selectedCrop = inv[tool].type; // 선택한 슬롯의 타입을 가져옴
+                if (inv[tool].type == selectedCrop && inv[tool].count > 0) //타입이 선택되고 1개 이상일 때
+                {
+                    CropType baseCropType = CropType::None; //처음은 빈손
+                    if (selectedCrop == CropType::Strawberry_1) baseCropType = CropType::Strawberry; //딸기씨앗 봉투면 딸기 
+                    else if (selectedCrop == CropType::Onion_1) baseCropType = CropType::Onion;     //양파씨앗 봉투면 양파 
+
+                    if (baseCropType != CropType::None) { //빈손이 아닐 때
+                        Crop* crop = new Crop(baseCropType);  //선택된 작물 정보 가져옴
+                        crop->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
+                        RenderManager::AddCrop(crop);  //작물 추가
+
+                        inv[tool].count--;  // 들고있는 아이템 -1
+                        if (inv[tool].count == 0) //들고있는 아이템 개수가 0개이다
+                            inv[tool].type = CropType::None; //아이템이 0개면 빈 슬롯
+                    }
+                }
+        }
+    }
+    else // 맨손 수확(우클릭 1,2번으로 수확 x)
+    {
+        Crop* crop = RenderManager::GetCropAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
+        if (crop && crop->IsFullyGrown()) { //작물이 있고 성장이 끝았을 때
+            CropType type = crop->GetType();  //작물 정보 가져옴
+            RenderManager::RemoveCrop(crop);  //작물 삭제
+            delete crop;  //작물 삭제
+            player->AddItem(type);  //인벤토리에 추가
+        }
+
+    }
+}
+
+void Player::UpdateBitmap()
+{
     // 이미지 핸들 업데이트
     hBmp = PLY[currentDir];
     if (memDC && hBmp) {

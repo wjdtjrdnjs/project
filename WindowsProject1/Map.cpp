@@ -10,6 +10,11 @@ Map::Map()
     Tile.push_back(grassBmp); // TILE_GRASS
     Tile.push_back(dirtBmp);  // TILE_FARMLAND
 
+    for (int i = 0; i <= 12; ++i) {
+        HBITMAP dirtBmp = (HBITMAP)LoadImage(NULL, MAKEINTRESOURCE(IDB_BITMAP25 + i),
+            IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+        Tile.push_back(dirtBmp);
+    }
     // ¸Þ¸ð¸® DC »ý¼º
     HDC screenDC = GetDC(NULL);
 
@@ -47,7 +52,7 @@ void Map::Render(HDC hdc)  //¸Ê Ãâ·Â
             int tileType = tiles[y][x];
             HDC tileDC = TileDCs[tileType];
 
-          
+
             // ºñÆ®¸Ê Å©±â °¡Á®¿À±â
             GetObject(Tile[tileType], sizeof(BITMAP), &bmp);
 
@@ -75,16 +80,15 @@ void Map::ToggleTile(int x, int y)  //Å¸ÀÏ ±³Ã¼
         tiles[y][x] = TILE_GRASS;
 }
 
-void Map::Init() 
+void Map::Init()
 {
     for (int y = 0; y < map_y; ++y)
     {
         for (int x = 0; x < map_x; ++x)
-        {          
-            if (y >= 6 && y <= 11 && x >= 1 && x < 9) tiles[y][x] = TILE_FARMLAND; //³óÁö,¹ç           
+        {
+            if (y >= 6 && y <= 10 && x >= 8 && x < 18) tiles[y][x] = TILE_FARMLAND; //³óÁö,¹ç           
             else tiles[y][x] = TILE_GRASS; //ÀÜµð
-                
-        }         
+        }
     }
-       
+
 }

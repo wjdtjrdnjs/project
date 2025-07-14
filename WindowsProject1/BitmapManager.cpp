@@ -1,9 +1,22 @@
 ﻿#include "BitmapManager.h"
-
+std::map<CropType, std::vector<HBITMAP>> BitmapManager::growthBitmaps;
 std::map<int, HBITMAP> BitmapManager::bitmapMap;
 
 void BitmapManager::Load(HINSTANCE hInstance)
 {
+    std::vector<HBITMAP> strawberryStages;
+    for (int i = 0; i < 6; ++i) { // IDB_BITMAP10 ~ IDB_BITMAP15까지 딸기 씨앗~성숙
+        HBITMAP bmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP10 + i), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+        strawberryStages.push_back(bmp);
+    }
+    growthBitmaps[CropType::Strawberry] = strawberryStages;
+    std::vector<HBITMAP> onionStages;
+    for (int i = 0; i < 6; ++i) { // IDB_BITMAP2 ~ IDB_BITMAP7까지 양파 씨앗~성숙
+        HBITMAP bmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP2 + i), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+        onionStages.push_back(bmp);
+    }
+    growthBitmaps[CropType::Onion] = onionStages;
+
     bitmapMap[IDB_IDLE] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_IDLE), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     bitmapMap[IDB_BITMAP2] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP2), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     bitmapMap[IDB_BITMAP3] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP3), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
@@ -19,10 +32,16 @@ void BitmapManager::Load(HINSTANCE hInstance)
     bitmapMap[IDB_BITMAP16] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP16), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     //울타리
     bitmapMap[IDB_BITMAP39] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP39), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
-
- 
+   
+   
 }
 
+const std::vector<HBITMAP>& BitmapManager::GetGrowthBitmaps(CropType type) {
+    static std::vector<HBITMAP> empty;  // 빈 벡터 (예외 방지용)
+    if (growthBitmaps.count(type))
+        return growthBitmaps[type];
+    return empty;
+}
 HBITMAP BitmapManager::GetBitmap(int resourceId)
 {
     if (bitmapMap.count(resourceId))
@@ -54,4 +73,11 @@ void BitmapManager::Release()
     for (auto& pair : bitmapMap)
         DeleteObject(pair.second);
     bitmapMap.clear();
+
+    for (auto& pair : growthBitmaps) {
+        for (auto& bmp : pair.second) {
+            if (bmp) DeleteObject(bmp);
+        }
+    }
+    growthBitmaps.clear();
 }

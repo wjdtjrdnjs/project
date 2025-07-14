@@ -13,7 +13,7 @@ public:
     static bool IsLeftClickDown();
     static bool IsLeftClickHeld();
 
-    static bool IsRightClickUp();           // 좌클릭 감지
+    static bool IsRightClickUp();           // 우클릭 감지
     static bool IsRightClickDown();
     static bool IsRightClickHeld();
 

@@ -87,10 +87,10 @@
     <ClInclude Include="InventoryItem.h">
       <Filter>Objects</Filter>
     </ClInclude>
-    <ClInclude Include="new_map.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="CropType.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaceableObject.h">
       <Filter>Objects</Filter>
     </ClInclude>
   </ItemGroup>
@@ -131,8 +131,8 @@
     <ClCompile Include="Inventory.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
-    <ClCompile Include="new_map.cpp">
-      <Filter>Game</Filter>
+    <ClCompile Include="PlaceableObject.cpp">
+      <Filter>Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

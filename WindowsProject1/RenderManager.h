@@ -35,6 +35,8 @@ public:
 
 	//µ¿¹°
 	static void AddAnimal(Animal* animal);
+	
+	static Fence* GetFencepAt(int tileX, int tileY);
 	static void AddFence(Fence* fence);
 	
 	////////////////

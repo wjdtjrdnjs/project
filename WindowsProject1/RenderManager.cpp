@@ -13,6 +13,7 @@ void RenderManager::SetMap(Map* m) { map = m; }
 void RenderManager::SetBox(Box* b) { box = b; }
 void RenderManager::AddCrop(Crop* crop) { crops.push_back(crop); }
 void RenderManager::AddAnimal(Animal* animal) { animals.push_back(animal); }
+
 void RenderManager::AddFence(Fence* fence) { fences.push_back(fence); } //울타리(임시)
 
 void RenderManager::RenderAll(HDC hdc, HWND hWnd)
@@ -23,13 +24,13 @@ void RenderManager::RenderAll(HDC hdc, HWND hWnd)
     for (auto& crop : crops) crop->Render(hdc); //작물
     for (auto& animal : animals) animal->Render(hdc); //동물 
     for (auto& fence : fences) fence->Render(hdc);//울타리(임시) 
-    if (box) box->Render(hdc); //박스 
+   // if (box) box->Render(hdc); //박스 
 
-    if (player->IsInventoryOpen()) {
+   /* if (player->IsInventoryOpen()) {
         player->RenderFullInventory(hdc);
-    }
+    }*/
 
-    if (box->IsOpen()) box->RenderUI(hdc); //박스 아이템 창
+   // if (box->IsOpen()) box->RenderUI(hdc); //박스 아이템 창
 
     if (player) 
     {
@@ -54,6 +55,21 @@ Crop* RenderManager::GetCropAt(int tileX, int tileY) { //해당 위치 작물 리턴
     return nullptr;
 }
 
-void RenderManager::RemoveCrop(Crop* crop) { //작물 삭제
+Fence* RenderManager::GetFencepAt(int tileX, int tileY)
+{
+    int px = tileX * tileSize;
+    int py = tileY * tileSize;
+    for (Fence* f : fences) {
+        if (f->GetX() == px && f->GetY() == py) return f;
+    }
+    return nullptr;
+}
+
+//void RenderManager::RemoveCrop(Crop* crop) { //작물 삭제
+//    crops.erase(std::remove(crops.begin(), crops.end(), crop), crops.end());
+//}
+void RenderManager::RemoveCrop(Crop* crop) {
     crops.erase(std::remove(crops.begin(), crops.end(), crop), crops.end());
+
+
 }

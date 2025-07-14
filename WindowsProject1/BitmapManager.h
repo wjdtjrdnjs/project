@@ -1,5 +1,6 @@
     #pragma once
-    #include <windows.h>
+#include <windows.h>
+#include <vector>
     #include <map>
     #include "CropType.h"
     #include "resource.h"
@@ -11,6 +12,10 @@
         static HBITMAP GetBitmap(int resourceId);           // 비트맵 가져오기
         static void Release();                              // 메모리 해제
         static HBITMAP GetBitmapForCrop(CropType type);
+        static const std::vector<HBITMAP>& GetGrowthBitmaps(CropType type);
+
     private:
         static std::map<int, HBITMAP> bitmapMap;            // 비트맵 저장소
+        static std::map<CropType, std::vector<HBITMAP>> growthBitmaps;
+
     };

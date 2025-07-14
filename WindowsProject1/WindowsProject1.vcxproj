@@ -139,7 +139,7 @@
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="InventoryItem.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="new_map.h" />
+    <ClInclude Include="PlaceableObject.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="Resource.h" />
@@ -156,7 +156,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="new_map.cpp" />
+    <ClCompile Include="PlaceableObject.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="TimeManager.cpp" />

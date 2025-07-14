@@ -1,12 +1,12 @@
 #pragma once
+#include "PlaceableObject.h"
 #include <windows.h>
-#include "resource.h"
 #include <vector>
+#include "resource.h"
 #include "Map.h"
 #include "CropType.h"
 
-
-class Crop {
+class Crop :public PlaceableObject {
 public:
     Crop(CropType type);  //생성자
     ~Crop();            //소멸자
@@ -14,13 +14,14 @@ public:
     int GetX() const { return x; }  //작물 위치 x
     int GetY() const { return y; }  //작물 위치 y
 
+    void Install(int x, int y, Player* player) override;
+    void Remove(int tileX, int tileY, Player* player) override;
+
     void Render(HDC hdc);  //작물 이미지 출력
     void Update();  // 성장 관리
     bool IsFullyGrown() const { return growthStage+1 >= maxGrowthStage; } //작물 성장이 최대 단계인지 확인 함수
     void Harvest(); // 수확 시 처리
-
     void SetPosition(int x, int y) { this->x = x; this->y = y; }
-
     CropType GetType() const { return type; }  //현재 작물 타입 리턴 (양파, 딸기)
     int GetGrowthStage() const { return growthStage; } //현재 작물 성장 단계 리턴 (수확을 위한 함수)
 

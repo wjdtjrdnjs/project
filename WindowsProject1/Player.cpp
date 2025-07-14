@@ -1,13 +1,13 @@
 ﻿#include "Player.h"
-#include "Map.h"
 #include "InputManager.h" 
 #include <iostream>
 #include <string>
 #include "RenderManager.h"
 #include "BitmapManager.h"
+
 Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry) 
 {
-    selectedCrop = CropType::Strawberry_1;
+    selectedCrop = CropType::None;
     selectedTool = -1;
 
     // 생성자에서 한 번만 비트맵 로드
@@ -28,7 +28,7 @@ Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry)
     inventory[2].type = CropType::Stone;        //괭이
     inventory[2].count = 1;
     inventory[3].type = CropType::Fence;        //울타리
-    inventory[3].count = 1;
+    inventory[3].count = 10;
     if (hBmp)
     {
         // 메모리 DC 생성 후 비트맵 선택
@@ -198,6 +198,7 @@ void Player::HandleToolSelection() {
 
 void Player::HandleLeftClickAction()
 {
+
         POINT pt =  InputManager::GetMousePosition();
          //타일 위치x,y
          int tileX = pt.x / tileSize;
@@ -226,14 +227,14 @@ void Player::HandleLeftClickAction()
          }
          else // 맨손 수확
          {
-             Crop* crop = RenderManager::GetCropAt(tileX, tileY); // 선택된 타일 위에 무엇이 있는지 확인
-             if (crop && crop->IsFullyGrown()) //작물이 있고 성장이 끝았을 때
-             {
-                 CropType type = crop->GetType(); //작물 정보 가져옴
-                 RenderManager::RemoveCrop(crop);//작물 삭제
-                 delete crop;//작물 삭제
-                 player->AddItem(type); //인벤토리에 추가
+             PlaceableObject* obj = RenderManager::GetCropAt(tileX, tileY); //해당 좌표에 무엇이 있는지 확인하고 삭제(작물, 울타리)
+             if (obj) {
+
+                 obj->Remove(tileX, tileY, player);
+
              }
+            
+          
          }
 }
 
@@ -248,48 +249,28 @@ void Player::HandleRightClickAction()
 
     Player* player = RenderManager::GetPlayer();//플레이어 정보 호출
     if (!player) return; //플레이어 정보가 존재하지 않는다면 종료
-
-    int tool = player->GetSelectedTool();  //선택된 아이템(슬롯)
-    
-    //CropType selectedCrop = player->GetSelectedCrop(); //선택된 작물(1,2)번 딸기와 양파  //사용x
-
     if (abs(tileX - (player->GetX() + tileSize / 2) / tileSize) > 1 || abs(tileY - (player->GetY() + tileSize / 2) / tileSize) > 1) return;
 
-    if (inventory[tool].type == CropType::Onion_1 || inventory[tool].type == CropType::Strawberry_1) //선택한 슬롯의 아이템이 씨앗봉투라면 실행    
-    {
-        if (Map::GetTile(tileX, tileY) == TILE_FARMLAND && !RenderManager::GetCropAt(tileX, tileY)) //타일이 밭(농지)이고 
-        {
-            InventoryItem* inv = player->GetInventory();  //인벤토리를 가져옴
-            CropType selectedCrop = inv[tool].type; // 선택한 슬롯의 타입을 가져옴
-                if (inv[tool].type == selectedCrop && inv[tool].count > 0) //타입이 선택되고 1개 이상일 때
-                {
-                    CropType baseCropType = CropType::None; //처음은 빈손
-                    if (selectedCrop == CropType::Strawberry_1) baseCropType = CropType::Strawberry; //딸기씨앗 봉투면 딸기 
-                    else if (selectedCrop == CropType::Onion_1) baseCropType = CropType::Onion;     //양파씨앗 봉투면 양파 
+    PlaceableObject* obj = nullptr;
+    int tool = player->GetSelectedTool();
+    InventoryItem* inv = player->GetInventory();
 
-                    if (baseCropType != CropType::None) { //빈손이 아닐 때
-                        Crop* crop = new Crop(baseCropType);  //선택된 작물 정보 가져옴
-                        crop->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
-                        RenderManager::AddCrop(crop);  //작물 추가
-
-                        inv[tool].count--;  // 들고있는 아이템 -1
-                        if (inv[tool].count == 0) //들고있는 아이템 개수가 0개이다
-                            inv[tool].type = CropType::None; //아이템이 0개면 빈 슬롯
-                    }
-                }
-        }
+    switch (inv[tool].type) {
+    case CropType::Onion_1:
+        obj = new Crop(CropType::Onion);
+        break;
+    case CropType::Strawberry_1:
+        obj = new Crop(CropType::Strawberry);
+        break;
+    case CropType::Fence:
+        obj = new Fence();
+        break;
     }
-    else // 맨손 수확(우클릭 1,2번으로 수확 x)
-    {
-        Crop* crop = RenderManager::GetCropAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
-        if (crop && crop->IsFullyGrown()) { //작물이 있고 성장이 끝았을 때
-            CropType type = crop->GetType();  //작물 정보 가져옴
-            RenderManager::RemoveCrop(crop);  //작물 삭제
-            delete crop;  //작물 삭제
-            player->AddItem(type);  //인벤토리에 추가
-        }
-
+    
+    if (obj) {
+        obj->Install(tileX, tileY, player);
     }
+   
 }
 
 void Player::UpdateBitmap()

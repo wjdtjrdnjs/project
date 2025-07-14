@@ -1,7 +1,6 @@
 #pragma once
 #define map_y 17
 #define map_x 36
-
 #include "resource.h"
 #include <windows.h>
 #include <vector>

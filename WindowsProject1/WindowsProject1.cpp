@@ -16,7 +16,7 @@
 #include "RenderManager.h"
 #include "BitmapManager.h"
 #include "InputManager.h"
-#include "Box.h"
+//#include "Box.h"
 #include <windowsx.h>
 #include "Inventory.h"
 
@@ -140,7 +140,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 #define Inventory_x 3
 #define Inventory_y 3
-Box* box = nullptr; 
+//Box* box = nullptr; 
 Player* player = nullptr;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -153,16 +153,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         player = new Player();                //플레이어 생성
         Animal* animal = new Animal();                 //동물 생성
-        Fence* fence = new Fence();                 //울타리 생성(임시)
         Map* map = new Map();                          //맵 생성
-        box = new Box(300, 5);                         //상자 위치 전달
+       // box = new Box(300, 5);                         //상자 위치 전달
 
         //렌더 매니저에 등록
         RenderManager::SetPlayer(player);             
         RenderManager::AddAnimal(animal);
-        RenderManager::AddFence(fence);
         RenderManager::SetMap(map);
-        RenderManager::SetBox(box);
+       // RenderManager::SetBox(box);
 
         SetTimer(hWnd, 999, 16, NULL); //플레이어 이동 타이머
 
@@ -209,7 +207,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 
         Player* player = RenderManager::GetPlayer();
-        if (!player || !box) break;
+        if (!player /*|| !box*/) break;
 
         int mouseX, mouseY;
         POINT pt;
@@ -218,17 +216,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         mouseX = pt.x;
         mouseY = pt.y;
 
-        if (wParam == 'E' && !player->IsBoxOpen()) {  //상자 열기
-            if (box->IsPlayerInRange(player->GetX(), player->GetY()) &&
-                box->IsMouseOverIcon(mouseX, mouseY)) {
-                box->Open();    //상자 열기
-                player->SetBoxOpen(true); //상자 열면 플레이어 이동 불가
-            }
-        }
-        else if (wParam == 'E' || wParam == VK_ESCAPE && box->IsOpen() ) { //esc나 E로 상자 닫기
-            box->Close();
-            player->SetBoxOpen(false); //닫으면 플레이어 이동 가능
-        }
+        //if (wParam == 'E' && !player->IsBoxOpen()) {  //상자 열기
+        //    if (box->IsPlayerInRange(player->GetX(), player->GetY()) &&
+        //        box->IsMouseOverIcon(mouseX, mouseY)) {
+        //        box->Open();    //상자 열기
+        //        player->SetBoxOpen(true); //상자 열면 플레이어 이동 불가
+        //    }
+        //}
+        //else if (wParam == 'E' || wParam == VK_ESCAPE && box->IsOpen() ) { //esc나 E로 상자 닫기
+        //    box->Close();
+        //    player->SetBoxOpen(false); //닫으면 플레이어 이동 가능
+        //}
 
         if (wParam == VK_TAB || wParam == 'I') {
             static bool inventoryOpen = false;
@@ -270,10 +268,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_DESTROY:
         KillTimer(hWnd, 999);  //타이머 종료
-        if (box) {  //상자 삭제
-            delete box;
-            box = nullptr;
-        }
+        //if (box) {  //상자 삭제
+        //    delete box;
+        //    box = nullptr;
+        //}
+        BitmapManager::Release();
         PostQuitMessage(0);
         break;
     default:

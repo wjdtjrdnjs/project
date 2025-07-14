@@ -1,11 +1,13 @@
 #pragma once
-#include "resource.h"
-#include "Crop.h"
-#include <windows.h>
 #include <vector>
+#include <windows.h>
 #include <algorithm>
+#include "resource.h"
+#include "CropType.h"
+#include "Crop.h"
 #include "Inventory.h"
 #include "InventoryItem.h"
+#include "PlaceableObject.h"
 
 enum Direction { //플레이어 방향
 	DOWN = 0,
@@ -45,9 +47,9 @@ public:
 	void SetSelectedTool(int t) { selectedTool = t; } //SetSelectedTool 선택된 번호를 가져옴
 	int GetSelectedTool()  { return selectedTool; }  //GetSelectedTool 선택된 번호를 리턴해줌
 
-	void RenderFullInventory(HDC hdc) {  //인벤토리 전체 렌더링 Inventory.h에 사용됨
-		fullInventory.Render(hdc, 360, 100);  // 원하는 위치에 UI 출력
-	}
+	//void RenderFullInventory(HDC hdc) {  //인벤토리 전체 렌더링 Inventory.h에 사용됨
+	//	fullInventory.Render(hdc, 360, 100);  // 원하는 위치에 UI 출력
+	//}
 
 	void SetInventoryOpen(bool open) { isInventoryOpen = open; }
 	bool IsInventoryOpen() const { return isInventoryOpen; }
@@ -64,7 +66,7 @@ private:
 	CropType selectedCrop = CropType::None; //빈손
 	Direction currentDir = DOWN;	  //처음 방향은 아래이다
 	InventoryItem inventory[9];
-	Inventory fullInventory;
+	//Inventory fullInventory;
 	int selectedTool = 4; //
 	int x = 39;
 	int y = 170;

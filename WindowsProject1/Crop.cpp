@@ -12,8 +12,12 @@ Crop::~Crop()
 }
 void Crop::Update()  //성관 관리
 {
-    growthTimer += 16;
-
+    int tileX = GetX() / tileSize;;
+    int tileY = GetY() / tileSize;;
+    if (!Map::IsWatered(tileX, tileY)) { //땅에 물을 뿌리지 않으면 작물 성장X
+        return;
+    }
+    growthTimer += 16; 
     if (growthTimer >= growthInterval && growthStage < maxGrowthStage - 1)
     {
         growthStage++; //작물 성장 단계 +1
@@ -21,11 +25,12 @@ void Crop::Update()  //성관 관리
         bitmap = growthBitmaps[growthStage]; // 다음 단계로 성장 ::이미지 바꿔주기
     }
 }
+
 void Crop::Install(int tileX, int tileY, Player* player)
 {
     int tool = player->GetSelectedTool();
     InventoryItem* inv = player->GetInventory();
-    if (Map::GetTile(tileX, tileY) == TILE_FARMLAND && !RenderManager::GetCropAt(tileX, tileY)) //타일이 밭(농지)이고 
+    if ((Map::GetTile(tileX, tileY) == TILE_Path || Map::GetTile(tileX, tileY) == Tile_FarmLand )&&!RenderManager::GetCropAt(tileX, tileY)) //중복설치 안되게
     {
 
         if (inv[tool].count > 0) // 1개 이상일 때
@@ -73,7 +78,7 @@ void Crop::Render(HDC hdc)
     int drawY = y + (tileSize - bmp.bmHeight) / 2;
 
     TransparentBlt(hdc,
-        drawX, drawY,
+        drawX-2, drawY-5,
         bmp.bmWidth+10, bmp.bmHeight+10,
         memDC,
         0, 0,

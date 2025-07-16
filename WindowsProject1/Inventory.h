@@ -4,6 +4,7 @@
 #include <string>
 #include "Crop.h"
 #include "InventoryItem.h"   
+////////////////사용xxxxxxxxxxx
 class Inventory {
 public:
     Inventory(int rows = 3, int cols = 9);

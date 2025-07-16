@@ -35,13 +35,16 @@ public:
 
 	//동물
 	static void AddAnimal(Animal* animal);
-	
-	static Fence* GetFencepAt(int tileX, int tileY);
+
+	//울타리
+	static Fence* GetFenceAt(int tileX, int tileY);
 	static void AddFence(Fence* fence);
-	
-	////////////////
+	static void RemoveFence(Fence* fence);
+
+	////////////////보류
 	static void SetMap(Map* map);
 	static void SetBox(Box* box);
+	static Box* GetBox() { return box; }
 private:
 	static Player* player;
 	static Map* map;

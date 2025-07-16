@@ -50,14 +50,22 @@ bool InputManager::IsLeftClickHeld()
     return currentLeftClick;
 }
 
+
+bool InputManager::IsLeftClickUp()
+{
+    return !currentLeftClick; // && previousLeftClick;
+}
+
+
 bool InputManager::IsRightClickUp()
 {
-    return !currentRightClick && previousLeftClick;
+    return !currentRightClick &&  previousRightClick;
+    ;
 }
 
 bool InputManager::IsRightClickDown()
 {
-    return currentRightClick && !previousLeftClick;
+    return currentRightClick; //&& !previousRightClick;
 }
 
 bool InputManager::IsRightClickHeld()
@@ -65,10 +73,6 @@ bool InputManager::IsRightClickHeld()
     return currentRightClick;
 }
 
-bool InputManager::IsLeftClickUp()
-{
-    return !currentLeftClick && previousLeftClick;
-}
 
 POINT InputManager::GetMousePosition()  //Å¬¸¯ÇÑ ÁÂÇ¥
 {

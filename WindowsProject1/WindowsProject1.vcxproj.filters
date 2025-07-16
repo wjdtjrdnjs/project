@@ -131,9 +131,6 @@
     <ClCompile Include="Inventory.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
-    <ClCompile Include="PlaceableObject.cpp">
-      <Filter>Objects</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WindowsProject1.rc">
@@ -146,9 +143,6 @@
     </Image>
     <Image Include="WindowsProject1.ico">
       <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="..\..\..\tttle.bmp">
-      <Filter>리소스 파일\Tileset</Filter>
     </Image>
     <Image Include="res\Character\Idle_3.bmp">
       <Filter>리소스 파일\Character</Filter>
@@ -228,31 +222,25 @@
     <Image Include="..\..\..\fences.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\Tileset\tile_0 (9).bmp">
+    <Image Include="..\..\..\Diamond Axe.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\House\House.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Objects\Fence\fences.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\pstatic.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Tileset\tttle.bmp">
       <Filter>리소스 파일\Tileset</Filter>
     </Image>
-    <Image Include="res\Tileset\tile_0 (1).bmp">
+    <Image Include="..\..\..\Water_Tile.bmp">
       <Filter>리소스 파일\Tileset</Filter>
     </Image>
-    <Image Include="res\Tileset\tile_0 (2).bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
-    <Image Include="res\Tileset\tile_0 (3).bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
-    <Image Include="res\Tileset\tile_0 (4).bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
-    <Image Include="res\Tileset\tile_0 (5).bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
-    <Image Include="res\Tileset\tile_0 (6).bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
-    <Image Include="res\Tileset\tile_0 (7).bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
-    <Image Include="res\Tileset\tile_0 (8).bmp">
+    <Image Include="..\..\..\FarmLand_Tile.bmp">
       <Filter>리소스 파일\Tileset</Filter>
     </Image>
   </ItemGroup>

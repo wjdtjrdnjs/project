@@ -16,6 +16,7 @@ void RenderManager::AddAnimal(Animal* animal) { animals.push_back(animal); }
 
 void RenderManager::AddFence(Fence* fence) { fences.push_back(fence); } //울타리(임시)
 
+
 void RenderManager::RenderAll(HDC hdc, HWND hWnd)
 {
     RECT r;
@@ -24,13 +25,13 @@ void RenderManager::RenderAll(HDC hdc, HWND hWnd)
     for (auto& crop : crops) crop->Render(hdc); //작물
     for (auto& animal : animals) animal->Render(hdc); //동물 
     for (auto& fence : fences) fence->Render(hdc);//울타리(임시) 
-   // if (box) box->Render(hdc); //박스 
+    if (box) box->Render(hdc); //박스 
 
-   /* if (player->IsInventoryOpen()) {
+   if (player->IsInventoryOpen()) {
         player->RenderFullInventory(hdc);
-    }*/
+    }
 
-   // if (box->IsOpen()) box->RenderUI(hdc); //박스 아이템 창
+   if (box->IsOpen()) box->RenderUI(hdc); //박스 아이템 창
 
     if (player) 
     {
@@ -40,7 +41,7 @@ void RenderManager::RenderAll(HDC hdc, HWND hWnd)
 }
 
 void RenderManager::UpdateAll() { //모든 객체 상태를 한 번에 업데이트
-    player->PlayerUpdate();  //플레이어 
+    player->UpdatePlayer();  //플레이어 
     for (auto animal : animals)
         animal->Update();    //동물 
     for (auto crop : crops)
@@ -52,10 +53,11 @@ Crop* RenderManager::GetCropAt(int tileX, int tileY) { //해당 위치 작물 리턴
     for (Crop* c : crops) {
         if (c->GetX() == px && c->GetY() == py) return c;
     }
+  
     return nullptr;
 }
 
-Fence* RenderManager::GetFencepAt(int tileX, int tileY)
+Fence* RenderManager::GetFenceAt(int tileX, int tileY)
 {
     int px = tileX * tileSize;
     int py = tileY * tileSize;
@@ -65,11 +67,11 @@ Fence* RenderManager::GetFencepAt(int tileX, int tileY)
     return nullptr;
 }
 
-//void RenderManager::RemoveCrop(Crop* crop) { //작물 삭제
-//    crops.erase(std::remove(crops.begin(), crops.end(), crop), crops.end());
-//}
+
 void RenderManager::RemoveCrop(Crop* crop) {
     crops.erase(std::remove(crops.begin(), crops.end(), crop), crops.end());
-
-
+}
+void RenderManager::RemoveFence(Fence* fence)
+{
+    fences.erase(std::remove(fences.begin(), fences.end(), fence), fences.end());
 }

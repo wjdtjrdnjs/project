@@ -26,12 +26,11 @@ void Fence::Install(int tileX, int tileY, Player* player)
 {
     int tool = player->GetSelectedTool();
     InventoryItem* inv = player->GetInventory();
-        if (inv[tool].count > 0 && !RenderManager::GetFencepAt(tileX, tileY)) // 1개 이상일 때
+        if (inv[tool].count > 0 && !RenderManager::GetFenceAt(tileX, tileY)) // 1개 이상이고 위치가 겹치지 않을 때
         {
-            StructureType baseCropType = StructureType::Fence; //처음은 빈손
-            Fence* fence = new Fence();  //선택된 작물 정보 가져옴
+            Fence* fence = new Fence();  //울타리 생성
             fence->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
-            RenderManager::AddFence(fence);  //작물 추가
+            RenderManager::AddFence(fence);  //울타리 추가
 
             inv[tool].count--;  // 들고있는 아이템 -1
             if (inv[tool].count == 0) //들고있는 아이템 개수가 0개이다
@@ -41,11 +40,17 @@ void Fence::Install(int tileX, int tileY, Player* player)
 
 void Fence::Remove(int tileX, int tileY, Player* player)
 {
+    
+    Fence* fence = RenderManager::GetFenceAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
+    if (fence) { //울타리가 있으면 실행
+        RenderManager::RemoveFence(fence);  //울타리 삭제
+        delete fence;  //울타리 삭제
+        player->AddItem(CropType::Fence);  //인벤토리에 추가
+    }
+
 }
 
-
-
-void Fence::Render(HDC hdc)  //동물 생성
+void Fence::Render(HDC hdc)  //울타리 생성
 {
     if (!hBmp || !memDC)
         return;
@@ -55,7 +60,7 @@ void Fence::Render(HDC hdc)  //동물 생성
 
     TransparentBlt(
         hdc,
-        x, y,
+        x+10, y,
         bmp.bmWidth + Fencesize, bmp.bmHeight + Fencesize,
         memDC,
         0, 0,
@@ -63,8 +68,3 @@ void Fence::Render(HDC hdc)  //동물 생성
         RGB(255, 255, 255)
     );
 }
-
-void Fence::Update()
-{
-}
-

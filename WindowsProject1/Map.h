@@ -9,7 +9,9 @@ const int tileSize = 32;
 
 enum TileType {
     TILE_GRASS,  //¿‹µ
-    TILE_FARMLAND //πÁ(≥Û¡ˆ)
+    TILE_Path, //∞Ê∑Œ
+    Tile_FarmLand,//πÁ
+    Tile_Water //
 };
 
 
@@ -20,12 +22,13 @@ public:
     ~Map();
 
     static void Init(); //√ ±‚ ∏ 
-    static void ToggleTile(int x, int y);  //≈∏¿œ ±≥√º
+    static void ToggleTile(int x, int y, int i);  //≈∏¿œ ±≥√º
     static TileType GetTile(int x, int y) {
         if (x < 0 || y < 0 || x >= map_x || y >= map_y)
-            return TILE_FARMLAND;
+            return TILE_Path;
         return tiles[y][x];
     };
+    static bool IsWatered(int x, int y);
 
 
     void Render(HDC hdc);

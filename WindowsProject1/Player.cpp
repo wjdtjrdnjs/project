@@ -1,61 +1,37 @@
 ﻿#include "Player.h"
 #include "InputManager.h" 
-#include <iostream>
-#include <string>
-#include "RenderManager.h"
 #include "BitmapManager.h"
+#include "RenderManager.h"
+std::map<Direction, std::vector<HBITMAP>> ply;
 
 Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry) 
 {
-    selectedCrop = CropType::None;
-    selectedTool = -1;
-
-    // 생성자에서 한 번만 비트맵 로드
-    for (int i = 0; i < 4; ++i) {
-        HBITMAP player = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_IDLE + i), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR); //플레이어 벙향
-        PLY.push_back(player);  //4장
-
-    }
-    hBmp = PLY[currentDir];
-    for (int i = 0; i < 9; i++) {
+   
+    ply = BitmapManager::GetPlayerBitmaps();
+  
+    for (int i = 0; i < 9; i++) {  //플레이어 인벤토리 초기화
         inventory[i].type = CropType::None;
         inventory[i].count = 0;
-    }
+    } 
+    //기본 아이템
     inventory[0].type = CropType::Strawberry_1; //1번 딸기봉투와 5개
     inventory[0].count = 5;
     inventory[1].type = CropType::Onion_1;      //2번 양파봉투 5개
     inventory[1].count = 5;
-    inventory[2].type = CropType::Stone;        //괭이
+    inventory[2].type = CropType::hoe;        //괭이
     inventory[2].count = 1;
-    inventory[3].type = CropType::Fence;        //울타리
-    inventory[3].count = 10;
-    if (hBmp)
-    {
-        // 메모리 DC 생성 후 비트맵 선택
-        HDC screenDC = GetDC(NULL);
-        memDC = CreateCompatibleDC(screenDC);
-        ReleaseDC(NULL, screenDC);
-
-        SelectObject(memDC, hBmp);
-    }
+    inventory[3].type = CropType::watering;     //물뿌리개
+    inventory[3].count = 1;
 }
 
-Player::~Player()
+Player::~Player()  //소멸자
 {
-    if (memDC) DeleteDC(memDC);
-    if (hBmp) DeleteObject(hBmp);
+    
 }
 
-bool Player::IsInPlayerRange(int tileX, int tileY, int playerX, int playerY)  //플레이어 사거리
-{
-    int playerTileX = playerX / tileSize;
-    int playerTileY = playerY / tileSize;
 
-    return abs(tileX - playerTileX) <= 1 && abs(tileY - playerTileY) <= 1;
 
-}
-
-void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플레이어 아래 인벤창(툴바)
+void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플레이어 인벤토리 아래(툴바)
 {
     int slotSize = 50;
     int startX = 10;
@@ -77,9 +53,6 @@ void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플�
 
         if (inventory[i].type != CropType::None) {
             HBITMAP bmp = BitmapManager::GetBitmapForCrop(inventory[i].type);
-
-           
-
             HDC memDC = CreateCompatibleDC(hdc);
             HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
             BITMAP bm;
@@ -99,7 +72,8 @@ void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플�
                 bm.bmHeight,
                 RGB(255, 255, 255));
             std::string countText = std::to_string(inventory[i].count);
-            TextOutA(hdc, offsetX + 30, offsetY + 30, countText.c_str(), countText.length());
+            //SetBkMode(hdc, TRANSPARENT);  //글자 배경을 투명으로 만든다
+            TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), countText.length());
             SelectObject(memDC, oldBmp);
             DeleteDC(memDC);
         }
@@ -107,62 +81,78 @@ void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플�
     }
 }
 
-void Player::AddItem(CropType type) {
-    // 이미 존재하는 아이템이면 count 증가
-    for (auto& slot : inventory) {
+void Player::AddItem(CropType type) {   //인벤토리에 아이템 추가 
+    for (auto& slot : inventory) {//같은 타입이면 수량 증가
         if (slot.type == type) {
             slot.count++;
             return;
         }
     }
-
-    // 빈 슬롯에 새로 추가
     for (auto& slot : inventory) {
-        if (slot.type == CropType::None) {
+        if (slot.type == CropType::None) { //같은 타입이 없으면 슬롯에 타입을 넣고 수량 추가
             slot.type = type;
             slot.count = 1;
             return;
         }
     }
-
 }
-
-void Player::Render(HDC hdc)
+void Player::Render(HDC hdc) //플레이어를 화면에 렌더링
 {
-    if (!hBmp || !memDC)
-        return;
+    if (ply.empty()) return;
 
-    BITMAP bmp;
-    GetObject(hBmp, sizeof(BITMAP), &bmp);
+    // 현재 방향의 비트맵 리스트 가져오기
+    auto& bitmaps = ply[currentDir];
+
+    if (bitmaps.empty()) return;
+
+    // 예를 들어 첫 번째 프레임만 사용 (나중에 애니메이션 프레임 관리 가능)
+    HBITMAP currentBmp = bitmaps[0];
+    if (!currentBmp) return;
+
+    HDC memDC = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, currentBmp);
+
+    BITMAP bmpInfo;
+    GetObject(currentBmp, sizeof(BITMAP), &bmpInfo);
 
     TransparentBlt(
         hdc,
         x, y,
-        bmp.bmWidth+ playersize, bmp.bmHeight+ playersize,
+        bmpInfo.bmWidth + playersize, bmpInfo.bmHeight + playersize,
         memDC,
         0, 0,
-        bmp.bmWidth, bmp.bmHeight,
+        bmpInfo.bmWidth, bmpInfo.bmHeight,
         RGB(255, 255, 255)
     );
+
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
 }
 
-void Player::PlayerUpdate()
+void Player::UpdatePlayer()
 {
-    if (isBoxOpen) return;
+    if (isBoxOpen) {  //박스 오픈 
+        if (InputManager::IsLeftClickDown()) {
+            POINT pt = InputManager::GetMousePosition();
+            RenderManager::GetBox()->HandleClick(pt.x, pt.y);
+        }
+        return;  // 상자 열렸을 땐 이동 금지
+    }
+
     Playermove(); //플레이어 이동 처리
     HandleToolSelection(); //아이템창 아래(툴바) 번호 선택
+
     if (InputManager::IsLeftClickDown()) { //좌클릭
         HandleLeftClickAction();
     }
     if (InputManager::IsRightClickDown()) { //우클릭
         HandleRightClickAction();
     }
-    UpdateBitmap(); //비트맵 갱신
   
 
 }
 
-void Player::Playermove()
+void Player::Playermove() //플레이어 이동 처리
 {
     // 이동 처리
     if (InputManager::IsKeyHeld('A')) {
@@ -181,81 +171,87 @@ void Player::Playermove()
         y += 5;
         currentDir = DOWN;
     }
-   
 }
-
-void Player::HandleToolSelection() {
-    if (InputManager::IsKeyDown('1')) selectedTool = 0;      
-    else if (InputManager::IsKeyDown('2')) selectedTool = 1;     
-    else if (InputManager::IsKeyDown('3')) selectedTool = 2;
-    else if (InputManager::IsKeyDown('4')) selectedTool = 3;
-    else if (InputManager::IsKeyDown('5')) selectedTool = 4;
-    else if (InputManager::IsKeyDown('6')) selectedTool = 5;
-    else if (InputManager::IsKeyDown('7')) selectedTool = 6;
-    else if (InputManager::IsKeyDown('8')) selectedTool = 7;
-    else if (InputManager::IsKeyDown('9')) selectedTool = 8;
+void Player::HandleToolSelection() { //번호 선택 함수
+    for (int i = 0; i < 9; ++i) {
+        if (InputManager::IsKeyDown('1' + i)) {
+            selectedTool = i;
+            break;
+        }
+    }
 }
-
-void Player::HandleLeftClickAction()
+//코드 수정 필요
+void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
 {
-
-        POINT pt =  InputManager::GetMousePosition();
-         //타일 위치x,y
-         int tileX = pt.x / tileSize;
-         int tileY = pt.y / tileSize;
-
-         Player* player = RenderManager::GetPlayer();  //플레이어 정보 호출
-         if (!player) return; //생성죄지 않았다면 브레이크
-
-         int tool = player->GetSelectedTool();  //선택된 아이템(슬롯)
-
-         //플레이어 범위 x,y
-         int playerTileX = (player->GetX() + tileSize / 2) / tileSize;
-         int playerTileY = (player->GetY() + tileSize / 2) / tileSize;
-
-         if (abs(tileX - playerTileX) > 1 || abs(tileY - playerTileY) > 1) return;// 범위 밖 클릭 무시
-
-         if (inventory[tool].type == CropType::Stone)  // 괭이일 때만 땅 교체 가능
-         {
-             Crop* crop = RenderManager::GetCropAt(tileX, tileY);
-             if (crop)
-             {
-                 RenderManager::RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
-                 delete crop;
-             }
-             Map::ToggleTile(tileX, tileY); //땅 교체
-         }
-         else // 맨손 수확
-         {
-             PlaceableObject* obj = RenderManager::GetCropAt(tileX, tileY); //해당 좌표에 무엇이 있는지 확인하고 삭제(작물, 울타리)
-             if (obj) {
-
-                 obj->Remove(tileX, tileY, player);
-
-             }
-            
-          
-         }
-}
-
-void Player::HandleRightClickAction()
-{
-    POINT pt = InputManager::GetMousePosition();  //마우스가 클릭된 좌표를 가져옴
-
-
-    //클릭한 타일 위치 
+    POINT pt = InputManager::GetMousePosition();
+    //타일 위치x,y
     int tileX = pt.x / tileSize;
     int tileY = pt.y / tileSize;
 
+
+    std::string debugMsg = "Left Click at (" + std::to_string(pt.x) + ", " + std::to_string(pt.y) + ")\n"; //디버깅 확인용 
+    OutputDebugStringA(debugMsg.c_str());
+    Player* player = RenderManager::GetPlayer();  //플레이어 정보 호출
+    if (!player) return; //생성죄지 않았다면 브레이크
+
+
+    //플레이어 범위 x,y
+    int playerTileX = (player->GetX() + tileSize / 2) / tileSize;
+    int playerTileY = (player->GetY() + tileSize / 2) / tileSize;
+
+    if (abs(tileX - playerTileX) > 1 || abs(tileY - playerTileY) > 1) return;// 범위 밖 클릭 무시
+
+    if (inventory[selectedTool].type == CropType::hoe)  // 괭이일 때만 땅 교체 가능
+    {
+        Crop* crop = RenderManager::GetCropAt(tileX, tileY);
+        if (crop)
+        {
+            RenderManager::RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
+            delete crop;
+        }
+        Map::ToggleTile(tileX, tileY, 4); //땅 교체
+    }
+    else if (inventory[selectedTool].type == CropType::Axe) //도끼 일때만 울타리 삭제
+    {
+        PlaceableObject* obj = RenderManager::GetFenceAt(tileX, tileY); //울타리
+        if (obj) {
+            obj->Remove(tileX, tileY, player);
+        }
+
+    }
+    else if (inventory[selectedTool].type == CropType::watering) //물뿌리개
+    {
+        Map::ToggleTile(tileX, tileY, 7); //땅 교체
+
+    }
+    else // 괭이, 도끼 제외 작물 수확
+    {
+        PlaceableObject* obj = RenderManager::GetCropAt(tileX, tileY); //작물
+        if (obj) {
+            obj->Remove(tileX, tileY, player);
+        }
+    }
+}
+//코드 수정 필요
+void Player::HandleRightClickAction() //아이템을 들고 우클릭
+{
+    POINT pt = InputManager::GetMousePosition();  //마우스가 클릭된 좌표를 가져옴
+    //클릭한 타일 위치 
+    int tileX = pt.x / tileSize;
+    int tileY = pt.y / tileSize;
+    // 디버깅 출력 좌표확인
+    std::string debugMsg = "Right Click at (" + std::to_string(pt.x) + ", " + std::to_string(pt.y) + ")\n";
+    OutputDebugStringA(debugMsg.c_str());
+
     Player* player = RenderManager::GetPlayer();//플레이어 정보 호출
     if (!player) return; //플레이어 정보가 존재하지 않는다면 종료
+
     if (abs(tileX - (player->GetX() + tileSize / 2) / tileSize) > 1 || abs(tileY - (player->GetY() + tileSize / 2) / tileSize) > 1) return;
 
     PlaceableObject* obj = nullptr;
-    int tool = player->GetSelectedTool();
-    InventoryItem* inv = player->GetInventory();
+    InventoryItem* inv = inventory; //인벤토리 정보를 가져옴
 
-    switch (inv[tool].type) {
+    switch (inv[selectedTool].type) {
     case CropType::Onion_1:
         obj = new Crop(CropType::Onion);
         break;
@@ -273,11 +269,3 @@ void Player::HandleRightClickAction()
    
 }
 
-void Player::UpdateBitmap()
-{
-    // 이미지 핸들 업데이트
-    hBmp = PLY[currentDir];
-    if (memDC && hBmp) {
-        SelectObject(memDC, hBmp);
-    }
-}

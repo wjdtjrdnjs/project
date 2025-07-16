@@ -4,23 +4,30 @@
 #include "Player.h"
 
 
-//class Box {
-//public:
-//    Box(int x, int y);
-//    void Render(HDC hdc);       // 상자 아이콘 그리기
-//    void RenderUI(HDC hdc);     // 상자 아이템 칸 UI 
-//    bool IsPlayerInRange(int playerX, int playerY); //플레이어가 박스 주변에 있는 지 확인
-//    bool IsMouseOverIcon(int mouseX, int mouseY);//마우스 커서가 상자아이콘 위에 있는지 확인
-//    void Open(); //열고
-//    void Close(); //닫기
-//    bool IsOpen() const;
-//
-//    InventoryItem* GetItems();
-//
-//private:
-//    int x, y;                  
-//    bool isOpen = false;
-//    InventoryItem items[27];    // 3x9 인벤토리 슬롯(임시)
-//    HBITMAP hIconBitmap;
-//    RECT iconRect;              // 아이콘 영역 (3x3 타일 크기)
-//};
+class Box {
+public:
+    Box(int x, int y);
+    void Render(HDC hdc);       // 상자 아이콘 그리기
+    void RenderUI(HDC hdc);     // 상자 아이템 칸 UI 
+    bool IsPlayerInRange(int playerX, int playerY); //플레이어가 박스 주변에 있는 지 확인
+    bool IsMouseOverIcon(int mouseX, int mouseY);//마우스 커서가 상자아이콘 위에 있는지 확인
+    void Open(); //열고
+    void Close(); //닫기
+    bool IsOpen() const;
+    void HandleClick(int row, int col); //마우스 클릭 지점 확인(박스 칸 or 플레이어 툴바)
+    void RenderCursorItem(HDC hdc); //클릭된 아이템이 커서에 붙게 하는 함수
+    void HandleItemSlotClick(InventoryItem& slot);//마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+
+   // InventoryItem* GetItems();
+    void SetPlayerToolbar(InventoryItem* toolbar) {
+        playerToolbar = toolbar;
+    }
+private:
+    int x, y;                  
+    bool isOpen = false;
+    InventoryItem* playerToolbar = nullptr;
+    InventoryItem items[3][9];    // 3x9 인벤토리 슬롯(임시)
+    InventoryItem heldItem;
+    HBITMAP hIconBitmap;
+    RECT iconRect;              // 아이콘 영역 (3x9 타일 크기)
+};

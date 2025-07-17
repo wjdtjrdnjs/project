@@ -81,6 +81,18 @@
     <ClInclude Include="Box.h">
       <Filter>Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Inventory.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="InventoryItem.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="CropType.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaceableObject.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowsProject1.cpp">
@@ -116,6 +128,9 @@
     <ClCompile Include="Box.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Inventory.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WindowsProject1.rc">
@@ -127,15 +142,6 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="WindowsProject1.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="..\..\..\tttle.bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
-    <Image Include="..\..\..\t1.bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
-    <Image Include="..\..\..\Stone Axe.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\Character\Idle_3.bmp">
@@ -189,18 +195,6 @@
     <Image Include="res\Farm Animals\Chicken\Chicken Blonde  Green.bmp">
       <Filter>리소스 파일\Chicken</Filter>
     </Image>
-    <Image Include="..\..\..\Fence%27s copiar.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="..\..\..\1122.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="..\..\..\box.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="res\Tileset\tttle.bmp">
-      <Filter>리소스 파일\Tileset</Filter>
-    </Image>
     <Image Include="res\Tileset\t1.bmp">
       <Filter>리소스 파일\Tileset</Filter>
     </Image>
@@ -215,6 +209,39 @@
     </Image>
     <Image Include="res\Objects\Strawberry\st.bmp">
       <Filter>리소스 파일\Strawberry</Filter>
+    </Image>
+    <Image Include="res\Objects\Box\box.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Objects\Stone Axe.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\House.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\fences.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\Diamond Axe.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\House\House.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Objects\Fence\fences.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\..\pstatic.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Tileset\tttle.bmp">
+      <Filter>리소스 파일\Tileset</Filter>
+    </Image>
+    <Image Include="..\..\..\Water_Tile.bmp">
+      <Filter>리소스 파일\Tileset</Filter>
+    </Image>
+    <Image Include="..\..\..\FarmLand_Tile.bmp">
+      <Filter>리소스 파일\Tileset</Filter>
     </Image>
   </ItemGroup>
 </Project>

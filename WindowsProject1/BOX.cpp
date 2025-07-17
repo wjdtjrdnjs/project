@@ -1,6 +1,8 @@
-
 #include "Box.h"
+#include "BitmapManager.h"
+#include "InputManager.h"
 
+#define slotSize 50
 Box::Box(int xPos, int yPos) : x(xPos), y(yPos), isOpen(false)
 {
     //위치
@@ -15,6 +17,23 @@ Box::Box(int xPos, int yPos) : x(xPos), y(yPos), isOpen(false)
         IMAGE_BITMAP,
         0, 0,
         LR_CREATEDIBSECTION);
+    for (int y = 0; y < 3; y++)
+    {
+        for (int i = 0; i < 9; i++) 
+        {
+            items[y][i].type = CropType::None;
+            items[y][i].count = 0;
+        }
+    }
+   
+    items[0][0].type = CropType::Strawberry_1; //1번 딸기봉투와 5개
+    items[0][0].count = 99;
+    items[0][1].type = CropType::Onion_1;      //2번 양파봉투 5개
+    items[0][1].count = 99;
+    items[0][2].type = CropType::Fence;        //울타리
+    items[0][2].count = 99;
+    items[0][3].type = CropType::Axe;       //도끼
+    items[0][3].count = 1;
 }
 bool Box::IsPlayerInRange(int playerX, int playerY) {  //플레이어가 박스 타일 주변에 있는 지 확인
     int playerTileX = playerX / tileSize;
@@ -78,7 +97,6 @@ void Box::Render(HDC hdc) {
 }
 void Box::RenderUI(HDC hdc)
 {
-    int slotSize = 50;
     int startX = 10;
     int startY = 100;
     for (int y = 0; y < 3; y++) {
@@ -87,19 +105,195 @@ void Box::RenderUI(HDC hdc)
             HBRUSH brush = nullptr;
             brush = CreateSolidBrush(RGB(200, 200, 200)); // 기본 색
 
-            RECT slotRect = { startX + i * (slotSize + 5) + 350, startY + y* 51, startX + i * (slotSize + 5) + slotSize + 350, startY + slotSize + y * 51 };
+            RECT slotRect = { startX + i * (slotSize + 5) + 350, startY + y * 51, startX + i * (slotSize + 5) + slotSize + 350, startY + slotSize + y * 51 };
 
             FillRect(hdc, &slotRect, brush);
             FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));  // 테두리
+            if (items[y][i].type != CropType::None) {
+                HBITMAP bmp = BitmapManager::GetBitmapForCrop(items[y][i].type);
+                HDC memDC = CreateCompatibleDC(hdc);
+                HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+                BITMAP bm;
+                GetObject(bmp, sizeof(BITMAP), &bm);
 
+                int drawSize = 40;
+                int offsetX = slotRect.left + (slotSize - drawSize) / 2;
+                int offsetY = slotRect.top + (slotSize - drawSize) / 2;
+
+
+                TransparentBlt(hdc,
+                    offsetX, offsetY,
+                    drawSize, drawSize,
+                    memDC,
+                    0, 0,
+                    bm.bmWidth,
+                    bm.bmHeight,
+                    RGB(255, 255, 255));
+                std::string countText = std::to_string(items[y][i].count);
+                TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), countText.length());
+                SelectObject(memDC, oldBmp);
+                DeleteDC(memDC);
+
+            }
+            DeleteObject(brush);
+        }
+    }
+    if (playerToolbar) {
+        int startX = 10;
+        int startY = 100 + 3 * 51 + 10;  // 상자 아래 여백 10
+
+        for (int i = 0; i < 9; i++) {
+            RECT slotRect = {
+                startX + i * (slotSize + 5) + 350,
+                startY,
+                startX + i * (slotSize + 5) + slotSize + 350,
+                startY + slotSize
+            };
+
+            HBRUSH brush = CreateSolidBrush(RGB(180, 180, 180));
+            FillRect(hdc, &slotRect, brush);
+            FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
             DeleteObject(brush);
 
-            FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+            if (playerToolbar[i].type != CropType::None) {
+                HBITMAP bmp = BitmapManager::GetBitmapForCrop(playerToolbar[i].type);
+                if (bmp) {
+                    HDC memDC = CreateCompatibleDC(hdc);
+                    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+                    BITMAP bm;
+                    GetObject(bmp, sizeof(BITMAP), &bm);
 
+                    int drawSize = 40;
+                    int offsetX = slotRect.left + (slotSize - drawSize) / 2;
+                    int offsetY = slotRect.top + (slotSize - drawSize) / 2;
+
+                    TransparentBlt(hdc, offsetX, offsetY,
+                        drawSize, drawSize,
+                        memDC, 0, 0,
+                        bm.bmWidth, bm.bmHeight,
+                        RGB(255, 255, 255));
+
+                    std::string countText = std::to_string(playerToolbar[i].count);
+                    TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), countText.length());
+                    SelectObject(memDC, oldBmp);
+                    DeleteDC(memDC);
+                }
+            }
+        }
+    }
+    RenderCursorItem(hdc);
+ 
+}
+//클릭된 아이템이 커서에 붙게 하는 함수
+void Box::RenderCursorItem(HDC hdc) { 
+    if (heldItem.type == CropType::None) return; // 아무것도 안 들고 있으면 돌아감
+
+    POINT mouse = InputManager::GetMousePosition();  //클릭한 좌표를 가져옴
+
+    HBITMAP bmp = BitmapManager::GetBitmapForCrop(heldItem.type);
+    if (!bmp) return;
+
+    HDC memDC = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+    BITMAP bm;
+    GetObject(bmp, sizeof(BITMAP), &bm);
+
+    int drawSize = 40;
+    TransparentBlt(
+        hdc,
+        mouse.x-20 , mouse.y -20,
+        drawSize, drawSize,
+        memDC,
+        0, 0,
+        bm.bmWidth, bm.bmHeight,
+        RGB(255, 255, 255)
+    );
+
+    if (heldItem.count > 0) { //아이템 수량이 1개 이상일 때 수량 표시 
+        std::string countText = std::to_string(heldItem.count);
+        TextOutA(hdc, mouse.x + 5, mouse.y + 10, countText.c_str(), countText.length());
+    }
+
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
+}
+
+/////////////////코드 수정////////////////
+ //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+void Box::HandleItemSlotClick(InventoryItem& slot) 
+{
+    if (heldItem.type == CropType::None) {
+        // 빈손이면 슬롯의 아이템을 든다
+        heldItem = slot;
+        slot.type = CropType::None;
+        slot.count = 0;
+    }
+    else {
+        if (slot.type == CropType::None) {
+            // 빈 슬롯이면 아이템을 넣는다
+            slot = heldItem;
+            heldItem.type = CropType::None;
+            heldItem.count = 0;
+        }
+        else if (slot.type == heldItem.type) {
+            // 같은 아이템이면 합치기
+            slot.count += heldItem.count;
+            heldItem.type = CropType::None;
+            heldItem.count = 0;
+        }
+        else {
+            // 서로 다른 아이템이면 교환
+            InventoryItem temp = heldItem;
+            heldItem = slot;
+            slot = temp;
         }
     }
 }
 
-InventoryItem* Box::GetItems() {
-    return items;
+//마우스 클릭 지점 확인(박스 or 플레이어 툴바)
+void Box::HandleClick(int mouseX, int mouseY)
+{
+    int startX = 10;
+    int startY = 100;
+
+    for (int i = 0; i < 3; ++i)  
+    {
+        for (int j = 0; j < 9; ++j)
+        {
+            //슬롯 위치
+            int left = startX + j * (slotSize + 5) + 350;
+            int top = startY + i * 51;
+            int right = left + slotSize;
+            int bottom = top + slotSize;
+
+            if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) //클릭한 곳이 박스 슬롯이면 실행
+            {
+                HandleItemSlotClick(items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+                return;
+            }
+        }
+    }
+    if (playerToolbar) {
+        int toolbarY = 100 + 3 * 51 + 10; // 상자 아래 여백 포함
+        int startX = 10;
+
+        for (int i = 0; i < 9; ++i) {  //플레이어 툴바 출력을 위한 반복문
+           
+            //슬롯 위치
+            int left = startX + i * (slotSize + 5) + 350;
+            int top = toolbarY;
+            int right = left + slotSize;
+            int bottom = top + slotSize;
+
+            if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) { //클릭한 곳이 플레이어 툴바이면 실행
+                HandleItemSlotClick(playerToolbar[i]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+                return;
+            }
+        }
+    }
+  
 }
+
+
+
+

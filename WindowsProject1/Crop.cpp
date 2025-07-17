@@ -1,42 +1,66 @@
 #include "Crop.h"
+#include "RenderManager.h"
 
-Crop::Crop(CropType type) : type(type), bitmap(nullptr), growthStage(0), growthTimer(0)
-{
-    switch (type) {  //타입에 따라 비트맵 적용
-    case CropType::Strawberry:  //딸기
-        for (int i = 0; i < maxGrowthStage; ++i) { // IDB_BITMAP10 ~ IDB_BITMAP15까지 딸기 씨앗~성숙
-            HBITMAP bmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP10 + i),IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-            growthBitmaps.push_back(bmp);
-        }
-        break;
-    case CropType::Onion:   //양파
-        for (int i = 0; i < maxGrowthStage ; ++i) { // IDB_BITMAP2 ~ IDB_BITMAP7까지 양파 씨앗~성숙
-            HBITMAP bmp = (HBITMAP)LoadImage(GetModuleHandle(NULL),MAKEINTRESOURCE(IDB_BITMAP2 + i),IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-            growthBitmaps.push_back(bmp);
-        }
-        break;
-    }
-
+Crop::Crop(CropType type) : type(type), growthStage(0), growthTimer(0) {
+    growthBitmaps = BitmapManager::GetGrowthBitmaps(type);
     if (!growthBitmaps.empty())
-        bitmap = growthBitmaps[0];  // 초기 비트맵 세팅
+        bitmap = growthBitmaps[0]; // 첫 단계 비트맵
 }
-
 Crop::~Crop()
 {
-    for (auto bmp : growthBitmaps) { // 등록된 비트맵 삭제
-        if (bmp) DeleteObject(bmp);
-    }
+   
 }
 void Crop::Update()  //성관 관리
 {
-    growthTimer += 16;
-
+    int tileX = GetX() / tileSize;;
+    int tileY = GetY() / tileSize;;
+    if (!Map::IsWatered(tileX, tileY)) { //땅에 물을 뿌리지 않으면 작물 성장X
+        return;
+    }
+    growthTimer += 16; 
     if (growthTimer >= growthInterval && growthStage < maxGrowthStage - 1)
     {
         growthStage++; //작물 성장 단계 +1
         growthTimer = 0;
         bitmap = growthBitmaps[growthStage]; // 다음 단계로 성장 ::이미지 바꿔주기
     }
+}
+
+void Crop::Install(int tileX, int tileY, Player* player)
+{
+    int tool = player->GetSelectedTool();
+    InventoryItem* inv = player->GetInventory();
+    if ((Map::GetTile(tileX, tileY) == TILE_Path || Map::GetTile(tileX, tileY) == Tile_FarmLand )&&!RenderManager::GetCropAt(tileX, tileY)) //중복설치 안되게
+    {
+
+        if (inv[tool].count > 0) // 1개 이상일 때
+        {
+            CropType baseCropType = CropType::None; //처음은 빈손
+            if (inv[tool].type == CropType::Strawberry_1) baseCropType = CropType::Strawberry; //딸기씨앗 봉투면 딸기 
+            else if (inv[tool].type == CropType::Onion_1) baseCropType = CropType::Onion;     //양파씨앗 봉투면 양파 
+
+            if (baseCropType != CropType::None) { //빈손이 아닐 때
+                Crop* crop = new Crop(baseCropType);  //선택된 작물 정보 가져옴
+                crop->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
+                RenderManager::AddCrop(crop);  //작물 추가
+
+                inv[tool].count--;  // 들고있는 아이템 -1
+                if (inv[tool].count == 0) //들고있는 아이템 개수가 0개이다
+                    inv[tool].type = CropType::None; //아이템이 0개면 빈 슬롯
+            }
+        }
+    }
+}
+void Crop::Remove(int tileX, int tileY, Player* player)
+{
+    Crop* crop = RenderManager::GetCropAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
+    if (crop && crop->IsFullyGrown()) { //작물이 있고 성장이 끝았을 때
+        CropType type = crop->GetType();  //작물 정보 가져옴
+        RenderManager::RemoveCrop(crop);  //작물 삭제
+        delete crop;  //작물 삭제
+        player->AddItem(type);  //인벤토리에 추가
+    }
+  
 }
 void Crop::Render(HDC hdc)
 {
@@ -54,7 +78,7 @@ void Crop::Render(HDC hdc)
     int drawY = y + (tileSize - bmp.bmHeight) / 2;
 
     TransparentBlt(hdc,
-        drawX, drawY,
+        drawX-2, drawY-5,
         bmp.bmWidth+10, bmp.bmHeight+10,
         memDC,
         0, 0,
@@ -68,3 +92,4 @@ void Crop::Harvest()
 {
     growthStage = 0;
 }
+

@@ -132,10 +132,14 @@
     <ClInclude Include="BitmapManager.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Crop.h" />
+    <ClInclude Include="CropType.h" />
     <ClInclude Include="Fence.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Inventory.h" />
+    <ClInclude Include="InventoryItem.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="PlaceableObject.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="Resource.h" />
@@ -150,6 +154,7 @@
     <ClCompile Include="Crop.cpp" />
     <ClCompile Include="Fence.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="RenderManager.cpp" />
@@ -160,17 +165,20 @@
     <ResourceCompile Include="WindowsProject1.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\1122.bmp" />
-    <Image Include="..\..\..\box.bmp" />
-    <Image Include="..\..\..\Fence%27s copiar.bmp" />
-    <Image Include="..\..\..\Stone Axe.bmp" />
-    <Image Include="..\..\..\t1.bmp" />
-    <Image Include="..\..\..\tttle.bmp" />
+    <Image Include="..\..\..\Diamond Axe.bmp" />
+    <Image Include="..\..\..\FarmLand_Tile.bmp" />
+    <Image Include="..\..\..\fences.bmp" />
+    <Image Include="..\..\..\House.bmp" />
+    <Image Include="..\..\..\pstatic.bmp" />
+    <Image Include="..\..\..\Water_Tile.bmp" />
     <Image Include="res\Character\Idle.bmp" />
     <Image Include="res\Character\Idle_1.bmp" />
     <Image Include="res\Character\Idle_2.bmp" />
     <Image Include="res\Character\Idle_3.bmp" />
     <Image Include="res\Farm Animals\Chicken\Chicken Blonde  Green.bmp" />
+    <Image Include="res\House\House.bmp" />
+    <Image Include="res\Objects\Box\box.bmp" />
+    <Image Include="res\Objects\Fence\fences.bmp" />
     <Image Include="res\Objects\onion\1.bmp" />
     <Image Include="res\Objects\onion\2.bmp" />
     <Image Include="res\Objects\onion\3.bmp" />
@@ -179,6 +187,7 @@
     <Image Include="res\Objects\onion\6.bmp" />
     <Image Include="res\Objects\onion\on.bmp" />
     <Image Include="res\Objects\onion\ono.bmp" />
+    <Image Include="res\Objects\Stone Axe.bmp" />
     <Image Include="res\Objects\Strawberry\2_1.bmp" />
     <Image Include="res\Objects\Strawberry\2_2.bmp" />
     <Image Include="res\Objects\Strawberry\2_3.bmp" />

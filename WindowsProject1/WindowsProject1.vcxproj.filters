@@ -93,6 +93,9 @@
     <ClInclude Include="PlaceableObject.h">
       <Filter>Objects</Filter>
     </ClInclude>
+    <ClInclude Include="SingletonT.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowsProject1.cpp">

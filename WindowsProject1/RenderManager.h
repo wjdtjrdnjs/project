@@ -2,13 +2,15 @@
 #include <windows.h>
 #include <iostream>
 #include <vector>
-#include "Player.h"
+//#include "Player.h"
 #include "Crop.h"
 #include "Animal.h"
 #include "Map.h"
 #include "Box.h"
 #include "Fence.h"
+#include "SingletonT.h"
 #include "BitmapManager.h"
+
 //그릴 클래스들 전방 선언
 class Player;
 class Animal;
@@ -17,7 +19,7 @@ class Crop;
 class Map;
 class Box;
 
-class RenderManager //그리기 담당
+class RenderManager:public SingletonT<RenderManager>//그리기 담당
 {
 public:
 	//업데이트
@@ -37,6 +39,7 @@ public:
 	static void AddAnimal(Animal* animal);
 
 	//울타리
+
 	static Fence* GetFenceAt(int tileX, int tileY);
 	static void AddFence(Fence* fence);
 	static void RemoveFence(Fence* fence);

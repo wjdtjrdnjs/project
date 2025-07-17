@@ -222,6 +222,15 @@ void Box::RenderCursorItem(HDC hdc) {
  //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
 void Box::HandleItemSlotClick(InventoryItem& slot) 
 {
+
+    if (InputManager::IsRightClickDown())
+    {
+        if (slot.type == CropType::None) {
+            slot = heldItem;
+            slot.count++;
+            heldItem.count--;
+        }
+    }
     if (heldItem.type == CropType::None) {
         // 빈손이면 슬롯의 아이템을 든다
         heldItem = slot;
@@ -248,6 +257,7 @@ void Box::HandleItemSlotClick(InventoryItem& slot)
             slot = temp;
         }
     }
+  
 }
 
 //마우스 클릭 지점 확인(박스 or 플레이어 툴바)

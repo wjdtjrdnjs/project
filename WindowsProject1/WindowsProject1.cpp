@@ -235,13 +235,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             player->SetBoxOpen(false); //닫으면 플레이어 이동 가능
         }
 
-        //if (wParam == VK_TAB || wParam == 'I') {
-        //    static bool inventoryOpen = false;
-        //    inventoryOpen = !inventoryOpen;
+        if (wParam == VK_TAB || wParam == 'I') {
+            static bool inventoryOpen = false;
+            inventoryOpen = !inventoryOpen;
 
-        //    // 이 상태는 렌더 함수나 업데이트 루프에 반영해야 함
-        //    player->SetInventoryOpen(inventoryOpen); 
-        //}
+            // 이 상태는 렌더 함수나 업데이트 루프에 반영해야 함
+            player->SetInventoryOpen(inventoryOpen); 
+        }
 
         break;
     }

@@ -5,6 +5,8 @@
 #include "CropType.h"
 #include "resource.h"
 #include "player.h"
+
+// 
 class BitmapManager
 {
 public:

@@ -15,6 +15,7 @@ public:
      HBITMAP GetBitmap(int resourceId);           // 비트맵 가져오기
      void Release();                              // 메모리 해제
      HBITMAP GetBitmapForCrop(CropType type);
+     HBITMAP GetBitmapFence();
      const std::vector<HBITMAP>& GetGrowthBitmaps(CropType type);
      const std::map<Direction, std::vector<HBITMAP>>& GetPlayerBitmaps() {
         return PLY;

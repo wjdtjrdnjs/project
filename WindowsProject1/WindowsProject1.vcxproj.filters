@@ -96,6 +96,9 @@
     <ClInclude Include="SingletonT.h">
       <Filter>Managers</Filter>
     </ClInclude>
+    <ClInclude Include="MyRoomMap.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowsProject1.cpp">
@@ -133,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="Inventory.cpp">
       <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="MyRoomMap.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -245,6 +251,21 @@
     </Image>
     <Image Include="..\..\..\FarmLand_Tile.bmp">
       <Filter>리소스 파일\Tileset</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Walls and Floors copiar.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Objects\Diamond Axe.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Objects\watering.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Tileset\FarmLand_Tile.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Tileset\Water_Tile.bmp">
+      <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>
 </Project>

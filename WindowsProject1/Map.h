@@ -35,7 +35,7 @@ public:
 
 private:
     static TileType tiles[map_y][map_x];
-    std::vector<HBITMAP> Tile;    // 비트맵 핸들 저장
-    std::vector<HDC> TileDCs;     // 각 타일 비트맵용 메모리 DC
+    static std::vector<HBITMAP> Tile;    // 비트맵 핸들 저장
+    static std::vector<HDC> TileDCs;     // 각 타일 비트맵용 메모리 DC
 
 };

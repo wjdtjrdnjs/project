@@ -261,7 +261,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         FillRect(memDC, &rect, (HBRUSH)(COLOR_WINDOW + 1));
 
         RenderManager::Instance().RenderAll(memDC, hWnd);
-
+     
         BitBlt(hdc, 0, 0, rect.right, rect.bottom, memDC, 0, 0, SRCCOPY);
 
         DeleteObject(backBuffer);

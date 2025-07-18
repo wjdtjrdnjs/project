@@ -3,25 +3,26 @@
 #include "RenderManager.h"
 Fence::Fence()
 {
-    // 생성자에서 한 번만 비트맵 로드
-    hBmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(image), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-    if (hBmp)
-    {
-        // 메모리 DC 생성 후 비트맵 선택
-        HDC screenDC = GetDC(NULL);
-        memDC = CreateCompatibleDC(screenDC);
-        ReleaseDC(NULL, screenDC);
 
-        SelectObject(memDC, hBmp);
-    }
+    hBmp = BitmapManager::Instance().GetBitmapFence();// itmapManager에서 울타리 비트맵 핸들 받아오기
 }
-
-Fence::~Fence() //동물 소멸자
+RECT Fence::GetBoundingBox() //울타리 충돌 범위
 {
-    if (memDC) DeleteDC(memDC);
-    if (hBmp) DeleteObject(hBmp);
+    BITMAP bmpInfo;
+    GetObject(hBmp, sizeof(BITMAP), &bmpInfo);
+
+    RECT rect;
+    rect.left = x + 10;  // 왼
+    rect.top = y;        //위
+    rect.right = rect.left + bmpInfo.bmWidth + Fencesize; //오른쪽
+    rect.bottom = rect.top + bmpInfo.bmHeight + Fencesize; //아래
+
+    return rect;
 }
 
+Fence::~Fence() //울타리 소멸자
+{
+}
 void Fence::Install(int tileX, int tileY, Player* player)
 {
     int tool = player->GetSelectedTool();
@@ -43,7 +44,7 @@ void Fence::Remove(int tileX, int tileY, Player* player)
     Fence* fence = RenderManager::Instance().GetFenceAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
     if (fence) { //울타리가 있으면 실행
         RenderManager::Instance().RemoveFence(fence);  //울타리 삭제
-        delete fence;  //울타리 삭제
+        delete fence;  //메모리 해제
         player->AddItem(CropType::Fence);  //인벤토리에 추가
     }
 
@@ -51,19 +52,29 @@ void Fence::Remove(int tileX, int tileY, Player* player)
 
 void Fence::Render(HDC hdc)  //울타리 생성
 {
-    if (!hBmp || !memDC)
-        return;
+    if (!hBmp) return;
+    // 임시 메모리 DC 생성
+    HDC memDC = CreateCompatibleDC(hdc);
+    HGDIOBJ oldBmp = SelectObject(memDC, hBmp);
 
     BITMAP bmp;
     GetObject(hBmp, sizeof(BITMAP), &bmp);
 
-    TransparentBlt(
-        hdc,
-        x+10, y,
+    TransparentBlt(hdc,
+        x + 10, y,
         bmp.bmWidth + Fencesize, bmp.bmHeight + Fencesize,
         memDC,
         0, 0,
         bmp.bmWidth, bmp.bmHeight,
         RGB(255, 255, 255)
     );
+    // 울타리 충돌 범위 (빨간 테두리)
+    RECT r = GetBoundingBox();
+    HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
+    FrameRect(hdc, &r, b);
+    DeleteObject(b);
+    // DC 정리
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
+
 }

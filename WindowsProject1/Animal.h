@@ -10,6 +10,8 @@ public:
 	int GetX() const { return x; }
 	int GetY() const { return y; }
 	void Render(HDC hdc);
+	RECT GetBoundingBox();
+	RECT GetDoorBoundingBox();
 	void Update();
 private:
 	int image = IDB_BITMAP38;

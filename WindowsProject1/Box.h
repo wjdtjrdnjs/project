@@ -18,7 +18,7 @@ public:
     void RenderCursorItem(HDC hdc); //클릭된 아이템이 커서에 붙게 하는 함수
     void HandleItemSlotLClick(InventoryItem& slot);//마우스 좌클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
     void HandleItemSlotRClick(InventoryItem& slot);//마우스 우클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
-
+    RECT GetBoundingBox(); //상자 충돌 범위(빨간 테투리)
    // InventoryItem* GetItems();
     void SetPlayerToolbar(InventoryItem* toolbar) {
         playerToolbar = toolbar;

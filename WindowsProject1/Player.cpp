@@ -123,6 +123,11 @@ void Player::Render(HDC hdc) //플레이어를 화면에 렌더링
         bmpInfo.bmWidth, bmpInfo.bmHeight,
         RGB(255, 255, 255)
     );
+    //플레이어 충돌 박스(빨간 테두리)
+    RECT r = GetBoundingBox();
+    HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0));
+    FrameRect(hdc, &r, hBrush);
+    DeleteObject(hBrush);
 
     SelectObject(memDC, oldBmp);
     DeleteDC(memDC);
@@ -155,22 +160,32 @@ void Player::UpdatePlayer()
 
 void Player::Playermove() //플레이어 이동 처리
 {
-    // 이동 처리
+    int dx = 0, dy = 0;  //이동 방향 값을 저장할 변수
     if (InputManager::Instance().IsKeyHeld('A')) {
-        x -= 5;
+        dx = -5;
         currentDir = LEFT;
     }
     else if (InputManager::Instance().IsKeyHeld('D')) {
-        x += 5;
+        dx = 5;
         currentDir = RIGHT;
     }
     else if (InputManager::Instance().IsKeyHeld('W')) {
-        y -= 5;
+        dy = -5;
         currentDir = UP;
     }
     else if (InputManager::Instance().IsKeyHeld('S')) {
-        y += 5;
+        dy = 5;
         currentDir = DOWN;
+    }
+    // 위치 업데이트
+    x += dx;
+    y += dy;
+
+    if (RenderManager::Instance().playerCollided()) { // 충돌 검사
+        //충돌이 발생하면 저장되었던 값을 되돌림
+        x -= dx;
+        y -= dy;
+        OutputDebugStringA("충돌 발생\n");
     }
 }
 void Player::HandleToolSelection() { //번호 선택 함수
@@ -275,3 +290,16 @@ void Player::HandleRightClickAction() //아이템을 들고 우클릭
    
 }
 
+RECT Player::GetBoundingBox() //플레이어 충돌 범위 
+{
+    BITMAP bmp;
+    HBITMAP currentBmp = ply[currentDir][0];  // 현재 방향의 첫 프레임
+    GetObject(currentBmp, sizeof(BITMAP), &bmp);
+
+    RECT rect;
+    rect.left = x + 25;
+    rect.top = y + 36;
+    rect.right = x + bmp.bmWidth + playersize -25;
+    rect.bottom = y + bmp.bmHeight + playersize - 20;
+    return rect;
+}

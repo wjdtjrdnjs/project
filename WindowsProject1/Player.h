@@ -25,7 +25,9 @@ public:
 	//플레이어 좌표
 	int GetX()  { return x; }
 	int GetY()  { return y; }
-
+	int GetWidth() { return x; }
+	int GeGetHeighttX() { return x; }
+	RECT GetBoundingBox();
 	void RenderInventory(HDC hdc, int screenWidth, int screenHeight);  //플레이어 아래 인벤창(툴바) 렌더링
 	void AddItem(CropType type);		//인벤토리에 아이템 추가
 	

@@ -88,13 +88,33 @@ void Box::Render(HDC hdc) {
             bmpWidth, bmpHeight,           // 원본 크기 그대로 유지
             RGB(255, 255, 255));
 
+        //상자 충돌 범위(빨간 테투리)
+        RECT r = GetBoundingBox();
+        HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
+        FrameRect(hdc, &r, b);
+        DeleteObject(b);
+
         SelectObject(memDC, oldBitmap);
         DeleteDC(memDC);
     }
-    else {
-        OutputDebugString(L"[ERROR] Bitmap is NULL\n");
-    }
+   
 }
+
+
+RECT Box::GetBoundingBox() //상자 충돌 범위
+{
+    BITMAP bmpInfo;
+    GetObject(hIconBitmap, sizeof(BITMAP), &bmpInfo);
+
+    RECT rect;
+    rect.left = x + 5;  // 왼
+    rect.top = y;        //위
+    rect.right = rect.left + bmpInfo.bmWidth +10; //오른쪽
+    rect.bottom = rect.top + bmpInfo.bmHeight + 10; //아래
+
+    return rect;
+}
+
 void Box::RenderUI(HDC hdc)
 {
     int startX = 10;

@@ -1,7 +1,8 @@
 #include "Map.h"
 
 TileType Map::tiles[map_y][map_x];
-
+std::vector<HBITMAP> Map::Tile;
+std::vector<HDC> Map::TileDCs;
 Map::Map()
 {
     HBITMAP grassBmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP22), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION); //ÀÜµð

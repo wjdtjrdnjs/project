@@ -2,10 +2,10 @@
 #include <windows.h>
 #include <iostream>
 #include <vector>
-//#include "Player.h"
 #include "Crop.h"
 #include "Animal.h"
 #include "Map.h"
+//#include "MyRoomMap.h"
 #include "Box.h"
 #include "Fence.h"
 #include "SingletonT.h"
@@ -29,7 +29,8 @@ public:
 	//플레이어
 	 Player* GetPlayer() { return Instance().player; }
 	 void SetPlayer(Player* player);
-	
+	 bool playerCollided();  //플레이어 충돌 검사
+
 	//작물
 	 Crop* GetCropAt(int tileX, int tileY);
 	 void AddCrop(Crop* crop);
@@ -46,11 +47,14 @@ public:
 
 	////////////////보류
 	 void SetMap(Map* map);
+	//void SetMyRoomMap(MyRoomMap* mymap);
 	 void SetBox(Box* box);
 	 Box* GetBox() { return box; }
 private:
+	bool isMapChanged = TRUE;
 	Player* player = nullptr;
 	Map* map = nullptr;
+	//MyRoomMap* mymap = nullptr;
 	Box* box = nullptr;
 	std::vector<Animal*> animals;
 	std::vector<Fence*> fences;

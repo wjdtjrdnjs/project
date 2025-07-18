@@ -39,7 +39,7 @@ void BitmapManager::Load(HINSTANCE hInstance)
     bitmapMap[IDB_BITMAP41] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP41), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     //울타리
     bitmapMap[IDB_BITMAP39] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP39), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
-   
+ 
    
 }
 
@@ -49,6 +49,8 @@ const std::vector<HBITMAP>& BitmapManager::GetGrowthBitmaps(CropType type) {
         return growthBitmaps[type];
     return empty;
 }
+
+
 HBITMAP BitmapManager::GetBitmap(int resourceId)
 {
     if (bitmapMap.count(resourceId))
@@ -77,6 +79,12 @@ HBITMAP BitmapManager::GetBitmapForCrop(CropType type) { //가져온 타입으�
     default: //없음
         return nullptr;
     }
+}
+
+HBITMAP BitmapManager::GetBitmapFence()
+{
+    
+    return bitmapMap[IDB_BITMAP39];
 }
 
 void BitmapManager::Release()

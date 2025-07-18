@@ -148,6 +148,8 @@ void Player::UpdatePlayer()
         HandleLeftClickAction();
     }
     if (InputManager::Instance().IsRightClickDown()) { //우클릭
+        HandleRightClickAction();
+
     }
 }
 
@@ -167,6 +169,7 @@ void Player::Playermove() //플레이어 이동 처리
         currentDir = UP;
     }
     else if (InputManager::Instance().IsKeyHeld('S')) {
+        y += 5;
         currentDir = DOWN;
     }
 }

@@ -110,7 +110,8 @@ void Box::RenderUI(HDC hdc)
             FillRect(hdc, &slotRect, brush);
             FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));  // 테두리
             if (items[y][i].type != CropType::None) {
-                HBITMAP bmp = BitmapManager::GetBitmapForCrop(items[y][i].type);
+                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(items[y][i].type);
+
                 HDC memDC = CreateCompatibleDC(hdc);
                 HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
                 BITMAP bm;
@@ -156,7 +157,8 @@ void Box::RenderUI(HDC hdc)
             DeleteObject(brush);
 
             if (playerToolbar[i].type != CropType::None) {
-                HBITMAP bmp = BitmapManager::GetBitmapForCrop(playerToolbar[i].type);
+                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(playerToolbar[i].type);
+
                 if (bmp) {
                     HDC memDC = CreateCompatibleDC(hdc);
                     HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
@@ -188,9 +190,9 @@ void Box::RenderUI(HDC hdc)
 void Box::RenderCursorItem(HDC hdc) { 
     if (heldItem.type == CropType::None) return; // 아무것도 안 들고 있으면 돌아감
 
-    POINT mouse = InputManager::GetMousePosition();  //클릭한 좌표를 가져옴
+    POINT mouse = InputManager::Instance().GetMousePosition();  //클릭한 좌표를 가져옴
+    HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(heldItem.type);
 
-    HBITMAP bmp = BitmapManager::GetBitmapForCrop(heldItem.type);
     if (!bmp) return;
 
     HDC memDC = CreateCompatibleDC(hdc);
@@ -220,8 +222,9 @@ void Box::RenderCursorItem(HDC hdc) {
 
 /////////////////코드 수정////////////////
  //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
-void Box::HandleItemSlotClick(InventoryItem& slot) 
+void Box::HandleItemSlotLClick(InventoryItem& slot)  //좌클릭
 {
+
     if (heldItem.type == CropType::None) {
         // 빈손이면 슬롯의 아이템을 든다
         heldItem = slot;
@@ -248,10 +251,47 @@ void Box::HandleItemSlotClick(InventoryItem& slot)
             slot = temp;
         }
     }
+  
 }
 
+void Box::HandleItemSlotRClick(InventoryItem& slot) //박스 아이템창에서 우클릭
+{
+    if (heldItem.type == CropType::None) return; //손에 아이템이 없으면 리턴
+    else {
+        if (slot.type == CropType::None) { 
+            // 빈 슬롯이면 아이템을 넣고 수량 +1 들고있는 아이템은 -1
+            slot.type = heldItem.type; 
+            slot.count++; 
+            heldItem.count--;
+            if (heldItem.count < 1) //들고 있는 아이템 수량이 0개 이하일 때 실행
+            {
+                heldItem.type = CropType::None;
+                heldItem.count = 0;
+            }
+                
+        }
+        else if (slot.type == heldItem.type) {
+            // 같은 아이템이면 합치기 슬롯에 있는 아이템은 +1 들고 있는 아이템은 -1
+            slot.count++;
+            heldItem.count--;
+            if (heldItem.count < 1) //들고 있는 아이템 수량이 0개 이하일 때 실행
+            {
+                heldItem.type = CropType::None;
+                heldItem.count = 0;
+            }
+        }        
+    }
+    
+}
+
+
+
+
+
+
 //마우스 클릭 지점 확인(박스 or 플레이어 툴바)
-void Box::HandleClick(int mouseX, int mouseY)
+void Box::HandleClick(int mouseX, int mouseY, int num)
+
 {
     int startX = 10;
     int startY = 100;
@@ -268,7 +308,10 @@ void Box::HandleClick(int mouseX, int mouseY)
 
             if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) //클릭한 곳이 박스 슬롯이면 실행
             {
-                HandleItemSlotClick(items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+                if(num == 1)
+                    HandleItemSlotLClick(items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+                else
+                    HandleItemSlotRClick(items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
                 return;
             }
         }
@@ -286,14 +329,15 @@ void Box::HandleClick(int mouseX, int mouseY)
             int bottom = top + slotSize;
 
             if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) { //클릭한 곳이 플레이어 툴바이면 실행
-                HandleItemSlotClick(playerToolbar[i]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+                if (num == 1)
+                    HandleItemSlotLClick(playerToolbar[i]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+                else
+                    HandleItemSlotRClick(playerToolbar[i]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+
+
                 return;
             }
         }
     }
   
 }
-
-
-
-

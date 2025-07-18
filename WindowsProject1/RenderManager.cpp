@@ -1,13 +1,5 @@
 #include "RenderManager.h"
 
-Player* RenderManager::player = nullptr; //플레이어
-Map* RenderManager::map = nullptr; //맵
-Box* RenderManager::box = nullptr; //상자
-
-std::vector<Crop*> RenderManager::crops;  //작물
-std::vector<Animal*> RenderManager::animals; //동물
-std::vector<Fence*> RenderManager::fences; //울타리(임시)
-
 void RenderManager::SetPlayer(Player* p) { player = p; }
 void RenderManager::SetMap(Map* m) { map = m; }
 void RenderManager::SetBox(Box* b) { box = b; }

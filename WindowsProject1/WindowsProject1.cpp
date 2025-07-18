@@ -21,6 +21,8 @@
 #include "Map.h"
 
 //Managers파일
+#include "SingletonT.h"
+
 #include "RenderManager.h"
 #include "BitmapManager.h"
 #include "InputManager.h"
@@ -46,7 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 여기에 코드를 입력합니다.
-    BitmapManager::Load(hInstance);
+    BitmapManager::Instance().Load(hInstance);
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_WINDOWSPROJECT1, szWindowClass, MAX_LOADSTRING);
@@ -152,7 +154,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
  
     case WM_CREATE:
     {
-        InputManager::Init(hWnd);
+        InputManager::Instance().Init(hWnd);
 
         player = new Player();                 //플레이어 생성
         Animal* animal = new Animal();         //동물 생성
@@ -160,10 +162,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         box = new Box(127, 285);               //상자 위치 전달
 
         //렌더 매니저에 등록
-        RenderManager::SetPlayer(player);
-        RenderManager::AddAnimal(animal);
-        RenderManager::SetMap(map);
-        RenderManager::SetBox(box);
+        RenderManager::Instance().SetPlayer(player);
+        RenderManager::Instance().AddAnimal(animal);
+        RenderManager::Instance().SetMap(map);
+        RenderManager::Instance().SetBox(box);
+
 
         SetTimer(hWnd, 999, 16, NULL); //플레이어 이동 타이머
 
@@ -196,8 +199,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case 999:
         {                            
-            InputManager::Update();  //모든 객체 업데이트
-            RenderManager::UpdateAll();  //모든 객체 업데이트
+            InputManager::Instance().Update();  //모든 객체 업데이트
+            RenderManager::Instance().UpdateAll();  //모든 객체 업데이트
+
             InvalidateRect(hWnd, NULL, FALSE); // 화면 다시 그리
             break;
         }
@@ -209,7 +213,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_KEYDOWN: //상자 열기
     {
 
-        Player* player = RenderManager::GetPlayer();
+        Player* player = RenderManager::Instance().GetPlayer();
+
 
         if (!player || !box) break;
 
@@ -235,13 +240,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             player->SetBoxOpen(false); //닫으면 플레이어 이동 가능
         }
 
-        //if (wParam == VK_TAB || wParam == 'I') {
-        //    static bool inventoryOpen = false;
-        //    inventoryOpen = !inventoryOpen;
+        if (wParam == VK_TAB || wParam == 'I') {
+            static bool inventoryOpen = false;
+            inventoryOpen = !inventoryOpen;
 
-        //    // 이 상태는 렌더 함수나 업데이트 루프에 반영해야 함
-        //    player->SetInventoryOpen(inventoryOpen); 
-        //}
+            // 이 상태는 렌더 함수나 업데이트 루프에 반영해야 함
+            player->SetInventoryOpen(inventoryOpen); 
+        }
 
         break;
     }
@@ -259,7 +264,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         FillRect(memDC, &rect, (HBRUSH)(COLOR_WINDOW + 1));
 
-        RenderManager::RenderAll(memDC, hWnd); 
+        RenderManager::Instance().RenderAll(memDC, hWnd);
 
         BitBlt(hdc, 0, 0, rect.right, rect.bottom, memDC, 0, 0, SRCCOPY);
 
@@ -279,7 +284,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             delete box;
             box = nullptr;
         }
-        BitmapManager::Release();
+        BitmapManager::Instance().Release();
+
         PostQuitMessage(0);
         break;
     default:

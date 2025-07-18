@@ -1,41 +1,43 @@
 #pragma once
 #include <Windows.h>
+#include "SingletonT.h"
 
-class InputManager
+
+class InputManager : public SingletonT<InputManager>
 {
 public:
-    static void Init(HWND hwnd);
-    static void Update(); // 매 프레임 호출
+    void Init(HWND hwnd);
+    void Update(); // 매 프레임 호출
 
     // 마우스
-    static POINT GetMousePosition();        // 마우스 좌표
-    static bool IsLeftClickUp();           // 좌클릭 감지
-    static bool IsLeftClickDown();
-    static bool IsLeftClickHeld();
+    POINT GetMousePosition();        // 마우스 좌표
+    bool IsLeftClickUp();           // 좌클릭 감지
+    bool IsLeftClickDown();
+    bool IsLeftClickHeld();
 
-    static bool IsRightClickUp();           // 우클릭 감지
-    static bool IsRightClickDown();
-    static bool IsRightClickHeld();
+    bool IsRightClickUp();           // 우클릭 감지
+    bool IsRightClickDown();
+    bool IsRightClickHeld();
 
     // 키보드
-    static bool IsKeyHeld(int vKey);        // 키가 눌려 있는 상태
-    static bool IsKeyDown(int vKey);        // 이번 프레임에 눌림
-    static bool IsKeyUp(int vKey);          // 이번 프레임에 뗌
+    bool IsKeyHeld(int vKey);        // 키가 눌려 있는 상태
+    bool IsKeyDown(int vKey);        // 이번 프레임에 눌림
+    bool IsKeyUp(int vKey);          // 이번 프레임에 뗌
 
 private:
-    static HWND hWnd;
-    static POINT mousePos;
+    HWND hWnd = nullptr;
+    POINT mousePos{ 0, 0 };
 
-    static bool mouseClicked;
-    static bool mouseClickedPrev;
+    bool mouseClicked = false;
+    bool mouseClickedPrev = false;
 
-
-    static bool currentLeftClick;
-    static bool previousLeftClick;
-    static bool currentRightClick;
-    static bool previousRightClick;
+    bool currentLeftClick = false;
+    bool previousLeftClick = false;
+    bool currentRightClick = false;
+    bool previousRightClick = false;
 
     // 키 상태 추적
-    static BYTE currentKeys[256];
-    static BYTE previousKeys[256];
+    BYTE currentKeys[256] = { 0 };
+    BYTE previousKeys[256] = { 0 };
+
 };

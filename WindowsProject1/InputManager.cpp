@@ -1,19 +1,5 @@
 #include "InputManager.h"
 
-HWND InputManager::hWnd = nullptr;
-
-bool InputManager::mouseClicked = false;
-bool InputManager::mouseClickedPrev = false;
-
-bool InputManager::currentLeftClick = false;
-bool InputManager::previousLeftClick = false;
-bool InputManager::currentRightClick = false;
-bool InputManager::previousRightClick = false;
-
-POINT InputManager::mousePos = { 0, 0 };
-
-BYTE InputManager::currentKeys[256] = { 0 };
-BYTE InputManager::previousKeys[256] = { 0 };
 
 void InputManager::Init(HWND hwnd)
 {
@@ -65,7 +51,8 @@ bool InputManager::IsRightClickUp()
 
 bool InputManager::IsRightClickDown()
 {
-    return currentRightClick; //&& !previousRightClick;
+    return currentRightClick && !previousRightClick;
+
 }
 
 bool InputManager::IsRightClickHeld()

@@ -2,7 +2,8 @@
 #include "RenderManager.h"
 
 Crop::Crop(CropType type) : type(type), growthStage(0), growthTimer(0) {
-    growthBitmaps = BitmapManager::GetGrowthBitmaps(type);
+    growthBitmaps = BitmapManager::Instance().GetGrowthBitmaps(type);
+
     if (!growthBitmaps.empty())
         bitmap = growthBitmaps[0]; // 첫 단계 비트맵
 }
@@ -30,7 +31,8 @@ void Crop::Install(int tileX, int tileY, Player* player)
 {
     int tool = player->GetSelectedTool();
     InventoryItem* inv = player->GetInventory();
-    if ((Map::GetTile(tileX, tileY) == TILE_Path || Map::GetTile(tileX, tileY) == Tile_FarmLand )&&!RenderManager::GetCropAt(tileX, tileY)) //중복설치 안되게
+    if ((Map::GetTile(tileX, tileY) == TILE_Path || Map::GetTile(tileX, tileY) == Tile_FarmLand )&&!RenderManager::Instance().GetCropAt(tileX, tileY)) //중복설치 안되게
+
     {
 
         if (inv[tool].count > 0) // 1개 이상일 때
@@ -42,7 +44,8 @@ void Crop::Install(int tileX, int tileY, Player* player)
             if (baseCropType != CropType::None) { //빈손이 아닐 때
                 Crop* crop = new Crop(baseCropType);  //선택된 작물 정보 가져옴
                 crop->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
-                RenderManager::AddCrop(crop);  //작물 추가
+                RenderManager::Instance().AddCrop(crop);  //작물 추가
+
 
                 inv[tool].count--;  // 들고있는 아이템 -1
                 if (inv[tool].count == 0) //들고있는 아이템 개수가 0개이다
@@ -53,10 +56,11 @@ void Crop::Install(int tileX, int tileY, Player* player)
 }
 void Crop::Remove(int tileX, int tileY, Player* player)
 {
-    Crop* crop = RenderManager::GetCropAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
+    Crop* crop = RenderManager::Instance().GetCropAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
     if (crop && crop->IsFullyGrown()) { //작물이 있고 성장이 끝았을 때
         CropType type = crop->GetType();  //작물 정보 가져옴
-        RenderManager::RemoveCrop(crop);  //작물 삭제
+        RenderManager::Instance().RemoveCrop(crop);  //작물 삭제
+
         delete crop;  //작물 삭제
         player->AddItem(type);  //인벤토리에 추가
     }

@@ -1,7 +1,5 @@
 ﻿#include "BitmapManager.h"
-std::map<CropType, std::vector<HBITMAP>> BitmapManager::growthBitmaps;
-std::map<int, HBITMAP> BitmapManager::bitmapMap;
-std::map<Direction, std::vector<HBITMAP>> BitmapManager::PLY;
+
 
 void BitmapManager::Load(HINSTANCE hInstance)
 {

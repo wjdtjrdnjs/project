@@ -7,7 +7,8 @@ std::map<Direction, std::vector<HBITMAP>> ply;
 Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry) 
 {
    
-    ply = BitmapManager::GetPlayerBitmaps();
+    ply =BitmapManager::Instance().GetPlayerBitmaps();
+
   
     for (int i = 0; i < 9; i++) {  //플레이어 인벤토리 초기화
         inventory[i].type = CropType::None;
@@ -52,7 +53,8 @@ void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플�
         DeleteObject(brush);
 
         if (inventory[i].type != CropType::None) {
-            HBITMAP bmp = BitmapManager::GetBitmapForCrop(inventory[i].type);
+            HBITMAP bmp =BitmapManager::Instance().GetBitmapForCrop(inventory[i].type);
+
             HDC memDC = CreateCompatibleDC(hdc);
             HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
             BITMAP bm;
@@ -132,9 +134,15 @@ void Player::Render(HDC hdc) //플레이어를 화면에 렌더링
 void Player::UpdatePlayer()
 {
     if (isBoxOpen) {  //박스 오픈 
-        if (InputManager::IsLeftClickDown()) {
-            POINT pt = InputManager::GetMousePosition();
-            RenderManager::GetBox()->HandleClick(pt.x, pt.y);
+        if (InputManager::Instance().IsLeftClickDown()) {
+            POINT pt = InputManager::Instance().GetMousePosition();
+            RenderManager::Instance().GetBox()->HandleClick(pt.x, pt.y, 1);
+        }
+        else if (InputManager::Instance().IsRightClickDown())
+        {
+            POINT pt = InputManager::Instance().GetMousePosition();
+            RenderManager::Instance().GetBox()->HandleClick(pt.x, pt.y,2);
+
         }
         return;  // 상자 열렸을 땐 이동 금지
     }
@@ -142,11 +150,11 @@ void Player::UpdatePlayer()
     Playermove(); //플레이어 이동 처리
     HandleToolSelection(); //아이템창 아래(툴바) 번호 선택
 
-    if (InputManager::IsLeftClickDown()) { //좌클릭
+    if (InputManager::Instance().IsLeftClickDown()) { //좌클릭
         HandleLeftClickAction();
     }
-    if (InputManager::IsRightClickDown()) { //우클릭
-        HandleRightClickAction();
+    if (InputManager::Instance().IsRightClickDown()) { //우클릭
+
     }
   
 
@@ -155,26 +163,27 @@ void Player::UpdatePlayer()
 void Player::Playermove() //플레이어 이동 처리
 {
     // 이동 처리
-    if (InputManager::IsKeyHeld('A')) {
+    if (InputManager::Instance().IsKeyHeld('A')) {
         x -= 5;
         currentDir = LEFT;
     }
-    else if (InputManager::IsKeyHeld('D')) {
+    else if (InputManager::Instance().IsKeyHeld('D')) {
         x += 5;
         currentDir = RIGHT;
     }
-    else if (InputManager::IsKeyHeld('W')) {
+    else if (InputManager::Instance().IsKeyHeld('W')) {
         y -= 5;
         currentDir = UP;
     }
-    else if (InputManager::IsKeyHeld('S')) {
-        y += 5;
+    else if (InputManager::Instance().IsKeyHeld('S')) {
+
         currentDir = DOWN;
     }
 }
 void Player::HandleToolSelection() { //번호 선택 함수
     for (int i = 0; i < 9; ++i) {
-        if (InputManager::IsKeyDown('1' + i)) {
+        if (InputManager::Instance().IsKeyDown('1' + i)) {
+
             selectedTool = i;
             break;
         }
@@ -183,7 +192,8 @@ void Player::HandleToolSelection() { //번호 선택 함수
 //코드 수정 필요
 void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
 {
-    POINT pt = InputManager::GetMousePosition();
+    POINT pt = InputManager::Instance().GetMousePosition();
+
     //타일 위치x,y
     int tileX = pt.x / tileSize;
     int tileY = pt.y / tileSize;
@@ -191,7 +201,8 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
 
     std::string debugMsg = "Left Click at (" + std::to_string(pt.x) + ", " + std::to_string(pt.y) + ")\n"; //디버깅 확인용 
     OutputDebugStringA(debugMsg.c_str());
-    Player* player = RenderManager::GetPlayer();  //플레이어 정보 호출
+    Player* player = RenderManager::Instance().GetPlayer();  //플레이어 정보 호출
+
     if (!player) return; //생성죄지 않았다면 브레이크
 
 
@@ -203,17 +214,19 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
 
     if (inventory[selectedTool].type == CropType::hoe)  // 괭이일 때만 땅 교체 가능
     {
-        Crop* crop = RenderManager::GetCropAt(tileX, tileY);
+        Crop* crop = RenderManager::Instance().GetCropAt(tileX, tileY);
         if (crop)
         {
-            RenderManager::RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
+            RenderManager::Instance().RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
+
             delete crop;
         }
         Map::ToggleTile(tileX, tileY, 4); //땅 교체
     }
     else if (inventory[selectedTool].type == CropType::Axe) //도끼 일때만 울타리 삭제
     {
-        PlaceableObject* obj = RenderManager::GetFenceAt(tileX, tileY); //울타리
+        PlaceableObject* obj = RenderManager::Instance().GetFenceAt(tileX, tileY); //울타리
+
         if (obj) {
             obj->Remove(tileX, tileY, player);
         }
@@ -226,7 +239,8 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
     }
     else // 괭이, 도끼 제외 작물 수확
     {
-        PlaceableObject* obj = RenderManager::GetCropAt(tileX, tileY); //작물
+        PlaceableObject* obj = RenderManager::Instance().GetCropAt(tileX, tileY); //작물
+
         if (obj) {
             obj->Remove(tileX, tileY, player);
         }
@@ -235,7 +249,8 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
 //코드 수정 필요
 void Player::HandleRightClickAction() //아이템을 들고 우클릭
 {
-    POINT pt = InputManager::GetMousePosition();  //마우스가 클릭된 좌표를 가져옴
+    POINT pt = InputManager::Instance().GetMousePosition();  //마우스가 클릭된 좌표를 가져옴
+
     //클릭한 타일 위치 
     int tileX = pt.x / tileSize;
     int tileY = pt.y / tileSize;
@@ -243,7 +258,8 @@ void Player::HandleRightClickAction() //아이템을 들고 우클릭
     std::string debugMsg = "Right Click at (" + std::to_string(pt.x) + ", " + std::to_string(pt.y) + ")\n";
     OutputDebugStringA(debugMsg.c_str());
 
-    Player* player = RenderManager::GetPlayer();//플레이어 정보 호출
+    Player* player = RenderManager::Instance().GetPlayer();//플레이어 정보 호출
+
     if (!player) return; //플레이어 정보가 존재하지 않는다면 종료
 
     if (abs(tileX - (player->GetX() + tileSize / 2) / tileSize) > 1 || abs(tileY - (player->GetY() + tileSize / 2) / tileSize) > 1) return;

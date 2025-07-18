@@ -5,21 +5,23 @@
 #include "CropType.h"
 #include "resource.h"
 #include "player.h"
-class BitmapManager
+#include "SingletonT.h"
+
+// 
+class BitmapManager:public SingletonT<BitmapManager>
 {
 public:
-    static void Load(HINSTANCE hInstance);              // 초기 로딩
-    static HBITMAP GetBitmap(int resourceId);           // 비트맵 가져오기
-    static void Release();                              // 메모리 해제
-    static HBITMAP GetBitmapForCrop(CropType type);
-    static const std::vector<HBITMAP>& GetGrowthBitmaps(CropType type);
-    static const std::map<Direction, std::vector<HBITMAP>>& GetPlayerBitmaps() {
+     void Load(HINSTANCE hInstance);              // 초기 로딩
+     HBITMAP GetBitmap(int resourceId);           // 비트맵 가져오기
+     void Release();                              // 메모리 해제
+     HBITMAP GetBitmapForCrop(CropType type);
+     const std::vector<HBITMAP>& GetGrowthBitmaps(CropType type);
+     const std::map<Direction, std::vector<HBITMAP>>& GetPlayerBitmaps() {
         return PLY;
     }
 private:
-    static std::map<int, HBITMAP> bitmapMap;            // 비트맵 저장소
-    static std::map<CropType, std::vector<HBITMAP>> growthBitmaps;
-    static std::map<Direction, std::vector<HBITMAP>> PLY;
-
+     std::map<int, HBITMAP> bitmapMap;            // 비트맵 저장소
+     std::map<CropType, std::vector<HBITMAP>> growthBitmaps;
+     std::map<Direction, std::vector<HBITMAP>> PLY;
 
 };

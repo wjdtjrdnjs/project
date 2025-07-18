@@ -14,9 +14,11 @@ public:
     void Open(); //열고
     void Close(); //닫기
     bool IsOpen() const;
-    void HandleClick(int row, int col); //마우스 클릭 지점 확인(박스 칸 or 플레이어 툴바)
+    void HandleClick(int row, int col, int num); //마우스 좌클릭 지점 확인(박스 칸 or 플레이어 툴바)
     void RenderCursorItem(HDC hdc); //클릭된 아이템이 커서에 붙게 하는 함수
-    void HandleItemSlotClick(InventoryItem& slot);//마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+    void HandleItemSlotLClick(InventoryItem& slot);//마우스 좌클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
+    void HandleItemSlotRClick(InventoryItem& slot);//마우스 우클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
+
 
    // InventoryItem* GetItems();
     void SetPlayerToolbar(InventoryItem* toolbar) {

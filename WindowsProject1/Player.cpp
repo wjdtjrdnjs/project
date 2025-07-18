@@ -3,7 +3,6 @@
 #include "BitmapManager.h"
 #include "RenderManager.h"
 std::map<Direction, std::vector<HBITMAP>> ply;
-
 Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry) 
 {
    

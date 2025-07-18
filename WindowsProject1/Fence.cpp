@@ -31,8 +31,6 @@ void Fence::Install(int tileX, int tileY, Player* player)
             Fence* fence = new Fence();  //울타리 생성
             fence->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
             RenderManager::Instance().AddFence(fence);  //울타리 추가
-
-
             inv[tool].count--;  // 들고있는 아이템 -1
             if (inv[tool].count == 0) //들고있는 아이템 개수가 0개이다
                inv[tool].type = CropType::None; //아이템이 0개면 빈 슬롯
@@ -45,7 +43,6 @@ void Fence::Remove(int tileX, int tileY, Player* player)
     Fence* fence = RenderManager::Instance().GetFenceAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
     if (fence) { //울타리가 있으면 실행
         RenderManager::Instance().RemoveFence(fence);  //울타리 삭제
-
         delete fence;  //울타리 삭제
         player->AddItem(CropType::Fence);  //인벤토리에 추가
     }

@@ -24,4 +24,5 @@ private:
      std::map<CropType, std::vector<HBITMAP>> growthBitmaps;
      std::map<Direction, std::vector<HBITMAP>> PLY;
 
+
 };

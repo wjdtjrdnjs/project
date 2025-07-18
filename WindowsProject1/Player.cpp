@@ -8,7 +8,6 @@ Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry)
 {
    
     ply =BitmapManager::Instance().GetPlayerBitmaps();
-
   
     for (int i = 0; i < 9; i++) {  //플레이어 인벤토리 초기화
         inventory[i].type = CropType::None;
@@ -54,7 +53,6 @@ void Player::RenderInventory(HDC hdc, int screenWidth, int screenHeight)  //플�
 
         if (inventory[i].type != CropType::None) {
             HBITMAP bmp =BitmapManager::Instance().GetBitmapForCrop(inventory[i].type);
-
             HDC memDC = CreateCompatibleDC(hdc);
             HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
             BITMAP bm;
@@ -142,22 +140,16 @@ void Player::UpdatePlayer()
         {
             POINT pt = InputManager::Instance().GetMousePosition();
             RenderManager::Instance().GetBox()->HandleClick(pt.x, pt.y,2);
-
         }
         return;  // 상자 열렸을 땐 이동 금지
     }
-
     Playermove(); //플레이어 이동 처리
     HandleToolSelection(); //아이템창 아래(툴바) 번호 선택
-
     if (InputManager::Instance().IsLeftClickDown()) { //좌클릭
         HandleLeftClickAction();
     }
     if (InputManager::Instance().IsRightClickDown()) { //우클릭
-
     }
-  
-
 }
 
 void Player::Playermove() //플레이어 이동 처리
@@ -176,14 +168,12 @@ void Player::Playermove() //플레이어 이동 처리
         currentDir = UP;
     }
     else if (InputManager::Instance().IsKeyHeld('S')) {
-
         currentDir = DOWN;
     }
 }
 void Player::HandleToolSelection() { //번호 선택 함수
     for (int i = 0; i < 9; ++i) {
         if (InputManager::Instance().IsKeyDown('1' + i)) {
-
             selectedTool = i;
             break;
         }
@@ -218,7 +208,6 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
         if (crop)
         {
             RenderManager::Instance().RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
-
             delete crop;
         }
         Map::ToggleTile(tileX, tileY, 4); //땅 교체
@@ -240,7 +229,6 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
     else // 괭이, 도끼 제외 작물 수확
     {
         PlaceableObject* obj = RenderManager::Instance().GetCropAt(tileX, tileY); //작물
-
         if (obj) {
             obj->Remove(tileX, tileY, player);
         }

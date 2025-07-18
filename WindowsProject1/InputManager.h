@@ -3,6 +3,7 @@
 #include "SingletonT.h"
 
 
+
 class InputManager : public SingletonT<InputManager>
 {
 public:
@@ -39,5 +40,4 @@ private:
     // 키 상태 추적
     BYTE currentKeys[256] = { 0 };
     BYTE previousKeys[256] = { 0 };
-
 };

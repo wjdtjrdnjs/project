@@ -117,6 +117,7 @@ void Box::RenderUI(HDC hdc)
                 BITMAP bm;
                 GetObject(bmp, sizeof(BITMAP), &bm);
 
+
                 int drawSize = 40;
                 int offsetX = slotRect.left + (slotSize - drawSize) / 2;
                 int offsetY = slotRect.top + (slotSize - drawSize) / 2;
@@ -192,6 +193,7 @@ void Box::RenderCursorItem(HDC hdc) {
 
     POINT mouse = InputManager::Instance().GetMousePosition();  //클릭한 좌표를 가져옴
     HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(heldItem.type);
+
 
     if (!bmp) return;
 
@@ -291,7 +293,6 @@ void Box::HandleItemSlotRClick(InventoryItem& slot) //박스 아이템창에서 우클릭
 
 //마우스 클릭 지점 확인(박스 or 플레이어 툴바)
 void Box::HandleClick(int mouseX, int mouseY, int num)
-
 {
     int startX = 10;
     int startY = 100;
@@ -312,6 +313,7 @@ void Box::HandleClick(int mouseX, int mouseY, int num)
                     HandleItemSlotLClick(items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
                 else
                     HandleItemSlotRClick(items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+
                 return;
             }
         }
@@ -333,11 +335,10 @@ void Box::HandleClick(int mouseX, int mouseY, int num)
                     HandleItemSlotLClick(playerToolbar[i]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
                 else
                     HandleItemSlotRClick(playerToolbar[i]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
-
-
                 return;
             }
         }
     }
   
 }
+

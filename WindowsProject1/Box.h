@@ -19,7 +19,6 @@ public:
     void HandleItemSlotLClick(InventoryItem& slot);//마우스 좌클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
     void HandleItemSlotRClick(InventoryItem& slot);//마우스 우클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
 
-
    // InventoryItem* GetItems();
     void SetPlayerToolbar(InventoryItem* toolbar) {
         playerToolbar = toolbar;

@@ -33,6 +33,7 @@ void Crop::Install(int tileX, int tileY, Player* player)
     InventoryItem* inv = player->GetInventory();
     if ((Map::GetTile(tileX, tileY) == TILE_Path || Map::GetTile(tileX, tileY) == Tile_FarmLand )&&!RenderManager::Instance().GetCropAt(tileX, tileY)) //중복설치 안되게
 
+
     {
 
         if (inv[tool].count > 0) // 1개 이상일 때
@@ -45,8 +46,6 @@ void Crop::Install(int tileX, int tileY, Player* player)
                 Crop* crop = new Crop(baseCropType);  //선택된 작물 정보 가져옴
                 crop->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
                 RenderManager::Instance().AddCrop(crop);  //작물 추가
-
-
                 inv[tool].count--;  // 들고있는 아이템 -1
                 if (inv[tool].count == 0) //들고있는 아이템 개수가 0개이다
                     inv[tool].type = CropType::None; //아이템이 0개면 빈 슬롯
@@ -60,7 +59,6 @@ void Crop::Remove(int tileX, int tileY, Player* player)
     if (crop && crop->IsFullyGrown()) { //작물이 있고 성장이 끝았을 때
         CropType type = crop->GetType();  //작물 정보 가져옴
         RenderManager::Instance().RemoveCrop(crop);  //작물 삭제
-
         delete crop;  //작물 삭제
         player->AddItem(type);  //인벤토리에 추가
     }

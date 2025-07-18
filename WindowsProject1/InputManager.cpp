@@ -1,6 +1,4 @@
 #include "InputManager.h"
-
-
 void InputManager::Init(HWND hwnd)
 {
     hWnd = hwnd;
@@ -52,7 +50,6 @@ bool InputManager::IsRightClickUp()
 bool InputManager::IsRightClickDown()
 {
     return currentRightClick && !previousRightClick;
-
 }
 
 bool InputManager::IsRightClickHeld()

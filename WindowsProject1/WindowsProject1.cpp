@@ -167,7 +167,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         RenderManager::Instance().SetMap(map);
         RenderManager::Instance().SetBox(box);
 
-
         SetTimer(hWnd, 999, 16, NULL); //플레이어 이동 타이머
 
 
@@ -201,7 +200,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {                            
             InputManager::Instance().Update();  //모든 객체 업데이트
             RenderManager::Instance().UpdateAll();  //모든 객체 업데이트
-
             InvalidateRect(hWnd, NULL, FALSE); // 화면 다시 그리
             break;
         }
@@ -214,8 +212,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 
         Player* player = RenderManager::Instance().GetPlayer();
-
-
         if (!player || !box) break;
 
         int mouseX, mouseY;
@@ -285,7 +281,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             box = nullptr;
         }
         BitmapManager::Instance().Release();
-
         PostQuitMessage(0);
         break;
     default:

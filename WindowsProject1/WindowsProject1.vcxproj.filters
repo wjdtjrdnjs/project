@@ -37,6 +37,12 @@
     <Filter Include="리소스 파일\Tileset">
       <UniqueIdentifier>{2a44b37a-3616-4ce4-a05b-7e390026c9f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Managers\SingletonT">
+      <UniqueIdentifier>{e246a08d-0a21-4731-8801-06865ffc6a75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CollisionManager">
+      <UniqueIdentifier>{c5f46239-4786-41a5-a2bb-d8bd3c0c4ef4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -60,20 +66,8 @@
     <ClInclude Include="Animal.h">
       <Filter>Objects</Filter>
     </ClInclude>
-    <ClInclude Include="RenderManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="BitmapManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="Map.h">
       <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeManager.h">
-      <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="Fence.h">
       <Filter>Objects</Filter>
@@ -93,14 +87,35 @@
     <ClInclude Include="PlaceableObject.h">
       <Filter>Objects</Filter>
     </ClInclude>
-    <ClInclude Include="SingletonT.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="MyRoomMap.h">
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="House.h">
       <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapManager.h">
+      <Filter>Managers\SingletonT</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Managers\SingletonT</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderManager.h">
+      <Filter>Managers\SingletonT</Filter>
+    </ClInclude>
+    <ClInclude Include="SingletonT.h">
+      <Filter>Managers\SingletonT</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeManager.h">
+      <Filter>Managers\SingletonT</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager.h">
+      <Filter>CollisionManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -119,18 +134,6 @@
     <ClCompile Include="Map.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="RenderManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="BitmapManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="TimeManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="Fence.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
@@ -145,6 +148,27 @@
     </ClCompile>
     <ClCompile Include="House.cpp">
       <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="BitmapManager.cpp">
+      <Filter>Managers\SingletonT</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Managers\SingletonT</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderManager.cpp">
+      <Filter>Managers\SingletonT</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeManager.cpp">
+      <Filter>Managers\SingletonT</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionManager.cpp">
+      <Filter>CollisionManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

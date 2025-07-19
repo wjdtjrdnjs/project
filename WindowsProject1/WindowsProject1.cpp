@@ -27,6 +27,7 @@
 #include "RenderManager.h"
 #include "BitmapManager.h"
 #include "InputManager.h"
+#include "GameObjectManager.h"
 
 #define MAX_LOADSTRING 100
 // 전역 변수:
@@ -165,9 +166,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         box = new Box(127, 285);               //상자 위치 전달
 
         //렌더 매니저에 등록
-        RenderManager::Instance().SetPlayer(player);
+        GameObjectManager::Instance().SetPlayer(player);
         RenderManager::Instance().SetHouse(house);
-        RenderManager::Instance().AddAnimal(animal);
+        GameObjectManager::Instance().AddAnimal(animal);
         RenderManager::Instance().SetMap(map);
         RenderManager::Instance().SetBox(box);
 
@@ -203,7 +204,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case 999:
         {                            
             InputManager::Instance().Update();  //모든 객체 업데이트
-            RenderManager::Instance().UpdateAll();  //모든 객체 업데이트
+            GameObjectManager::Instance().UpdateAll();  //모든 객체 업데이트
             InvalidateRect(hWnd, NULL, FALSE); // 화면 다시 그리
             break;
         }
@@ -215,7 +216,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_KEYDOWN: //상자 열기
     {
 
-        Player* player = RenderManager::Instance().GetPlayer();
+        Player* player = GameObjectManager::Instance().GetPlayer();
         if (!player || !box) break;
 
         int mouseX, mouseY;

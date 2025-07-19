@@ -2,6 +2,9 @@
 #include "InputManager.h" 
 #include "BitmapManager.h"
 #include "RenderManager.h"
+#include "GameObjectManager.h"
+#include "CollisionManager.h"
+
 std::map<Direction, std::vector<HBITMAP>> ply;
 Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry) 
 {
@@ -180,8 +183,8 @@ void Player::Playermove() //플레이어 이동 처리
     // 위치 업데이트
     x += dx;
     y += dy;
-
-    if (RenderManager::Instance().playerCollided()) { // 충돌 검사
+    CollisionManager collisionMgr;
+    if (collisionMgr.playerCollided()) { // 충돌 검사
         //충돌이 발생하면 저장되었던 값을 되돌림
         x -= dx;
         y -= dy;
@@ -208,7 +211,7 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
 
     std::string debugMsg = "Left Click at (" + std::to_string(pt.x) + ", " + std::to_string(pt.y) + ")\n"; //디버깅 확인용 
     OutputDebugStringA(debugMsg.c_str());
-    Player* player = RenderManager::Instance().GetPlayer();  //플레이어 정보 호출
+    Player* player = GameObjectManager::Instance().GetPlayer();  //플레이어 정보 호출
 
     if (!player) return; //생성죄지 않았다면 브레이크
 
@@ -221,17 +224,17 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
 
     if (inventory[selectedTool].type == CropType::hoe)  // 괭이일 때만 땅 교체 가능
     {
-        Crop* crop = RenderManager::Instance().GetCropAt(tileX, tileY);
+        Crop* crop = GameObjectManager::Instance().GetCropAt(tileX, tileY);
         if (crop)
         {
-            RenderManager::Instance().RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
+            GameObjectManager::Instance().RemoveCrop(crop);  //땅위에 작물이 있으면 삭제
             delete crop;
         }
         Map::ToggleTile(tileX, tileY, 4); //땅 교체
     }
     else if (inventory[selectedTool].type == CropType::Axe) //도끼 일때만 울타리 삭제
     {
-        PlaceableObject* obj = RenderManager::Instance().GetFenceAt(tileX, tileY); //울타리
+        PlaceableObject* obj = GameObjectManager::Instance().GetFenceAt(tileX, tileY); //울타리
 
         if (obj) {
             obj->Remove(tileX, tileY, player);
@@ -245,7 +248,7 @@ void Player::HandleLeftClickAction()//아이템을 들고 좌클릭
     }
     else // 괭이, 도끼 제외 작물 수확
     {
-        PlaceableObject* obj = RenderManager::Instance().GetCropAt(tileX, tileY); //작물
+        PlaceableObject* obj = GameObjectManager::Instance().GetCropAt(tileX, tileY); //작물
         if (obj) {
             obj->Remove(tileX, tileY, player);
         }
@@ -263,7 +266,7 @@ void Player::HandleRightClickAction() //아이템을 들고 우클릭
     std::string debugMsg = "Right Click at (" + std::to_string(pt.x) + ", " + std::to_string(pt.y) + ")\n";
     OutputDebugStringA(debugMsg.c_str());
 
-    Player* player = RenderManager::Instance().GetPlayer();//플레이어 정보 호출
+    Player* player = GameObjectManager::Instance().GetPlayer();//플레이어 정보 호출
 
     if (!player) return; //플레이어 정보가 존재하지 않는다면 종료
 

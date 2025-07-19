@@ -99,6 +99,9 @@
     <ClInclude Include="MyRoomMap.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="House.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowsProject1.cpp">
@@ -139,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="MyRoomMap.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="House.cpp">
+      <Filter>Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

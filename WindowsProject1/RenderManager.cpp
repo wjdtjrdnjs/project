@@ -1,6 +1,8 @@
 ﻿#include "RenderManager.h"
-
+#include "Animal.h"
+#include "House.h"
 void RenderManager::SetPlayer(Player* p) { player = p; }
+void RenderManager::SetHouse(House* h) { house = h; }
 void RenderManager::SetMap(Map* m) { map = m; }
 //void RenderManager::SetMyRoomMap(MyRoomMap* mym) { mymap = mym; }
 void RenderManager::SetBox(Box* b) { box = b; }
@@ -15,10 +17,10 @@ void RenderManager::RenderAll(HDC hdc, HWND hWnd)
     GetClientRect(hWnd, &r);
     if (map)map->Render(hdc); //맵
     for (auto& crop : crops) crop->Render(hdc); //작물
-    for (auto& animal : animals) animal->Render(hdc); //동물 
+   // for (auto& animal : animals) animal->Render(hdc); //동물 
     for (auto& fence : fences) fence->Render(hdc);//울타리(임시) 
     if (box) box->Render(hdc); //박스      
-  
+    if (house) house->Render(hdc); //박스  
 
     if (player)
     {

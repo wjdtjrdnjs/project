@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector>
 #include "Crop.h"
-#include "Animal.h"
 #include "Map.h"
 //#include "MyRoomMap.h"
 #include "Box.h"
@@ -14,6 +13,7 @@
 //그릴 클래스들 전방 선언
 class Player;
 class Animal;
+class House;
 class Fence;
 class Crop;
 class Map;
@@ -30,7 +30,8 @@ public:
 	 Player* GetPlayer() { return Instance().player; }
 	 void SetPlayer(Player* player);
 	 bool playerCollided();  //플레이어 충돌 검사
-
+	 //집
+	 void SetHouse(House* house);
 	//작물
 	 Crop* GetCropAt(int tileX, int tileY);
 	 void AddCrop(Crop* crop);
@@ -53,6 +54,7 @@ public:
 private:
 	bool isMapChanged = TRUE;
 	Player* player = nullptr;
+	House* house = nullptr;
 	Map* map = nullptr;
 	//MyRoomMap* mymap = nullptr;
 	Box* box = nullptr;

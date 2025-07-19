@@ -135,6 +135,7 @@
     <ClInclude Include="CropType.h" />
     <ClInclude Include="Fence.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="House.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="InventoryItem.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Crop.cpp" />
     <ClCompile Include="Fence.cpp" />
+    <ClCompile Include="House.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="Map.cpp" />

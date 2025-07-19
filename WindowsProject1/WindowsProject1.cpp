@@ -16,6 +16,7 @@
 #include "Player.h"
 #include "Inventory.h"
 #include "Box.h"
+#include "House.h"
 
 //game파일
 #include "Map.h"
@@ -147,6 +148,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 Box* box = nullptr; 
 Player* player = nullptr;
+House* house = nullptr;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -157,12 +159,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         InputManager::Instance().Init(hWnd);
 
         player = new Player();                 //플레이어 생성
+        house = new House();                 //플레이어 생성
         Animal* animal = new Animal();         //동물 생성
         Map* map = new Map();                  //맵 생성
         box = new Box(127, 285);               //상자 위치 전달
 
         //렌더 매니저에 등록
         RenderManager::Instance().SetPlayer(player);
+        RenderManager::Instance().SetHouse(house);
         RenderManager::Instance().AddAnimal(animal);
         RenderManager::Instance().SetMap(map);
         RenderManager::Instance().SetBox(box);

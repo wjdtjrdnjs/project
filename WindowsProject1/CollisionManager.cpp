@@ -12,7 +12,7 @@ bool CollisionManager::playerCollided()
     Box* box = RenderManager::Instance().GetBox();
     House* house = RenderManager::Instance().GetHouse();
 
-    RECT playerBox = GameObjectManager::Instance().GetPlayer()->GetBoundingBox();  //  플레이어 충돌 범위
+    RECT playerBox = player->GetBoundingBox();  //플레이어 충돌 범위
     RECT BoxBox = box->GetBoundingBox(); //상자 충돌 영역을 가져옴 
     RECT houseBox = house->GetBoundingBox(); //집 전체 충돌 영역을 가져옴
 
@@ -25,7 +25,7 @@ bool CollisionManager::playerCollided()
         RECT fenceBox = fence->GetBoundingBox();  //울타리 충돌 영역 가져옴 
         if (IntersectRect(&intersect, &playerBox, &fenceBox)) {//울타리와 플레이어가 충돌했는지 확인
             return true; // 충돌 발생
-        };
+        }
     }
 
     if (IntersectRect(&intersect, &playerBox, &BoxBox)) {//상자와 플레이어가 충돌했는지 확인
@@ -33,9 +33,10 @@ bool CollisionManager::playerCollided()
     }
 
     if (IntersectRect(&intersect, &playerBox, &houseBox)) {//집과 플레이어가 충돌했는지 확인
-        houseBox = house->GetDoorBoundingBox(); //집의 문 충돌 영역으로 교체
-        if (IntersectRect(&intersect, &playerBox, &houseBox))//플레이어가 문에 닿았는 지 확인
+        RECT doorBox = house->GetDoorBoundingBox(); //집의 문 충돌 영역으로 교체
+        if (IntersectRect(&intersect, &playerBox, &doorBox))//플레이어가 문에 닿았는 지 확인
         {
+            RenderManager::Instance().SetisMapChanged();
             OutputDebugStringA("집 내부 입장\n");
         }
         return true; // 충돌 발생

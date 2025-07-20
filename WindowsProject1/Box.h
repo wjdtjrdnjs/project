@@ -1,10 +1,12 @@
 #pragma once
 #include <Windows.h>
+#include <vector>
 #include "Map.h"
 #include "Player.h"
+#include "CollisionManager.h"
 
 
-class Box {
+class Box:public CollisionManager{
 public:
     Box(int x, int y);
     void Render(HDC hdc);       // 상자 아이콘 그리기
@@ -18,7 +20,10 @@ public:
     void RenderCursorItem(HDC hdc); //클릭된 아이템이 커서에 붙게 하는 함수
     void HandleItemSlotLClick(InventoryItem& slot);//마우스 좌클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
     void HandleItemSlotRClick(InventoryItem& slot);//마우스 우클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
-    RECT GetBoundingBox(); //상자 충돌 범위(빨간 테투리)
+
+    std::vector<RECT>GetCollisionRects()const override;
+
+    RECT GetBoundingBox() const; //상자 충돌 범위(빨간 테투리)
    // InventoryItem* GetItems();
     void SetPlayerToolbar(InventoryItem* toolbar) {
         playerToolbar = toolbar;

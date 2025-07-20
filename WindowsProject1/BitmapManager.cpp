@@ -1,6 +1,5 @@
 ﻿#include "BitmapManager.h"
 
-
 void BitmapManager::Load(HINSTANCE hInstance)
 {
     std::vector<HBITMAP> onionStages;

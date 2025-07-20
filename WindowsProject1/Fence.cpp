@@ -7,7 +7,7 @@ Fence::Fence()
 
     hBmp = BitmapManager::Instance().GetBitmapFence();// itmapManager에서 울타리 비트맵 핸들 받아오기
 }
-RECT Fence::GetBoundingBox() //울타리 충돌 범위
+RECT Fence::GetBoundingBox() const //울타리 충돌 범위
 {
     BITMAP bmpInfo;
     GetObject(hBmp, sizeof(BITMAP), &bmpInfo);
@@ -20,6 +20,15 @@ RECT Fence::GetBoundingBox() //울타리 충돌 범위
 
     return rect;
 }
+
+std::vector<RECT> Fence::GetCollisionRects() const
+{
+    std::vector<RECT> rect;
+    rect.push_back(GetBoundingBox());
+    return rect;
+}
+
+
 
 Fence::~Fence() //울타리 소멸자
 {

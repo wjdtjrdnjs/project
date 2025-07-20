@@ -101,7 +101,7 @@ void Box::Render(HDC hdc) {
 }
 
 
-RECT Box::GetBoundingBox() //상자 충돌 범위
+RECT Box::GetBoundingBox()const //상자 충돌 범위
 {
     BITMAP bmpInfo;
     GetObject(hIconBitmap, sizeof(BITMAP), &bmpInfo);
@@ -304,6 +304,13 @@ void Box::HandleItemSlotRClick(InventoryItem& slot) //박스 아이템창에서 우클릭
         }        
     }
     
+}
+
+std::vector<RECT> Box::GetCollisionRects() const
+{
+    std::vector<RECT> rect;
+    rect.push_back(GetBoundingBox());
+    return rect;
 }
 
 

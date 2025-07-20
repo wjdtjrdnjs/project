@@ -8,6 +8,7 @@
 #include "Crop.h"
 #include "Inventory.h"
 #include "InventoryItem.h"
+#include "CollisionManager.h"
 #include "PlaceableObject.h"
 
 enum Direction { //플레이어 방향
@@ -17,7 +18,7 @@ enum Direction { //플레이어 방향
 	LEFT = 3
 };
 
-class Player
+class Player:public CollisionManager
 {
 public:
 	Player();
@@ -27,10 +28,12 @@ public:
 	int GetY()  { return y; }
 	int GetWidth() { return x; }
 	int GeGetHeighttX() { return x; }
-	RECT GetBoundingBox();
+	RECT GetBoundingBox()const;
 	void RenderInventory(HDC hdc, int screenWidth, int screenHeight);  //플레이어 아래 인벤창(툴바) 렌더링
 	void AddItem(CropType type);		//인벤토리에 아이템 추가
-	
+
+	std::vector<RECT>GetCollisionRects()const override;;
+
 	void Render(HDC hdc);	//플레이어 렌더링
 	void UpdatePlayer();	//플레이어 업데이트(이동 처리, 툴바 번호 선택, 좌클릭 or 우클릭, 방향 이미지 갱신)
 	void Playermove();		//플레이어 이동 처리

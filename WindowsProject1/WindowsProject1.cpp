@@ -163,13 +163,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         house = new House();                 //플레이어 생성
         Animal* animal = new Animal();         //동물 생성
         Map* map = new Map();                  //맵 생성
+        MyRoomMap* mymap = new MyRoomMap();                  //집 내부 생성
         box = new Box(127, 285);               //상자 위치 전달
 
         //렌더 매니저에 등록
         GameObjectManager::Instance().SetPlayer(player);
         RenderManager::Instance().SetHouse(house);
-        GameObjectManager::Instance().AddAnimal(animal);
-        RenderManager::Instance().SetMap(map);
+        GameObjectManager::Instance().AddAnimal(animal); 
+        RenderManager::Instance().SetMap(map);      
+        RenderManager::Instance().SetMyRoomMap(mymap); 
         RenderManager::Instance().SetBox(box);
 
         SetTimer(hWnd, 999, 16, NULL); //플레이어 이동 타이머

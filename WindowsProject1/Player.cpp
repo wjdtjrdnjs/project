@@ -3,7 +3,6 @@
 #include "BitmapManager.h"
 #include "RenderManager.h"
 #include "GameObjectManager.h"
-#include "CollisionManager.h"
 
 std::map<Direction, std::vector<HBITMAP>> ply;
 Player::Player() : x(50), y(250), selectedCrop(CropType::Strawberry) 
@@ -98,6 +97,11 @@ void Player::AddItem(CropType type) {   //인벤토리에 아이템 추가
         }
     }
 }
+std::vector<RECT> Player::GetCollisionRects() const
+{
+    //플레이어 여러 충돌 범위가 생길 시 벡터 사용해야함
+    return { GetBoundingBox() };
+}
 void Player::Render(HDC hdc) //플레이어를 화면에 렌더링
 {
     if (ply.empty()) return;
@@ -183,8 +187,8 @@ void Player::Playermove() //플레이어 이동 처리
     // 위치 업데이트
     x += dx;
     y += dy;
-    CollisionManager collisionMgr;
-    if (collisionMgr.playerCollided()) { // 충돌 검사
+    //if ();
+    if (playerCollided()) { // 충돌 검사
         //충돌이 발생하면 저장되었던 값을 되돌림
         x -= dx;
         y -= dy;
@@ -293,10 +297,10 @@ void Player::HandleRightClickAction() //아이템을 들고 우클릭
    
 }
 
-RECT Player::GetBoundingBox() //플레이어 충돌 범위 
+RECT Player::GetBoundingBox() const//플레이어 충돌 범위 
 {
     BITMAP bmp;
-    HBITMAP currentBmp = ply[currentDir][0];  // 현재 방향의 첫 프레임
+    HBITMAP currentBmp = ply.at(currentDir).at(0);// 현재 방향의 첫 프레임
     GetObject(currentBmp, sizeof(BITMAP), &bmp);
 
     RECT rect;

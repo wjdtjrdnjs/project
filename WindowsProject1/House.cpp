@@ -52,7 +52,15 @@ void House::Render(HDC hdc)  //동물 생성
     DeleteObject(b);
 }
 
-RECT House::GetBoundingBox()
+std::vector<RECT> House::GetCollisionRects()const
+{
+    std::vector<RECT> rects;
+    rects.push_back(GetBoundingBox());     // 집 본체 충돌
+    rects.push_back(GetDoorBoundingBox()); // 문 충돌
+    return rects;
+}
+
+RECT House::GetBoundingBox()const
 {
     BITMAP bmpInfo;
     GetObject(hBmp, sizeof(BITMAP), &bmpInfo);
@@ -66,7 +74,7 @@ RECT House::GetBoundingBox()
 
 }
 
-RECT House::GetDoorBoundingBox()
+RECT House::GetDoorBoundingBox()const
 {
     BITMAP bmpInfo;
     GetObject(hBmp, sizeof(BITMAP), &bmpInfo);

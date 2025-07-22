@@ -7,6 +7,7 @@ void BitmapManager::Load(HINSTANCE hInstance)
     std::vector<HBITMAP> playerBitmaps;
 
     for (int i = 0; i < 6; ++i) { // IDB_BITMAP10 ~ IDB_BITMAP15까지 딸기 씨앗~성숙
+        
         HBITMAP bmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP10 + i), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
         strawberryStages.push_back(bmp);
     }
@@ -52,8 +53,12 @@ const std::vector<HBITMAP>& BitmapManager::GetGrowthBitmaps(CropType type) {
 
 HBITMAP BitmapManager::GetBitmap(int resourceId)
 {
-    if (bitmapMap.count(resourceId))
-        return bitmapMap[resourceId];
+    auto it = bitmapMap.find(resourceId);
+    if (it != bitmapMap.end()) {
+        return it->second;
+    }
+
+    OutputDebugString(L"[BitmapManager] Bitmap NOT FOUND for resourceId\n");
     return nullptr;
 }
 

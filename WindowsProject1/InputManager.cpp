@@ -82,3 +82,19 @@ bool InputManager::IsKeyUp(int vKey)
     return ((currentKeys[vKey] & 0x80) == 0) &&
         ((previousKeys[vKey] & 0x80) != 0);
 }
+
+int InputManager::GetPressedNumberKey()
+{
+    for (int i = 0; i < 9; ++i) {
+        // VK_1 ~ VK_9 = 0x31 ~ 0x39
+        if (GetAsyncKeyState(0x31 + i) & 0x8000) {
+            return i + 1; // 1~9 숫자 반환
+        }
+    }
+    return 0; // 아무 것도 안 눌렸으면 0
+}
+
+bool InputManager::IsKeyPressedOnce(int key) {
+    return (GetAsyncKeyState(key) & 0x0001); // ← 딱 한 번만 true
+}
+

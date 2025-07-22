@@ -1,7 +1,10 @@
 #include "Box.h"
 #include "BitmapManager.h"
 #include "InputManager.h"
+#include "InventoryItem.h"
+#include "GameObjectManager.h"
 
+#include <string>
 #define slotSize 50
 Box::Box(int xPos, int yPos) : x(xPos), y(yPos), isOpen(false)
 {
@@ -51,10 +54,12 @@ bool Box::IsMouseOverIcon(int mouseX, int mouseY) { //마우스 커서가 상자아이콘 �
         mouseY >= iconRect.top && mouseY <= iconRect.bottom;
 }
 void Box::Open() {
+    GameObjectManager::Instance().GetPlayerController()->SetStopped(true);
     isOpen = true;
 }
 
 void Box::Close() {
+    GameObjectManager::Instance().GetPlayerController()->SetStopped(false);
     isOpen = false;
 }
 
@@ -115,6 +120,21 @@ RECT Box::GetBoundingBox()const //상자 충돌 범위
     return rect;
 }
 
+void Box::SetPlayerToolbar(InventoryItem* toolbar)
+{
+    for (int i = 0; i < 9; i++)
+    {
+        playerToolbar[i] = &toolbar[i];  //박스 안에서 교환이 이루어지므로 주소값을 가져옴
+    }
+  
+}
+
+void Box::SetPlayerNear(bool ch) //플레이어가 박스 근처에 있을 시
+{
+    playerNear = ch; 
+}
+
+
 void Box::RenderUI(HDC hdc)
 {
     int startX = 10;
@@ -131,7 +151,11 @@ void Box::RenderUI(HDC hdc)
             FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));  // 테두리
             if (items[y][i].type != CropType::None) {
                 HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(items[y][i].type);
-
+                if (!bmp) {
+                    // 비트맵 로드 실패! 로그 찍거나 기본 비트맵으로 대체
+                    OutputDebugString(L"비트맵을 찾을 수 없습니다!\n");
+                    return;  // 여기서 리턴하거나 대체 처리
+                }
                 HDC memDC = CreateCompatibleDC(hdc);
                 HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
                 BITMAP bm;
@@ -160,9 +184,8 @@ void Box::RenderUI(HDC hdc)
             DeleteObject(brush);
         }
     }
-    if (playerToolbar) {
-        int startX = 10;
-        int startY = 100 + 3 * 51 + 10;  // 상자 아래 여백 10
+         startX = 10;
+         startY = 100 + 3 * 51 + 10;  // 상자 아래 여백 10
 
         for (int i = 0; i < 9; i++) {
             RECT slotRect = {
@@ -176,10 +199,13 @@ void Box::RenderUI(HDC hdc)
             FillRect(hdc, &slotRect, brush);
             FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
             DeleteObject(brush);
-
-            if (playerToolbar[i].type != CropType::None) {
-                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(playerToolbar[i].type);
-
+            if (playerToolbar[i]->type != CropType::None) {
+                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(playerToolbar[i]->type);
+                if (!bmp) {
+                    // 비트맵 로드 실패! 로그 찍거나 기본 비트맵으로 대체
+                    OutputDebugString(L"비트맵을 찾을 수 없습니다!\n");
+                    return;  // 여기서 리턴하거나 대체 처리
+                }
                 if (bmp) {
                     HDC memDC = CreateCompatibleDC(hdc);
                     HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
@@ -196,26 +222,29 @@ void Box::RenderUI(HDC hdc)
                         bm.bmWidth, bm.bmHeight,
                         RGB(255, 255, 255));
 
-                    std::string countText = std::to_string(playerToolbar[i].count);
+                    std::string countText = std::to_string(playerToolbar[i]->count);
                     TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), countText.length());
                     SelectObject(memDC, oldBmp);
                     DeleteDC(memDC);
                 }
             }
         }
+        RenderCursorItem(hdc);
+
     }
-    RenderCursorItem(hdc);
  
-}
 //클릭된 아이템이 커서에 붙게 하는 함수
 void Box::RenderCursorItem(HDC hdc) { 
     if (heldItem.type == CropType::None) return; // 아무것도 안 들고 있으면 돌아감
 
     POINT mouse = InputManager::Instance().GetMousePosition();  //클릭한 좌표를 가져옴
     HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(heldItem.type);
+    if (!bmp) {
+        // 비트맵 로드 실패! 로그 찍거나 기본 비트맵으로 대체
+        OutputDebugString(L"비트맵을 찾을 수 없습니다!\n");
+        return;  // 여기서 리턴하거나 대체 처리
+    }
 
-
-    if (!bmp) return;
 
     HDC memDC = CreateCompatibleDC(hdc);
     HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
@@ -244,46 +273,46 @@ void Box::RenderCursorItem(HDC hdc) {
 
 /////////////////코드 수정////////////////
  //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
-void Box::HandleItemSlotLClick(InventoryItem& slot)  //좌클릭
+void Box::HandleItemSlotLClick(InventoryItem* slot)  //좌클릭
 {
 
     if (heldItem.type == CropType::None) {
         // 빈손이면 슬롯의 아이템을 든다
-        heldItem = slot;
-        slot.type = CropType::None;
-        slot.count = 0;
+        heldItem = *slot;
+        slot->type = CropType::None;
+        slot->count = 0;
     }
     else {
-        if (slot.type == CropType::None) {
+        if (slot->type == CropType::None) {
             // 빈 슬롯이면 아이템을 넣는다
-            slot = heldItem;
+            *slot = heldItem;
             heldItem.type = CropType::None;
             heldItem.count = 0;
         }
-        else if (slot.type == heldItem.type) {
+        else if (slot->type == heldItem.type) {
             // 같은 아이템이면 합치기
-            slot.count += heldItem.count;
+            slot->count += heldItem.count;
             heldItem.type = CropType::None;
             heldItem.count = 0;
         }
         else {
             // 서로 다른 아이템이면 교환
-            InventoryItem temp = heldItem;
-            heldItem = slot;
-            slot = temp;
+            InventoryItem temp = *slot;
+            *slot = heldItem;
+            heldItem = temp;
         }
     }
   
 }
 
-void Box::HandleItemSlotRClick(InventoryItem& slot) //박스 아이템창에서 우클릭
+void Box::HandleItemSlotRClick(InventoryItem* slot) //박스 아이템창에서 우클릭
 {
     if (heldItem.type == CropType::None) return; //손에 아이템이 없으면 리턴
     else {
-        if (slot.type == CropType::None) { 
+        if (slot->type == CropType::None) { 
             // 빈 슬롯이면 아이템을 넣고 수량 +1 들고있는 아이템은 -1
-            slot.type = heldItem.type; 
-            slot.count++; 
+            slot->type = heldItem.type; 
+            slot->count++;
             heldItem.count--;
             if (heldItem.count < 1) //들고 있는 아이템 수량이 0개 이하일 때 실행
             {
@@ -292,9 +321,9 @@ void Box::HandleItemSlotRClick(InventoryItem& slot) //박스 아이템창에서 우클릭
             }
                 
         }
-        else if (slot.type == heldItem.type) {
+        else if (slot->type == heldItem.type) {
             // 같은 아이템이면 합치기 슬롯에 있는 아이템은 +1 들고 있는 아이템은 -1
-            slot.count++;
+            slot->count++;
             heldItem.count--;
             if (heldItem.count < 1) //들고 있는 아이템 수량이 0개 이하일 때 실행
             {
@@ -337,9 +366,9 @@ void Box::HandleClick(int mouseX, int mouseY, int num)
             if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) //클릭한 곳이 박스 슬롯이면 실행
             {
                 if(num == 1)
-                    HandleItemSlotLClick(items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+                    HandleItemSlotLClick(&items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
                 else
-                    HandleItemSlotRClick(items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
+                    HandleItemSlotRClick(&items[i][j]); //마우스로 클릭한 슬롯과 현재 들고 있는 아이템 처리 함수
 
                 return;
             }

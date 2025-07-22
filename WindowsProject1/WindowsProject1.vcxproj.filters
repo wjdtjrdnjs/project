@@ -43,6 +43,18 @@
     <Filter Include="CollisionManager">
       <UniqueIdentifier>{c5f46239-4786-41a5-a2bb-d8bd3c0c4ef4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Inventory">
+      <UniqueIdentifier>{841e5e87-03ba-4615-a0b6-3ecc4c84883d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{1190a9ad-1ea6-4b59-a384-2ec231d539c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{d16b38e1-e4c7-425a-bac9-472d589be637}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject">
+      <UniqueIdentifier>{bc0b06c2-7404-4dc5-874c-5a1058d807a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -57,17 +69,11 @@
     <ClInclude Include="WindowsProject1.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Crop.h">
       <Filter>Objects</Filter>
     </ClInclude>
     <ClInclude Include="Animal.h">
       <Filter>Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Fence.h">
       <Filter>Objects</Filter>
@@ -75,16 +81,7 @@
     <ClInclude Include="Box.h">
       <Filter>Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Inventory.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="InventoryItem.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
     <ClInclude Include="CropType.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="PlaceableObject.h">
       <Filter>Objects</Filter>
     </ClInclude>
     <ClInclude Include="MyRoomMap.h">
@@ -114,16 +111,43 @@
     <ClInclude Include="GameObjectManager.h">
       <Filter>Managers</Filter>
     </ClInclude>
+    <ClInclude Include="WorldMap.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Player</Filter>
+    </ClInclude>
     <ClInclude Include="CollisionManager.h">
-      <Filter>CollisionManager</Filter>
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaceableObject.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerGraphics.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="InventoryItem.h">
+      <Filter>Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="InventoryComponent.h">
+      <Filter>Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="Direction.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="InventoryUIController.h">
+      <Filter>Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowsProject1.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Objects</Filter>
     </ClCompile>
     <ClCompile Include="Crop.cpp">
       <Filter>Objects</Filter>
@@ -131,16 +155,10 @@
     <ClCompile Include="Animal.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Fence.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
     <ClCompile Include="Box.cpp">
-      <Filter>Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Inventory.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
     <ClCompile Include="MyRoomMap.cpp">
@@ -167,8 +185,29 @@
     <ClCompile Include="GameObjectManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
+    <ClCompile Include="WorldMap.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
     <ClCompile Include="CollisionManager.cpp">
-      <Filter>CollisionManager</Filter>
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerGraphics.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="InventoryComponent.cpp">
+      <Filter>Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="InventoryUIController.cpp">
+      <Filter>Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

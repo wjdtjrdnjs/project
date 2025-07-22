@@ -2,9 +2,11 @@
 #include "Player.h"
 #include "RenderManager.h"
 #include "GameObjectManager.h"
+#include "PlayerController.h"
+#include "InventoryComponent.h"
+#include "InputManager.h"
 Fence::Fence()
 {
-
     hBmp = BitmapManager::Instance().GetBitmapFence();// itmapManager에서 울타리 비트맵 핸들 받아오기
 }
 RECT Fence::GetBoundingBox() const //울타리 충돌 범위
@@ -33,29 +35,35 @@ std::vector<RECT> Fence::GetCollisionRects() const
 Fence::~Fence() //울타리 소멸자
 {
 }
-void Fence::Install(int tileX, int tileY, Player* player)
+
+void Fence::Install(int tileX, int tileY, InventoryComponent& inventory)
 {
-    int tool = player->GetSelectedTool();
-    InventoryItem* inv = player->GetInventory();
-        if (inv[tool].count > 0 && !GameObjectManager::Instance().GetFenceAt(tileX, tileY)) // 1개 이상이고 위치가 겹치지 않을 때
+    int tool = InputManager::Instance().GetPressedNumberKey();
+    int index = tool - 1;
+    if (index >= 0 && index < 9)
+    {
+        InventoryItem& item = inventory[index];
+        if (item.count > 0 && !GameObjectManager::Instance().GetFenceAt(tileX, tileY)) // 1개 이상이고 위치가 겹치지 않을 때
         {
             Fence* fence = new Fence();  //울타리 생성
             fence->SetPosition(tileX * tileSize, tileY * tileSize); //설치할 위치
             GameObjectManager::Instance().AddFence(fence);  //울타리 추가
-            inv[tool].count--;  // 들고있는 아이템 -1
-            if (inv[tool].count == 0) //들고있는 아이템 개수가 0개이다
-               inv[tool].type = CropType::None; //아이템이 0개면 빈 슬롯
+            item.count--;  // 들고있는 아이템 -1
+            if (item.count == 0) //들고있는 아이템 개수가 0개이다
+                item.type = CropType::None; //아이템이 0개면 빈 슬롯
         }
+    }
+        
 }
 
-void Fence::Remove(int tileX, int tileY, Player* player)
+void Fence::Remove(int tileX, int tileY, InventoryComponent& inventory)
 {
     
     Fence* fence = GameObjectManager::Instance().GetFenceAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
     if (fence) { //울타리가 있으면 실행
         GameObjectManager::Instance().RemoveFence(fence);  //울타리 삭제
         delete fence;  //메모리 해제
-        player->AddItem(CropType::Fence);  //인벤토리에 추가
+        inventory.AddItem(CropType::Fence);  //인벤토리에 추가
     }
 
 }

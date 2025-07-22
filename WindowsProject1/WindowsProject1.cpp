@@ -1,12 +1,12 @@
 ﻿// WindowsProject1.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
-
 #include "framework.h"
 #include "WindowsProject1.h"
 #include <windowsx.h>
 #include <wingdi.h> 
 #include <math.h> 
 #include <iostream>
+#include <string>
 #include <vector>
 
 //Objects 파일
@@ -14,13 +14,11 @@
 #include "Crop.h"
 #include "Animal.h"
 #include "Player.h"
-#include "Inventory.h"
 #include "Box.h"
 #include "House.h"
 
 //game파일
-#include "Map.h"
-
+#include "WorldMap.h"
 //Managers파일
 #include "SingletonT.h"
 
@@ -28,6 +26,8 @@
 #include "BitmapManager.h"
 #include "InputManager.h"
 #include "GameObjectManager.h"
+#include "PlayerController.h"
+#include "CollisionManager.h"
 
 #define MAX_LOADSTRING 100
 // 전역 변수:
@@ -146,10 +146,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 // 
 
-
-Box* box = nullptr; 
-Player* player = nullptr;
-House* house = nullptr;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -157,23 +153,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
  
     case WM_CREATE:
     {
-        InputManager::Instance().Init(hWnd);
-
-        player = new Player();                 //플레이어 생성
-        house = new House();                 //플레이어 생성
-        Animal* animal = new Animal();         //동물 생성
-        Map* map = new Map();                  //맵 생성
-        MyRoomMap* mymap = new MyRoomMap();                  //집 내부 생성
-        box = new Box(127, 285);               //상자 위치 전달
-
-        //렌더 매니저에 등록
-        GameObjectManager::Instance().SetPlayer(player);
-        RenderManager::Instance().SetHouse(house);
-        GameObjectManager::Instance().AddAnimal(animal); 
-        RenderManager::Instance().SetMap(map);      
-        RenderManager::Instance().SetMyRoomMap(mymap); 
-        RenderManager::Instance().SetBox(box);
-
+        GameObjectManager::Instance().Init(hWnd);
         SetTimer(hWnd, 999, 16, NULL); //플레이어 이동 타이머
 
 
@@ -205,8 +185,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case 999:
         {                            
-            InputManager::Instance().Update();  //모든 객체 업데이트
-            GameObjectManager::Instance().UpdateAll();  //모든 객체 업데이트
+            GameObjectManager::Instance().Update();
             InvalidateRect(hWnd, NULL, FALSE); // 화면 다시 그리
             break;
         }
@@ -217,43 +196,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;  
     case WM_KEYDOWN: //상자 열기
     {
-
-        Player* player = GameObjectManager::Instance().GetPlayer();
-        if (!player || !box) break;
-
-        int mouseX, mouseY;
-        POINT pt;
-        GetCursorPos(&pt);
-        ScreenToClient(hWnd, &pt);
-        mouseX = pt.x;
-        mouseY = pt.y;
-
-        if (wParam == 'E' && !player->IsBoxOpen()) {  //상자 열기
-            if (box->IsPlayerInRange(player->GetX(), player->GetY()) &&
-                box->IsMouseOverIcon(mouseX, mouseY)) {
-                box->Open();    //상자 열기
-                player->SetBoxOpen(true); //상자 열면 플레이어 이동 불가
-                box->SetPlayerToolbar(player->GetInventory());
-
+        Box* box = GameObjectManager::Instance().GetBox();
+        if (wParam == 'E' && box->IsPlayerNear())
+        {
+            if (box->IsOpen())
+            {
+                box->Close();
+                box->SetPlayerNear(FALSE);
             }
+            else
+                box->Open();
         }
-        else if (wParam == 'E' || wParam == VK_ESCAPE && box->IsOpen() ) { //esc나 E로 상자 닫기
-            box->Close();
-           
-            player->SetBoxOpen(false); //닫으면 플레이어 이동 가능
+        else if (wParam == VK_ESCAPE)
+        {
+            // ESC 키 처리
+            if (box->IsOpen())
+                box->Close();
         }
-
-        if (wParam == VK_TAB || wParam == 'I') {
-            static bool inventoryOpen = false;
-            inventoryOpen = !inventoryOpen;
-
-            // 이 상태는 렌더 함수나 업데이트 루프에 반영해야 함
-            player->SetInventoryOpen(inventoryOpen); 
-        }
-
-        break;
     }
-
+        break;
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -266,9 +227,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SelectObject(memDC, backBuffer);
 
         FillRect(memDC, &rect, (HBRUSH)(COLOR_WINDOW + 1));
-
-        RenderManager::Instance().RenderAll(memDC, hWnd);
-     
+       
+        GameObjectManager::Instance().Render(memDC, hWnd);
+       
         BitBlt(hdc, 0, 0, rect.right, rect.bottom, memDC, 0, 0, SRCCOPY);
 
         DeleteObject(backBuffer);
@@ -283,10 +244,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_DESTROY:
         KillTimer(hWnd, 999);  //타이머 종료
-        if (box) {  //상자 삭제
-            delete box;
-            box = nullptr;
-        }
+        GameObjectManager::Instance().Release();
         BitmapManager::Instance().Release();
         PostQuitMessage(0);
         break;

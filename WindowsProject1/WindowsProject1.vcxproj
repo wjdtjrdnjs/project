@@ -134,17 +134,21 @@
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Crop.h" />
     <ClInclude Include="CropType.h" />
+    <ClInclude Include="Direction.h" />
     <ClInclude Include="Fence.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameObjectManager.h" />
     <ClInclude Include="House.h" />
     <ClInclude Include="InputManager.h" />
-    <ClInclude Include="Inventory.h" />
+    <ClInclude Include="InventoryComponent.h" />
     <ClInclude Include="InventoryItem.h" />
-    <ClInclude Include="Map.h" />
+    <ClInclude Include="InventoryUIController.h" />
     <ClInclude Include="MyRoomMap.h" />
     <ClInclude Include="PlaceableObject.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerController.h" />
+    <ClInclude Include="PlayerGraphics.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SingletonT.h" />
@@ -152,6 +156,7 @@
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="UpdateManager.h" />
     <ClInclude Include="WindowsProject1.h" />
+    <ClInclude Include="WorldMap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animal.cpp" />
@@ -160,11 +165,15 @@
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Crop.cpp" />
     <ClCompile Include="Fence.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="InventoryComponent.cpp" />
+    <ClCompile Include="InventoryUIController.cpp" />
+    <ClCompile Include="PlayerController.cpp" />
+    <ClCompile Include="PlayerGraphics.cpp" />
+    <ClCompile Include="WorldMap.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="House.cpp" />
     <ClCompile Include="InputManager.cpp" />
-    <ClCompile Include="Inventory.cpp" />
-    <ClCompile Include="Map.cpp" />
     <ClCompile Include="MyRoomMap.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="RenderManager.cpp" />

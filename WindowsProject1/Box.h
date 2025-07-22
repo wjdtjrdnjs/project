@@ -1,12 +1,10 @@
 #pragma once
 #include <Windows.h>
-#include <vector>
-#include "Map.h"
-#include "Player.h"
 #include "CollisionManager.h"
+#include "InventoryItem.h"
 
-
-class Box:public CollisionManager{
+class Box:public CollisionManager
+{
 public:
     Box(int x, int y);
     void Render(HDC hdc);       // 상자 아이콘 그리기
@@ -18,20 +16,24 @@ public:
     bool IsOpen() const;
     void HandleClick(int row, int col, int num); //마우스 좌클릭 지점 확인(박스 칸 or 플레이어 툴바)
     void RenderCursorItem(HDC hdc); //클릭된 아이템이 커서에 붙게 하는 함수
-    void HandleItemSlotLClick(InventoryItem& slot);//마우스 좌클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
-    void HandleItemSlotRClick(InventoryItem& slot);//마우스 우클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
+
+    void HandleItemSlotLClick(InventoryItem* slot);//마우스 좌클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
+    void HandleItemSlotRClick(InventoryItem* slot);//마우스 우클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
 
     std::vector<RECT>GetCollisionRects()const override;
 
     RECT GetBoundingBox() const; //상자 충돌 범위(빨간 테투리)
    // InventoryItem* GetItems();
-    void SetPlayerToolbar(InventoryItem* toolbar) {
-        playerToolbar = toolbar;
-    }
+    void SetPlayerToolbar(InventoryItem* toolbar);
+    
+    void SetPlayerNear(bool ch);
+    bool IsPlayerNear() { return playerNear; }
+       
 private:
     int x, y;                  
     bool isOpen = false;
-    InventoryItem* playerToolbar = nullptr;
+    bool playerNear = false;
+    InventoryItem* playerToolbar[9];
     InventoryItem items[3][9];    // 3x9 인벤토리 슬롯(임시)
     InventoryItem heldItem;
     HBITMAP hIconBitmap;

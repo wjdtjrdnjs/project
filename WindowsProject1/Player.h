@@ -4,74 +4,45 @@
 #include <windows.h>
 #include <algorithm>
 #include "resource.h"
-#include "CropType.h"
-#include "Crop.h"
-#include "Inventory.h"
-#include "InventoryItem.h"
 #include "CollisionManager.h"
-#include "PlaceableObject.h"
+#include "Direction.h"
 
-enum Direction { //플레이어 방향
-	DOWN = 0,
-	UP = 1,
-	RIGHT = 2,
-	LEFT = 3
-};
-
-class Player:public CollisionManager
+class InventoryComponent;
+class Player : public CollisionManager
 {
 public:
-	Player();
+	Player(InventoryComponent* inventoryComponent);
 	~Player();
-	//플레이어 좌표
-	int GetX()  { return x; }
-	int GetY()  { return y; }
-	int GetWidth() { return x; }
-	int GeGetHeighttX() { return x; }
-	RECT GetBoundingBox()const;
-	void RenderInventory(HDC hdc, int screenWidth, int screenHeight);  //플레이어 아래 인벤창(툴바) 렌더링
-	void AddItem(CropType type);		//인벤토리에 아이템 추가
+	void LoadSprites();
+	// 플레이어 좌표
+	int GetX() const { return x; }
+	int GetY() const { return y; }
+	void SetPlusX(int dx, int dy)  { x += dx, y += dy;}
+	void SetMinusY(int dx, int dy) { x -= dx, y -= dy; }
+	RECT GetBoundingBox() const;
 
-	std::vector<RECT>GetCollisionRects()const override;;
+	void Render(HDC hdc);	// 플레이어 렌더링
 
-	void Render(HDC hdc);	//플레이어 렌더링
-	void UpdatePlayer();	//플레이어 업데이트(이동 처리, 툴바 번호 선택, 좌클릭 or 우클릭, 방향 이미지 갱신)
-	void Playermove();		//플레이어 이동 처리
-	void HandleToolSelection();		// 툴바 번호 선택
-	void HandleLeftClickAction();	// 좌클릭 
-	void HandleRightClickAction();  // 우클릭 
+	void SetDirection(Direction dir) { currentDir = dir; }
+	Direction  GetDirection() const { return currentDir; }
 
-	void SetSelectedCrop(CropType type) { selectedCrop = type; }  //SetSelectedCrop 선택된 아이템 타입을 가져옴 
-	CropType GetSelectedCrop() const { return selectedCrop; } //GetSelectedCrop 선택된 아이템 타입 리턴  //현재 사용x
-	void SetSelectedTool(int t) { selectedTool = t; } //SetSelectedTool 선택된 번호를 가져옴
-	int GetSelectedTool()  { return selectedTool; }  //GetSelectedTool 선택된 번호를 리턴해줌
+	std::vector<RECT> GetCollisionRects() const override;
 
-	void RenderFullInventory(HDC hdc) {  //인벤토리 전체 렌더링 Inventory.h에 사용됨
-		fullInventory.Render(hdc, 360, 100);  // 원하는 위치에 UI 출력
-	}
+	//플레이어 인벤토리 전달
+	InventoryComponent* GetInventory() { return inventory; }
 
-	void SetInventoryOpen(bool open) { isInventoryOpen = open; }
-	bool IsInventoryOpen() const { return isInventoryOpen; }
 
-	//인벤토리 정보 리턴
-	InventoryItem* GetInventory() { return inventory; }
-
-	void SetBoxOpen(bool open) { isBoxOpen = open; } //open은 true 또는 false
-	bool IsBoxOpen() const { return isBoxOpen; }
 private:
-	std::map<Direction, std::vector<HBITMAP>> ply; // 플레이어 방향 이미지
-
-	bool isBoxOpen = false;
-	bool isInventoryOpen = false;
-	CropType selectedCrop = CropType::None; //빈손
-	Direction currentDir = DOWN;	  //처음 방향은 아래이다
-	InventoryItem inventory[9];
-	Inventory fullInventory;
-	int selectedTool = 0; //
 	int x = 39;
-	int y = 170;
-	int playersize = 35;
+	int y = 250;
+	int playerSize = 35;
+	Direction currentDir = DOWN; // 초기 방향은 아래
+
+	std::map<Direction, std::vector<HBITMAP>> playerSprites; // 플레이어 방향별 이미지
+	InventoryComponent* inventory = nullptr;
+	
+
 	HBITMAP hBmp = nullptr; // 비트맵 핸들 저장용
 	HDC memDC = nullptr;
+	void ReleaseResources();  // 필요 시 구현
 };
-

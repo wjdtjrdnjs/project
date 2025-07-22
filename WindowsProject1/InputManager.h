@@ -25,6 +25,8 @@ public:
     bool IsKeyDown(int vKey);        // 이번 프레임에 눌림
     bool IsKeyUp(int vKey);          // 이번 프레임에 뗌
 
+    bool IsKeyPressedOnce(int key);
+    int GetPressedNumberKey();
 private:
     HWND hWnd = nullptr;
     POINT mousePos{ 0, 0 };
@@ -41,3 +43,6 @@ private:
     BYTE currentKeys[256] = { 0 };
     BYTE previousKeys[256] = { 0 };
 };
+
+
+

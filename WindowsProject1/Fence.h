@@ -4,7 +4,7 @@
 #include "CropType.h"
 #include "CollisionManager.h"
 #include "PlaceableObject.h"
-
+class PlayerController;
 class Fence :public PlaceableObject, public CollisionManager{
 public:
 	Fence();
@@ -16,12 +16,13 @@ public:
 	std::vector<RECT>GetCollisionRects()const override;
 
 	//PlaceableObject.h
-	void Install(int x, int y, Player* player) override; //설치 
-	void Remove(int tileX, int tileY, Player* player) override; //삭제
+	void Install(int x, int y, InventoryComponent& inventory) override; //설치 
+	void Remove(int tileX, int tileY, InventoryComponent& inventory) override; //삭제
 
 	void SetPosition(int x, int y) { this->x = x; this->y = y; }
 	void Render(HDC hdc);
 private:
+	PlayerController* playercon = nullptr;
 	int x, y;
 	int Fencesize = 10;
 	HBITMAP hBmp = nullptr; // 비트맵 핸들 저장용

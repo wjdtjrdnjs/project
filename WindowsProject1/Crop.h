@@ -3,8 +3,9 @@
 #include <windows.h>
 #include <vector>
 #include "resource.h"
-#include "Map.h"
 #include "CropType.h"
+#include "WorldMap.h"
+class PlayerController;
 
 class Crop :public PlaceableObject {
 public:
@@ -14,9 +15,8 @@ public:
     int GetX() const { return x; }  //작물 위치 x
     int GetY() const { return y; }  //작물 위치 y
 
-    void Install(int x, int y, Player* player) override;
-    void Remove(int tileX, int tileY, Player* player) override;
-
+    void Install(int x, int y, InventoryComponent& inventory) override;
+    void Remove(int tileX, int tileY, InventoryComponent& inventory) override;
     void Render(HDC hdc);  //작물 이미지 출력
     void Update();  // 성장 관리
     bool IsFullyGrown() const { return growthStage+1 >= maxGrowthStage; } //작물 성장이 최대 단계인지 확인 함수
@@ -29,7 +29,7 @@ private:
     CropType type;     //작물 타입(딸기, 양파)
     int x = 0, y = 0;  //작물 심은 위치
     HBITMAP bitmap; 
-
+    PlayerController* playercon = nullptr;
     int growthStage = 0;          //현재 작물 단계
     const int maxGrowthStage = 6; //작물 성장 최대 단계
    

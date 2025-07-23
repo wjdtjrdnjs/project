@@ -5,6 +5,8 @@
 #include "InventoryComponent.h"
 #include "InventoryItem.h"
 #include "InputManager.h"
+#include "WorldMap.h"
+#include <string>
 
 Crop::Crop(CropType type) : type(type), growthStage(0), growthTimer(0) {
     growthBitmaps = BitmapManager::Instance().GetGrowthBitmaps(type);
@@ -20,9 +22,10 @@ void Crop::Update()  //성관 관리
 {
     int tileX = GetX() / tileSize;;
     int tileY = GetY() / tileSize;;
-    //if (!map->IsWatered(tileX, tileY)) { //땅에 물을 뿌리지 않으면 작물 성장X
-    //    return;
-    //}
+    WorldMap* worldMap = GameObjectManager::Instance().GetWorldMap();
+    if (!worldMap->IsWatered(tileX, tileY)) { //땅에 물을 뿌리지 않으면 작물 성장X
+        return;
+    }
     growthTimer += 16; 
     if (growthTimer >= growthInterval && growthStage < maxGrowthStage - 1)
     {
@@ -34,15 +37,16 @@ void Crop::Update()  //성관 관리
 
 void Crop::Install(int tileX, int tileY, InventoryComponent& inventory)
 {
+    WorldMap* worldMap = GameObjectManager::Instance().GetWorldMap();
 
-    if (/*(map->GetTile(tileX, tileY) == TILE_Path || map->GetTile(tileX, tileY) == Tile_FarmLand )&&*/!GameObjectManager::Instance().GetCropAt(tileX, tileY)) //중복설치 안되게
+    if ((worldMap->GetTile(tileX, tileY) == tile_path || worldMap->GetTile(tileX, tileY) == tile_farmland)&&!GameObjectManager::Instance().GetCropAt(tileX, tileY)) //중복설치 안되게
     {
         int tool = inventory.GetSelectedTool();
         if (inventory[tool].count > 0) // 1개 이상일 때
         {
             CropType baseCropType = CropType::None; //처음은 빈손
-            if (inventory[tool].type == CropType::Strawberry_1) baseCropType = CropType::Strawberry; //딸기씨앗 봉투면 딸기 
-            else if (inventory[tool].type == CropType::Onion_1) baseCropType = CropType::Onion;     //양파씨앗 봉투면 양파 
+            if (inventory[tool].cropType == CropType::Strawberry_1) baseCropType = CropType::Strawberry; //딸기씨앗 봉투면 딸기 
+            else if (inventory[tool].cropType == CropType::Onion_1) baseCropType = CropType::Onion;     //양파씨앗 봉투면 양파 
 
             if (baseCropType != CropType::None) { //빈손이 아닐 때
                 Crop* crop = new Crop(baseCropType);  //선택된 작물 정보 가져옴
@@ -50,22 +54,28 @@ void Crop::Install(int tileX, int tileY, InventoryComponent& inventory)
                 GameObjectManager::Instance().AddCrop(crop);  //작물 추가
                 inventory[tool].count--;  // 들고있는 아이템 -1
                 if (inventory[tool].count == 0) //들고있는 아이템 개수가 0개이다
-                    inventory[tool].type = CropType::None; //아이템이 0개면 빈 슬롯
+                    inventory[tool].itemType = ItemType::NONE; //아이템이 0개면 빈 슬롯
             }
         }
     }
 }
 void Crop::Remove(int tileX, int tileY, InventoryComponent& inventory)
 {
-  
+
     Crop* crop = GameObjectManager::Instance().GetCropAt(tileX, tileY); //선택된 타일 위에 무엇이 있는지 확인 
-    if (crop && crop->IsFullyGrown()) { //작물이 있고 성장이 끝았을 때
+    if (!IsActive())
+    {
+        OutputDebugStringA("작물 수확 안됨(다른 맵)\n");
+        return;
+    }
+    if (crop && crop->IsFullyGrown()) //작물이 있고 성장이 끝았을 때
+    { 
         CropType type = crop->GetType();  //작물 정보 가져옴
         GameObjectManager::Instance().RemoveCrop(crop);  //작물 삭제
         delete crop;  //작물 삭제
         inventory.AddItem(type);  //인벤토리에 추가
+        OutputDebugStringA("작물 수확");
     }
-  
 }
 void Crop::Render(HDC hdc)
 {

@@ -3,6 +3,8 @@
 #include <vector>
 #include <map>
 #include "CropType.h"
+#include "ToolType.h"
+#include "InventoryItem.h"
 #include "resource.h"
 #include "player.h"
 #include "SingletonT.h"
@@ -14,7 +16,7 @@ public:
      void Load(HINSTANCE hInstance);              // 초기 로딩
      HBITMAP GetBitmap(int resourceId);           // 비트맵 가져오기
      void Release();                              // 메모리 해제
-     HBITMAP GetBitmapForCrop(CropType type);
+     HBITMAP GetBitmapForCrop(InventoryItem type);
      HBITMAP GetBitmapFence();
      const std::vector<HBITMAP>& GetGrowthBitmaps(CropType type);
      const std::map<Direction, std::vector<HBITMAP>>& GetPlayerBitmaps() {

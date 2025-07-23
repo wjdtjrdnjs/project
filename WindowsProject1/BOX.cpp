@@ -3,15 +3,18 @@
 #include "InputManager.h"
 #include "InventoryItem.h"
 #include "GameObjectManager.h"
+#include "WorldMap.h"
 
 #include <string>
+#include "Global.h" //충돌영역 on/off
+
 #define slotSize 50
 Box::Box(int xPos, int yPos) : x(xPos), y(yPos), isOpen(false)
 {
     //위치
     iconRect.left = x;
     iconRect.top = y;
-    iconRect.right = x + tileSize * 3;
+    iconRect.right = x +  tileSize * 3;
     iconRect.bottom = y + tileSize * 3;
 
     // 비트맵 로드 
@@ -24,18 +27,26 @@ Box::Box(int xPos, int yPos) : x(xPos), y(yPos), isOpen(false)
     {
         for (int i = 0; i < 9; i++) 
         {
-            items[y][i].type = CropType::None;
+            items[y][i].itemType = ItemType::NONE;
+            items[y][i].cropType = CropType::None;
+            items[y][i].toolType = Tool::None;
             items[y][i].count = 0;
         }
     }
-   
-    items[0][0].type = CropType::Strawberry_1; //1번 딸기봉투와 5개
+    items[0][0].itemType = ItemType::CROP;
+    items[0][0].cropType = CropType::Strawberry_1; //1번 딸기봉투와 5개
     items[0][0].count = 99;
-    items[0][1].type = CropType::Onion_1;      //2번 양파봉투 5개
+
+    items[0][1].itemType = ItemType::CROP;
+    items[0][1].cropType = CropType::Onion_1;      //2번 양파봉투 5개
     items[0][1].count = 99;
-    items[0][2].type = CropType::Fence;        //울타리
+
+    items[0][2].itemType = ItemType::CROP;
+    items[0][2].cropType = CropType::Fence;        //울타리
     items[0][2].count = 99;
-    items[0][3].type = CropType::Axe;       //도끼
+
+    items[0][3].itemType = ItemType::TOOL;
+    items[0][3].toolType = Tool::Axe;       //도끼
     items[0][3].count = 1;
 }
 bool Box::IsPlayerInRange(int playerX, int playerY) {  //플레이어가 박스 타일 주변에 있는 지 확인
@@ -94,10 +105,14 @@ void Box::Render(HDC hdc) {
             RGB(255, 255, 255));
 
         //상자 충돌 범위(빨간 테투리)
-        RECT r = GetBoundingBox();
-        HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
-        FrameRect(hdc, &r, b);
-        DeleteObject(b);
+        if (g_bFenceRedFrameOn)
+        {
+            RECT r = GetBoundingBox();
+            HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
+            FrameRect(hdc, &r, b);
+            DeleteObject(b);
+        }
+      
 
         SelectObject(memDC, oldBitmap);
         DeleteDC(memDC);
@@ -149,13 +164,10 @@ void Box::RenderUI(HDC hdc)
 
             FillRect(hdc, &slotRect, brush);
             FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));  // 테두리
-            if (items[y][i].type != CropType::None) {
-                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(items[y][i].type);
-                if (!bmp) {
-                    // 비트맵 로드 실패! 로그 찍거나 기본 비트맵으로 대체
-                    OutputDebugString(L"비트맵을 찾을 수 없습니다!\n");
-                    return;  // 여기서 리턴하거나 대체 처리
-                }
+            if (items[y][i].itemType != ItemType::NONE) {
+                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(items[y][i]);
+                if (!bmp)  return;
+
                 HDC memDC = CreateCompatibleDC(hdc);
                 HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
                 BITMAP bm;
@@ -199,13 +211,10 @@ void Box::RenderUI(HDC hdc)
             FillRect(hdc, &slotRect, brush);
             FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
             DeleteObject(brush);
-            if (playerToolbar[i]->type != CropType::None) {
-                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(playerToolbar[i]->type);
-                if (!bmp) {
-                    // 비트맵 로드 실패! 로그 찍거나 기본 비트맵으로 대체
-                    OutputDebugString(L"비트맵을 찾을 수 없습니다!\n");
-                    return;  // 여기서 리턴하거나 대체 처리
-                }
+            if (playerToolbar[i]->itemType != ItemType::NONE) {
+                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(*playerToolbar[i]);
+
+                if (!bmp) return;
                 if (bmp) {
                     HDC memDC = CreateCompatibleDC(hdc);
                     HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
@@ -235,17 +244,12 @@ void Box::RenderUI(HDC hdc)
  
 //클릭된 아이템이 커서에 붙게 하는 함수
 void Box::RenderCursorItem(HDC hdc) { 
-    if (heldItem.type == CropType::None) return; // 아무것도 안 들고 있으면 돌아감
+    if (heldItem.itemType == ItemType::NONE) return; // 아무것도 안 들고 있으면 돌아감
 
     POINT mouse = InputManager::Instance().GetMousePosition();  //클릭한 좌표를 가져옴
-    HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(heldItem.type);
-    if (!bmp) {
-        // 비트맵 로드 실패! 로그 찍거나 기본 비트맵으로 대체
-        OutputDebugString(L"비트맵을 찾을 수 없습니다!\n");
-        return;  // 여기서 리턴하거나 대체 처리
-    }
-
-
+    HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(heldItem);
+    if (!bmp) return;
+  
     HDC memDC = CreateCompatibleDC(hdc);
     HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
     BITMAP bm;
@@ -276,24 +280,57 @@ void Box::RenderCursorItem(HDC hdc) {
 void Box::HandleItemSlotLClick(InventoryItem* slot)  //좌클릭
 {
 
-    if (heldItem.type == CropType::None) {
+    if (heldItem.itemType == ItemType::NONE) {
         // 빈손이면 슬롯의 아이템을 든다
         heldItem = *slot;
-        slot->type = CropType::None;
+        slot->itemType = ItemType::NONE;
+        slot->cropType = CropType::None;
+        slot->toolType = Tool::None;
         slot->count = 0;
     }
     else {
-        if (slot->type == CropType::None) {
+        if (slot->itemType == ItemType::NONE) {
             // 빈 슬롯이면 아이템을 넣는다
             *slot = heldItem;
-            heldItem.type = CropType::None;
+            heldItem.itemType = ItemType::NONE;
+            heldItem.cropType = CropType::None;
+            heldItem.toolType = Tool::None;
             heldItem.count = 0;
         }
-        else if (slot->type == heldItem.type) {
+        else if (slot->itemType == heldItem.itemType) {
             // 같은 아이템이면 합치기
-            slot->count += heldItem.count;
-            heldItem.type = CropType::None;
-            heldItem.count = 0;
+            if (heldItem.itemType == ItemType::TOOL)
+            {
+                if (slot->toolType == heldItem.toolType)
+                {
+                    slot->count += heldItem.count;
+                    heldItem.itemType = ItemType::NONE;
+                    heldItem.cropType = CropType::None;
+                    heldItem.count = 0;
+                }
+                else {
+                    // 서로 다른 아이템이면 교환
+                    InventoryItem temp = *slot;
+                    *slot = heldItem;
+                    heldItem = temp;
+                }
+            }
+            else if (heldItem.itemType == ItemType::CROP)
+            {
+                if (slot->cropType == heldItem.cropType)
+                {
+                    slot->count += heldItem.count;
+                    heldItem.itemType = ItemType::NONE;
+                    heldItem.toolType = Tool::None;
+                    heldItem.count = 0;
+                }
+                else {
+                    // 서로 다른 아이템이면 교환
+                    InventoryItem temp = *slot;
+                    *slot = heldItem;
+                    heldItem = temp;
+                }
+            }
         }
         else {
             // 서로 다른 아이템이면 교환
@@ -307,32 +344,50 @@ void Box::HandleItemSlotLClick(InventoryItem* slot)  //좌클릭
 
 void Box::HandleItemSlotRClick(InventoryItem* slot) //박스 아이템창에서 우클릭
 {
-    if (heldItem.type == CropType::None) return; //손에 아이템이 없으면 리턴
+    if (heldItem.itemType == ItemType::NONE) return; //손에 아이템이 없으면 리턴
     else {
-        if (slot->type == CropType::None) { 
+        if (slot->itemType == ItemType::NONE) {
             // 빈 슬롯이면 아이템을 넣고 수량 +1 들고있는 아이템은 -1
-            slot->type = heldItem.type; 
+            slot->itemType = heldItem.itemType;
+            slot->cropType = heldItem.cropType;
+            slot->toolType = heldItem.toolType;
             slot->count++;
             heldItem.count--;
             if (heldItem.count < 1) //들고 있는 아이템 수량이 0개 이하일 때 실행
             {
-                heldItem.type = CropType::None;
+                heldItem.itemType = ItemType::NONE;
+                heldItem.cropType = CropType::None;
+                heldItem.toolType = Tool::None;
                 heldItem.count = 0;
             }
-                
+
         }
-        else if (slot->type == heldItem.type) {
-            // 같은 아이템이면 합치기 슬롯에 있는 아이템은 +1 들고 있는 아이템은 -1
-            slot->count++;
-            heldItem.count--;
-            if (heldItem.count < 1) //들고 있는 아이템 수량이 0개 이하일 때 실행
+        else if (slot->itemType == heldItem.itemType) { // 같은 아이템이면 합치기 슬롯에 있는 아이템은 +1 들고 있는 아이템은 -1
+            if (heldItem.itemType == ItemType::TOOL)
             {
-                heldItem.type = CropType::None;
-                heldItem.count = 0;
+                if (slot->toolType == heldItem.toolType)
+                {
+                    slot->count++;
+                    heldItem.count--;
+                }
+                else if (heldItem.itemType == ItemType::CROP)
+                {
+                    if (slot->cropType == heldItem.cropType)
+                    {
+                        slot->count++;
+                        heldItem.count--;
+                    }
+                }
+                if (heldItem.count < 1) //들고 있는 아이템 수량이 0개 이하일 때 실행
+                {
+                    heldItem.itemType = ItemType::NONE;
+                    heldItem.cropType = CropType::None;
+                    heldItem.toolType = Tool::None;
+                    heldItem.count = 0;
+                }
             }
-        }        
+        }
     }
-    
 }
 
 std::vector<RECT> Box::GetCollisionRects() const

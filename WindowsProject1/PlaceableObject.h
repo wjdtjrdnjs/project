@@ -1,8 +1,8 @@
 #pragma once
-
+#include "GameObject.h"
 class InventoryComponent;
 class InventoryItem;
-class PlaceableObject
+class PlaceableObject:public GameObject
 {
 public:
    

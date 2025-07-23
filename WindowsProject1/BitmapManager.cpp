@@ -19,8 +19,8 @@ void BitmapManager::Load(HINSTANCE hInstance)
     growthBitmaps[CropType::Onion] = onionStages;
     
     //사용자
-    for (int i = 0; i < 4; ++i) {
-        HBITMAP playerBmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_IDLE + i), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+    for (int i = 0; i < 16; ++i) {
+        HBITMAP playerBmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP27 + i), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
         Direction dir = static_cast<Direction>(i);
         PLY[dir].push_back(playerBmp);
         playerBitmaps.push_back(playerBmp);  //4장
@@ -39,6 +39,8 @@ void BitmapManager::Load(HINSTANCE hInstance)
     bitmapMap[IDB_BITMAP41] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP41), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     //울타리
     bitmapMap[IDB_BITMAP39] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP39), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+    //문
+    bitmapMap[IDB_BITMAP26] = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP26), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
  
    
 }
@@ -62,27 +64,41 @@ HBITMAP BitmapManager::GetBitmap(int resourceId)
     return nullptr;
 }
 
-HBITMAP BitmapManager::GetBitmapForCrop(CropType type) { //가져온 타입으로 그림 돌려줌
-    switch (type) {
-    case CropType::Strawberry: //딸기
-        return GetBitmap(IDB_BITMAP1);
-    case CropType::Onion: //양파
-        return GetBitmap(IDB_BITMAP9);
-    case CropType::hoe:  //괭이
-        return GetBitmap(IDB_BITMAP16);
-    case CropType::Axe:  //도끼
-        return GetBitmap(IDB_BITMAP40);
-    case CropType::watering:  //물뿌리개
-        return GetBitmap(IDB_BITMAP41);
-    case CropType::Strawberry_1: //딸기봉투
-        return GetBitmap(IDB_BITMAP18);
-    case CropType::Onion_1: //양파봉투
-        return GetBitmap(IDB_BITMAP17);
-    case CropType::Fence: //울타리
-        return GetBitmap(IDB_BITMAP39);
-    default: //없음
-        return nullptr;
+HBITMAP BitmapManager::GetBitmapForCrop(InventoryItem item) { //가져온 타입으로 그림 돌려줌
+    if (item.itemType == ItemType::CROP)
+    {
+        switch (item.cropType)
+        {
+        case CropType::Strawberry: //딸기
+            return GetBitmap(IDB_BITMAP1);
+        case CropType::Onion: //양파
+            return GetBitmap(IDB_BITMAP9);
+        case CropType::Strawberry_1: //딸기봉투
+            return GetBitmap(IDB_BITMAP18);
+        case CropType::Onion_1: //양파봉투
+            return GetBitmap(IDB_BITMAP17);
+        case CropType::Fence: //울타리
+            return GetBitmap(IDB_BITMAP39);
+        default: //없음
+            return nullptr;
+        }
     }
+    else if (item.itemType == ItemType::TOOL)
+    {
+        switch (item.toolType)
+        {
+        case Tool::hoe:  //괭이
+            return GetBitmap(IDB_BITMAP16);
+        case Tool::Axe:  //도끼
+            return GetBitmap(IDB_BITMAP40);
+        case Tool::watering:  //물뿌리개
+            return GetBitmap(IDB_BITMAP41);
+        default: //없음
+            return nullptr;
+        }
+    }
+    
+         
 }
 
 HBITMAP BitmapManager::GetBitmapFence()

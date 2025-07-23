@@ -1,34 +1,48 @@
-#include "MyRoomMap.h"
+Ôªø#include "MyRoomMap.h"
 const int tileSize = 32;
 TileType_1 MyRoomMap::tiles_1[map_y][map_x];
 
 MyRoomMap::MyRoomMap()
 {
-	HBITMAP Floor = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP25), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION); //¿‹µ
-
-    Tile_1.push_back(Floor); // ¿‹µ
+    HBITMAP Floor = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP25), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION); //ÏûîÎîî
+    doorBitmap = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP26), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
     HDC screenDC = GetDC(NULL);
+
+    Tile_1.push_back(Floor); // ÏûîÎîî
 
     for (auto bmp : Tile_1) {
         HDC memDC = CreateCompatibleDC(screenDC);
         SelectObject(memDC, bmp);
         TileDCs_1.push_back(memDC);
     }
-    Init();  //√ ±‚ ∏  ªÛ≈¬
+    doorDC = CreateCompatibleDC(screenDC);
+    SelectObject(doorDC, doorBitmap);
+
+    Init();  //Ï¥àÍ∏∞ Îßµ ÏÉÅÌÉú
     ReleaseDC(NULL, screenDC);
+
+
 }
 
 MyRoomMap::~MyRoomMap()
 {
-    // ∏ﬁ∏∏Æ DC «ÿ¡¶
+    // Î©îÎ™®Î¶¨ DC Ìï¥Ï†ú
     for (auto dc : TileDCs_1) {
         if (dc) DeleteDC(dc);
     }
 
-    // ∫Ò∆Æ∏  «ÿ¡¶
+    // ÎπÑÌä∏Îßµ Ìï¥Ï†ú
     for (auto bmp : Tile_1) {
         if (bmp) DeleteObject(bmp);
     }
+
+    if (doorDC) DeleteDC(doorDC);
+    if (doorBitmap) DeleteObject(doorBitmap);
+}
+
+RECT MyRoomMap::GetExitDoorBoundingBox() const
+{
+    return { exitDoorX, exitDoorY, exitDoorX + tileSize, exitDoorY + tileSize };
 }
 
 void MyRoomMap::Init()
@@ -37,7 +51,7 @@ void MyRoomMap::Init()
     {
         for (int x = 0; x < map_x; ++x)
         {
-           tiles_1[y][x] = TILE_Floor; //≥Û¡ˆ,πÁ           
+           tiles_1[y][x] = TILE_Floor; //ÎÜçÏßÄ,Î∞≠           
         }
     }
 }
@@ -51,12 +65,20 @@ void MyRoomMap::Render(HDC hdc)
         for (int x = 0; x < map_x; x++)
         {
             int tileType = tiles_1[y][x];
+            if (tileType < 0 || tileType >= static_cast<int>(TileDCs_1.size()))
+            {
+                OutputDebugStringA("tileType Í∞íÏù¥ Î≤îÏúÑÎ•º Î≤óÏñ¥ÎÇ¨ÏäµÎãàÎã§!\n");
+                continue;  // ÌòπÏùÄ tileTypeÏùÑ Í∏∞Î≥∏Í∞íÏúºÎ°ú Ï≤òÎ¶¨
+            }
+
             HDC tileDC = TileDCs_1[tileType];
+            if (!tileDC)
+            {
+                OutputDebugStringA("tileDCÍ∞Ä nullptrÏûÖÎãàÎã§!\n");
+                continue;  // nullptr DC ÏÇ¨Ïö© Í∏àÏßÄ
+            }
 
-
-            // ∫Ò∆Æ∏  ≈©±‚ ∞°¡Æø¿±‚
             GetObject(Tile_1[tileType], sizeof(BITMAP), &bmp);
-
             TransparentBlt(
                 hdc,
                 x * tileSize, y * tileSize,
@@ -68,4 +90,15 @@ void MyRoomMap::Render(HDC hdc)
             );
         }
     }
+  /*  OutputDebugStringA("Î¨∏ Î†åÎçî Ï§ë...\n");
+    GetObject(doorBitmap, sizeof(BITMAP), &bmp);
+    TransparentBlt(
+        hdc,
+        exitDoorX * tileSize, exitDoorY * tileSize,
+        tileSize, tileSize,
+        doorDC,
+        0, 0,
+        bmp.bmWidth, bmp.bmHeight,
+        RGB(255, 255, 255)
+    );*/
 }

@@ -25,6 +25,7 @@ public:
 
 	 void SetisMapChanged() { isMapChanged = FALSE;}
 	 void SetMyRoomMap(MyRoomMap* mymap);
+	 MyRoomMap* GetMyRoomMap() { return mymap; }
 	 void SetBox(Box* box);
 	 void SetWorldMap(WorldMap* map);
 	 Box* GetBox() { return box; }

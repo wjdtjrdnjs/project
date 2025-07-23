@@ -5,7 +5,6 @@
 #include <windows.h>
 #include <vector>
 
-
 enum TileType_1 {
     TILE_Floor,  //바닥
 };
@@ -15,7 +14,7 @@ class MyRoomMap
 public:
     MyRoomMap();
     ~MyRoomMap();
-
+    RECT GetExitDoorBoundingBox() const;
     static void Init(); //초기 맵
    
     void Render(HDC hdc);
@@ -25,6 +24,11 @@ private:
     std::vector<HBITMAP> Tile_1;    // 비트맵 핸들 저장
     std::vector<HDC> TileDCs_1;     // 각 타일 비트맵용 메모리 DC
 
+    HBITMAP doorBitmap;
+    HDC doorDC;
+
+    int exitDoorX = 5;
+    int exitDoorY = 8;
 };
 
 

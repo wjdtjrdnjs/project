@@ -144,6 +144,12 @@
     <ClInclude Include="GameObject.h">
       <Filter>GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="ToolType.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Global.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowsProject1.cpp">
@@ -209,6 +215,9 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="Global.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WindowsProject1.rc">
@@ -221,18 +230,6 @@
     </Image>
     <Image Include="WindowsProject1.ico">
       <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="res\Character\Idle_3.bmp">
-      <Filter>리소스 파일\Character</Filter>
-    </Image>
-    <Image Include="res\Character\Idle_2.bmp">
-      <Filter>리소스 파일\Character</Filter>
-    </Image>
-    <Image Include="res\Character\Idle_1.bmp">
-      <Filter>리소스 파일\Character</Filter>
-    </Image>
-    <Image Include="res\Character\Idle.bmp">
-      <Filter>리소스 파일\Character</Filter>
     </Image>
     <Image Include="res\Objects\onion\1.bmp">
       <Filter>리소스 파일\onion</Filter>
@@ -334,6 +331,69 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\Tileset\Water_Tile.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Interior.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Idle.bmp">
+      <Filter>리소스 파일\Character</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Idle_1.bmp">
+      <Filter>리소스 파일\Character</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Idle_2.bmp">
+      <Filter>리소스 파일\Character</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Idle_3.bmp">
+      <Filter>리소스 파일\Character</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Idle.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Idle_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Idle_2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Idle_3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Axe_Actions.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Axe_Actions1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Axe_Actions2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Axe_Actions3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Hoe_Actions.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Hoe_Actions1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Hoe_Actions2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Hoe_Actions3.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

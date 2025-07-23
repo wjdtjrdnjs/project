@@ -29,6 +29,8 @@
 #include "PlayerController.h"
 #include "CollisionManager.h"
 
+#include "Global.h"
+
 #define MAX_LOADSTRING 100
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -145,7 +147,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 // 
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -172,7 +173,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
-           
+            case IDM_ON:
+                g_bFenceRedFrameOn = true;
+                InvalidateRect(hWnd, NULL, TRUE);
+                break;
+
+            case IDM_OFF:
+                g_bFenceRedFrameOn = false;
+                InvalidateRect(hWnd, NULL, TRUE);
+                break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }

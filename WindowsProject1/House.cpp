@@ -1,4 +1,6 @@
 #include "House.h"
+#include "Global.h" //충돌영역 on/off
+
 House::House()
 {
     // 생성자에서 한 번만 비트맵 로드
@@ -41,15 +43,19 @@ void House::Render(HDC hdc)  //동물 생성
         bmp.bmWidth, bmp.bmHeight,
         RGB(255, 255, 255)
     );
-    RECT r = GetBoundingBox();
-    HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
-    FrameRect(hdc, &r, b);
-    DeleteObject(b);
-    //문
-    r = GetDoorBoundingBox();
-    b = CreateSolidBrush(RGB(0, 255, 255));
-    FrameRect(hdc, &r, b);
-    DeleteObject(b);
+    if (g_bFenceRedFrameOn)
+    {
+        RECT r = GetBoundingBox();
+        HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
+        FrameRect(hdc, &r, b);
+        DeleteObject(b);
+        //문
+        r = GetDoorBoundingBox();
+        b = CreateSolidBrush(RGB(0, 255, 255));
+        FrameRect(hdc, &r, b);
+        DeleteObject(b);
+    }
+
 }
 
 std::vector<RECT> House::GetCollisionRects()const

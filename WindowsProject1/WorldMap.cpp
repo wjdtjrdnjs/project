@@ -126,7 +126,8 @@ void WorldMap::Render(HDC hdc) {
     }
 }
 
-void WorldMap::ToggleTile(int x, int y, int i)
+
+void WorldMap::ToggleTile(int x, int y, int i)  //타일 교체
 {
     if (x < 0 || y < 0 || x >= map_x || y >= map_y) // 범위 체크 수정(map_x, map_y 순서 주의)
         return;
@@ -139,27 +140,12 @@ void WorldMap::ToggleTile(int x, int y, int i)
 
     if (i == 7 && tiles[y][x] == tile_path) //물뿌리개로 경로타일 클릭 시 밭으로 변경
         tiles[y][x] = tile_farmland;
+
+
 }
 
-//void WorldMap::ToggleTile(int x, int y, int i)  //타일 교체
-//{
-//    if (x < 0 || y < 0 || x >= map_x || y >= map_y) // 범위 체크 수정(map_x, map_y 순서 주의)
-//        return;
-//
-//    if (i == 4 && tiles[y][x] == tile_grass)
-//        tiles[y][x] = tile_path;
-//    else if (i == 4 && tiles[y][x] == tile_path || i == 4 && tiles[y][x] == tile_farmland)
-//        tiles[y][x] = tile_grass;
-//
-//
-//    if (i == 7 && tiles[y][x] == tile_path) //물뿌리개로 경로타일 클릭 시 밭으로 변경
-//        tiles[y][x] = tile_farmland;
-//
-//
-//}
-//
-//
-//
-//bool WorldMap::IsWatered(int x, int y) { //해당 타일이 밭인지 확인
-//    return tiles[y][x] == tile_type::tile_farmland;
-//}
+
+
+bool WorldMap::IsWatered(int x, int y) { //해당 타일이 밭인지 확인
+    return tiles[y][x] == tile_type::tile_farmland;
+}

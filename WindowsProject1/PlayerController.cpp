@@ -16,27 +16,25 @@ void PlayerController::Playermove() //플레이어 이동 처리
     int dx = 0, dy = 0;  //이동 방향 값을 저장할 변수
     if (InputManager::Instance().IsKeyHeld('A')) {
         dx = -5;
-        player->SetDirection(LEFT);
+        player->SetDirection(Direction::LEFT);
     }
     else if (InputManager::Instance().IsKeyHeld('D')) {
         dx = 5;
-        player->SetDirection(RIGHT); 
+        player->SetDirection(Direction::RIGHT);
     }
     else if (InputManager::Instance().IsKeyHeld('W')) {
         dy = -5;
-        player->SetDirection(UP);
+        player->SetDirection(Direction::UP);
     }
     else if (InputManager::Instance().IsKeyHeld('S')) {
         dy = 5;
-        player->SetDirection(DOWN);
+        player->SetDirection(Direction::DOWN);
     }
-    //위치 임시 설정
+    //위치 우치 갱신
     player->SetPlusX(dx,dy);
 
-    if (collisionMgr->playerCollided()) { // 충돌 검사
-        //충돌이 발생하면 원래 위치로 되돌아감
+    if (collisionMgr->playerCollided()) { // 충돌이 발생하면 이동 취소
         player->SetMinusY(dx, dy);
-        OutputDebugStringA("충돌 발생\n");
     }
 }
 
@@ -46,18 +44,16 @@ void PlayerController::HandleToolSelection() { //번호 선택 함수
         if (InputManager::Instance().IsKeyDown('1' + i)) {
             selectedTool = i;
             if (player) {
-                player->GetInventory()->SetSelectedTool(selectedTool);  // 선택된 툴을 인벤토리에 전달
-                OutputDebugStringA(("Selected slot cha5555555555555nged to: " + std::to_string(i) + "\n").c_str());
+                player->GetInventory()->SetSelectedTool(selectedTool);  // 선택된 툴을 인벤토리컴포넌트에 전달
+                UpdatePlayerToolFromInventory(); //선택된 툴 정보를 플레이어한테 전달
                 break;
             }
-           
-
         }
     }
 }
 
 //코드 수정 필요
-void PlayerController::HandleLeftClickAction()//아이템을 들고 좌클릭
+void PlayerController::HandleLeftClickAction() //좌클릭 액션 처리
 {
     if (!player) return;
     POINT pt = InputManager::Instance().GetMousePosition();
@@ -72,21 +68,18 @@ void PlayerController::HandleLeftClickAction()//아이템을 들고 좌클릭
 
     if (abs(tileX - playerTileX) > 1 || abs(tileY - playerTileY) > 1) return;// 범위 밖 클릭 무시
 
-    //플레이어 위치 좌표 확인용
+    // 디버깅용 좌표 출력
     std::string debugMsg = "Left Click at (" + std::to_string(pt.x) + ", " + std::to_string(pt.y) + ")\n"; //디버깅 확인용 
     OutputDebugStringA(debugMsg.c_str());  
-    
-    InventoryComponent* inventory = player->GetInventory();
-
-    if (selectedTool < 0 || selectedTool >= 9) { //selectedTool 범위 체크
-        OutputDebugStringA("Selected tool index out of range\n");
-        return;
-    }
-    CropType selectedToolType = (*inventory)[selectedTool].type;
+   
+    InventoryComponent* inventory = player->GetInventory(); // 선택된 인벤토리 아이템 확인
+    if (selectedTool < 0 || selectedTool >= 9) return; //selectedTool 범위 체크
+    InventoryItem item  = (*inventory)[selectedTool];
     PlaceableObject* obj = nullptr;
-    switch (selectedToolType)
+
+    switch (item.toolType) //도구 종류에 따른 행돌
     {
-    case CropType::hoe:
+    case Tool::hoe: //괭이
     {
         Crop* crop = GameObjectManager::Instance().GetCropAt(tileX, tileY);
         if (crop)
@@ -98,24 +91,25 @@ void PlayerController::HandleLeftClickAction()//아이템을 들고 좌클릭
         break;
 
     }
-    case CropType::Axe:
+    case Tool::Axe: //도끼
     {
-        obj = GameObjectManager::Instance().GetFenceAt(tileX, tileY); //울타리
+        //울타리 제거
+        obj = GameObjectManager::Instance().GetFenceAt(tileX, tileY);
         if (obj) obj->Remove(tileX, tileY, (*inventory));
         break;
     }
-    case CropType::watering:
+    case Tool::watering: //물뿌리개
     {
-        GameObjectManager::Instance().GetWorldMap()->ToggleTile(tileX, tileY, 7); //땅 교체
+        //땅에 물 주기
+        GameObjectManager::Instance().GetWorldMap()->ToggleTile(tileX, tileY, 7);
         break;
     }
         
-    default:
+    default: //도구가 아닌 것
         obj = GameObjectManager::Instance().GetCropAt(tileX, tileY); //작물
         if (obj) obj->Remove(tileX, tileY, (*inventory));
         break;
     }
-  
    
 }
 void PlayerController::HandleRightClickAction() //아이템을 들고 우클릭
@@ -138,10 +132,10 @@ void PlayerController::HandleRightClickAction() //아이템을 들고 우클릭
     if (selectedTool < 0 || selectedTool >= 9) { //selectedTool 범위 체크
         return;
     }
-    CropType selectedToolType = (*inventory)[selectedTool].type;
+    InventoryItem item = (*inventory)[selectedTool]; //선택된 아이템
     PlaceableObject* obj = nullptr;
-
-    switch (selectedToolType)
+     
+    switch (item.cropType) //선택된 아이템 타입
     {
     case CropType::Strawberry_1:
         obj = new Crop(CropType::Strawberry);
@@ -153,39 +147,32 @@ void PlayerController::HandleRightClickAction() //아이템을 들고 우클릭
         obj = new Fence();
         break;
     }
-    if (obj)  obj->Install(tileX, tileY, (*inventory));
+    if (obj)  obj->Install(tileX, tileY, (*inventory)); //타입 확인 후 설치
 }
 
-void PlayerController::HandleKeyDown(WPARAM wParam)  //사용 XXXXXXXXXXXXXX
+
+void PlayerController::UpdatePlayerToolFromInventory() //플레이어한테 도구 타입 전달
 {
-   
-    Box* box = RenderManager::Instance().GetBox();
-    if (!box) return;
+    InventoryItem* ivn = inventory->GetItems(); //인벤토리 객체를 포인터로 받음
 
-    //switch (wParam) {
-    //case 'E':  // e 키로 상자 열고 닫기
-    //{   OutputDebugStringA((std::to_string(1) + "\n").c_str());
-    //     box->Open();
-    //     box->SetPlayerToolbar(inventory->GetItems());
-    // }
-    //    break;
-
-    //case VK_ESCAPE:  // ESC 키로 상자 닫기
-    //    if (box->IsOpen())
-    //        box->Close();
-    //    break;
-    //}
-
+    if (ivn[selectedTool].itemType == ItemType::TOOL) //전달받은 인벤토리와 선택된 툴 번호로  도구 타입인지 확인
+    {
+        player->SetEquippedTool(ivn[selectedTool].toolType);  //플레이어에게 무슨 도구인지 전달
+    }
+    else
+    {
+        player->SetEquippedTool(Tool::None); //플레이어에게 도구가 아님을 전달
+    }
 }
 
 
 void PlayerController::UpdatePlayer()
 {
 
-    if (collisionMgr) collisionMgr->playerCollided();
+    if (collisionMgr) collisionMgr->playerCollided(); //충돌감지
 
     if (playerstop) {  //박스 오픈 
-        OutputDebugStringA("박스 열림 상태 — 이동 막음\n");
+       // OutputDebugStringA("박스 열림 상태 — 이동 막음\n"); //디버깅 확인용
         if (InputManager::Instance().IsLeftClickDown()) {
             POINT pt = InputManager::Instance().GetMousePosition();
             RenderManager::Instance().GetBox()->HandleClick(pt.x, pt.y, 1);
@@ -199,7 +186,7 @@ void PlayerController::UpdatePlayer()
     }
     else
     {
-        OutputDebugStringA("박스 닫힘 — 이동 가능\n");
+        //OutputDebugStringA("박스 닫힘 — 이동 가능\n"); //디버깅 확인용
         Playermove(); //플레이어 이동 처리
         HandleToolSelection(); //아이템창 아래(툴바) 번호 선택
         if (InputManager::Instance().IsLeftClickDown()) { //좌클릭

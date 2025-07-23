@@ -2,8 +2,9 @@
 #include <Windows.h>
 #include "CollisionManager.h"
 #include "InventoryItem.h"
+#include "GameObject.h"
 
-class Box:public CollisionManager
+class Box:public CollisionManager, public GameObject
 {
 public:
     Box(int x, int y);

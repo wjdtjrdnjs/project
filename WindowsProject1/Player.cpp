@@ -8,6 +8,7 @@
 #include "PlaceableObject.h"
 #include "Direction.h"
 
+#include "Global.h" //충돌영역 on/off
 
 Player::Player(InventoryComponent* inventoryComponent)
     : inventory(inventoryComponent) 
@@ -24,6 +25,8 @@ std::vector<RECT> Player::GetCollisionRects() const
     //플레이어 여러 충돌 범위가 생길 시 벡터 사용해야함
     return { GetBoundingBox() };
 }
+
+
 void Player::ReleaseResources()
 {
     if (hBmp)
@@ -42,14 +45,14 @@ void Player::Render(HDC hdc) //플레이어를 화면에 렌더링
 {
     if (playerSprites.empty()) return;
 
-    // 현재 방향의 비트맵 리스트 가져오기
-    auto& bitmaps = playerSprites[currentDir];
+    Direction dir = GetDirection();
+    Tool currentTool = GetEquippedTool();
 
-    if (bitmaps.empty()) return;
+    const auto& dirMap = playerSprites.at(currentTool);
+    const auto& bitmaps = dirMap.at(dir);
+    HBITMAP currentBmp = nullptr;
 
-
-    // 예를 들어 첫 번째 프레임만 사용 (나중에 애니메이션 프레임 관리 가능)
-    HBITMAP currentBmp = bitmaps[0];
+        currentBmp = bitmaps[0];
     if (!currentBmp) return;
 
     HDC memDC = CreateCompatibleDC(hdc);
@@ -67,11 +70,15 @@ void Player::Render(HDC hdc) //플레이어를 화면에 렌더링
         bmpInfo.bmWidth, bmpInfo.bmHeight,
         RGB(255, 255, 255)
     );
-    //플레이어 충돌 박스(빨간 테두리)
-    RECT r = GetBoundingBox();
-    HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0));
-    FrameRect(hdc, &r, hBrush);
-    DeleteObject(hBrush);
+    if (g_bFenceRedFrameOn)
+    {
+        //플레이어 충돌 박스(빨간 테두리)
+        RECT r = GetBoundingBox();
+        HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0));
+        FrameRect(hdc, &r, hBrush);
+        DeleteObject(hBrush);
+    }
+  
 
     SelectObject(memDC, oldBmp);
     DeleteDC(memDC);
@@ -82,22 +89,27 @@ void Player::Render(HDC hdc) //플레이어를 화면에 렌더링
 
 RECT Player::GetBoundingBox() const // 플레이어 충돌 범위 
 {
+    Tool currentTool = GetEquippedTool();
+    Direction currentDir = GetDirection();
+
     // currentDir 키 존재 확인
-    if (playerSprites.count(currentDir) == 0) {
+    if (playerSprites.count(currentTool) == 0) {
         // 키가 없으면 빈 RECT 반환 (필요하면 로그 추가)
         RECT emptyRect = { 0, 0, 0, 0 };
         return emptyRect;
     }
 
-    const auto& frames = playerSprites.at(currentDir);
+    const auto& dirMap = playerSprites.at(currentTool);
 
     // 벡터가 비어있는지 확인
-    if (frames.empty()) {
+    if (dirMap.count(currentDir) == 0) {
         RECT emptyRect = { 0, 0, 0, 0 };
         return emptyRect;
     }
+    const auto& frames = dirMap.at(currentDir);
 
-    HBITMAP currentBmp = frames.at(0);
+    if (frames.empty()) return { 0, 0, 0, 0 };
+    HBITMAP currentBmp = frames[0];
 
     BITMAP bmp;
     GetObject(currentBmp, sizeof(BITMAP), &bmp);
@@ -113,24 +125,37 @@ RECT Player::GetBoundingBox() const // 플레이어 충돌 범위
 
 void Player::LoadSprites()
 {
-    for (int i = 0; i < 4; ++i) {
-        Direction dir = static_cast<Direction>(i);
+    for (int t = 0; t < 4; ++t) { // tool::hoe ~ tool::watering
+        Tool toolType = static_cast<Tool>(t);
 
-        // 리소스 ID는 IDB_IDLE, IDB_IDLE + 1, IDB_IDLE + 2, ...
-        int resourceId = IDB_IDLE + i;
+        for (int d = 0; d < 4; ++d) { // Direction::DOWN ~ LEFT
+            Direction dir = static_cast<Direction>(d);
+            //for (int f = 0; f < 4; ++f) {
+                int resourceId = GetResourceId(toolType, dir);  // 각 프레임별 리소스 ID
 
-        HBITMAP bmp = (HBITMAP)LoadImage(
-            GetModuleHandle(NULL),
-            MAKEINTRESOURCE(resourceId),
-            IMAGE_BITMAP,
-            0, 0,
-            LR_CREATEDIBSECTION);
+                HBITMAP bmp = (HBITMAP)LoadImage(
+                    GetModuleHandle(NULL),
+                    MAKEINTRESOURCE(resourceId),
+                    IMAGE_BITMAP,
+                    0, 0,
+                    LR_CREATEDIBSECTION);
 
-        if (bmp) {
-            playerSprites[dir].push_back(bmp);
+                if (bmp) playerSprites[toolType][dir].push_back(bmp);
         }
-        else {
-            OutputDebugStringA(("플레이어 비트맵 로드 실패: ID " + std::to_string(resourceId) + "\n").c_str());
-        }
+    }
+}
+
+int Player::GetResourceId(Tool toolType, Direction dir)
+{
+    // 베이스 ID는 도구별로 다르게 설정
+    switch (toolType) {
+    case Tool::hoe:
+        return IDB_BITMAP45 + static_cast<int>(dir);
+    case Tool::Axe:
+        return IDB_BITMAP35 + static_cast<int>(dir);
+    case Tool::watering:
+        return IDB_BITMAP31 + static_cast<int>(dir);
+    case Tool::None:
+        return IDB_BITMAP27 + static_cast<int>(dir);
     }
 }

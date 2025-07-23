@@ -9,9 +9,6 @@ enum class CropType {  //코드 수정 필요
     //울타리
     Fence = 5,  //울타리 기본1
 
-    //도구
-    hoe = 4,  //괭이
-    Axe = 6,  //도끼
-    watering = 7 //물뿌리개
+
 };
 

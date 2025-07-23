@@ -1,8 +1,9 @@
 #pragma once
 #include "resource.h"
 #include <windows.h>
+#include "GameObject.h"
 
-class Animal
+class Animal: public GameObject
 {
 public:
 	Animal();

@@ -4,7 +4,6 @@
 #include <vector>
 #include "resource.h"
 #include "CropType.h"
-#include "WorldMap.h"
 class PlayerController;
 
 class Crop :public PlaceableObject {

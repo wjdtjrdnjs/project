@@ -26,6 +26,10 @@ bool CollisionManager::playerCollided()
     auto& fences = GameObjectManager::Instance().GetFences();
     for (auto& fence : fences)
     {
+        OutputDebugStringA("울타리 충돌 발생\n");
+
+        if (!fence->IsActive()) continue; //비활성화된 울타리
+
         RECT fenceBox = fence->GetBoundingBox();
         if (IntersectRect(&intersect, &playerBox, &fenceBox))
         {
@@ -33,25 +37,56 @@ bool CollisionManager::playerCollided()
         }
     }
 
+    if (!box->IsActive()) return false; //비활성호된 상자
     // 상자 겹침(이동 불가) 검사
-    if (IntersectRect(&intersect, &playerBox, &boxBox))collided = true;  // 이동 막음
-    else if (IsNearBox(playerBox, boxBox, 10))  box->SetPlayerNear(TRUE); // 10픽셀 이내 접근하면 상자 오픈
-    else  box->SetPlayerNear(FALSE); //상자 오픈 불가
-  
+    if (IntersectRect(&intersect, &playerBox, &boxBox))
+    {
+        OutputDebugStringA("박스 충돌 발생\n");
+        collided = true;  // 이동 막음
+    }
+    else if (IsNearBox(playerBox, boxBox, 10))
+    {
+        box->SetPlayerNear(TRUE); // 10픽셀 이내 접근하면 상자 오픈
+    }
+    else  
+        box->SetPlayerNear(FALSE); //상자 오픈 불가
+
+    if (!house->IsActive()) return collided;  //비활성화된 집
 
     // 집 충돌 검사
     if (IntersectRect(&intersect, &playerBox, &houseBox))
     {
-        RECT doorBox = house->GetDoorBoundingBox();
-        if (IntersectRect(&intersect, &playerBox, &doorBox))
+        OutputDebugStringA("집 충돌 발생\n");
+
+        RECT doorBox = house->GetDoorBoundingBox(); //문 충돌  영역가져옴
+        if (IntersectRect(&intersect, &playerBox, &doorBox)) //검사
         {
-            WorldMap* worldmap = GameObjectManager::Instance().GetWorldMap();
-            worldmap->MoveToRegion(1);
-           // GameObjectManager::Instance().SetPlayerInsideHouse(true);
+            WorldMap* worldmap = GameObjectManager::Instance().GetWorldMap(); //객제 
+            worldmap->MoveToRegion(1);  //마이룸으로 입장
+            GameObjectManager::Instance().SetPlayerInsideHouse(true); 
             OutputDebugStringA("집 내부 입장\n");
         }
         collided = true;
     }
+
+    //XXXXXXXXXXXXXXXXXXXXXX
+    //if (GameObjectManager::Instance().IsPlayerInsideHouse()) {
+    //    RECT playerBox = player->GetBoundingBox();
+
+    //    MyRoomMap* mymap = RenderManager::Instance().GetMyRoomMap();
+    //    if (mymap) {
+    //        RECT doorBox = mymap->GetExitDoorBoundingBox();
+
+    //        if (IntersectRect(&intersect, &playerBox, &doorBox)) {
+    //            // 밖으로 나가기
+    //            WorldMap* worldmap = GameObjectManager::Instance().GetWorldMap();
+    //            worldmap->MoveToRegion(0);  // 바깥 맵 인덱스
+
+    //            GameObjectManager::Instance().SetPlayerInsideHouse(false);
+    //            OutputDebugStringA("밖으로 나감\n");
+    //        }
+    //    }
+    //}
     return collided;
 }
 

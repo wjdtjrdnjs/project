@@ -13,19 +13,18 @@ void InventoryUIController::Initialize(int slotCount)
  
 }
 
-void InventoryUIController::UpdateInventory(InventoryItem* items)
+void InventoryUIController::UpdateInventory(InventoryItem* items) // 인벤토리 내용 갱신
 {
     for (int i = 0; i < 9; i++)
         inventorySlots[i] = items[i];
-    
 }
 
-void InventoryUIController::ToolSelected(int index)
+void InventoryUIController::ToolSelected(int index) // 선택된 툴 표시
 {
     selectedSlot = index;
 }
 
-void InventoryUIController::Render(HDC hdc)
+void InventoryUIController::Render(HDC hdc)  //인벤토리UI렌더링
 {
     int slotSize = 50;
     int startX = 10;
@@ -42,8 +41,8 @@ void InventoryUIController::Render(HDC hdc)
         DeleteObject(brush);
 
         InventoryItem* item = inventorySlots;
-        if (item[i].type != CropType::None) {
-            HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(item[i].type);
+        if (item[i].itemType != ItemType::NONE) {
+            HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(item[i]);
             HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
             BITMAP bm;
             GetObject(bmp, sizeof(BITMAP), &bm);
@@ -73,7 +72,7 @@ void InventoryUIController::Render(HDC hdc)
 
 }
   
-RECT InventoryUIController::GetSlotRect(int index) const
+RECT InventoryUIController::GetSlotRect(int index) const // 슬롯 좌표 계산 함수
 {
     RECT rect;
     rect.left = baseX + index * (slotSize + slotPadding);
@@ -83,7 +82,7 @@ RECT InventoryUIController::GetSlotRect(int index) const
     return rect;
 }
 
-int InventoryUIController::ProcessMouseClick(int mouseX, int mouseY)
+int InventoryUIController::ProcessMouseClick(int mouseX, int mouseY) // 마우스 클릭 이벤트 처리, 클릭한 슬롯 인덱스 반환
 {
     for (int i = 0; i < 9; ++i) {
         RECT r = GetSlotRect(i);

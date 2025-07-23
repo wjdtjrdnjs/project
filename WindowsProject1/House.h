@@ -3,8 +3,9 @@
 #include "CollisionManager.h"
 #include <windows.h>
 #include <vector>
+#include "GameObject.h"
 
-class House:public CollisionManager
+class House:public CollisionManager, public GameObject
 {
 public:
 	House();

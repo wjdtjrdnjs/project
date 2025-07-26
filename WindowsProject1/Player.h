@@ -2,56 +2,60 @@
 #include <vector>
 #include <map>
 #include <windows.h>
-#include <algorithm>
 #include "resource.h"
-#include "CollisionManager.h"
-#include "Direction.h"
-#include "GameObject.h"
-#include "ToolType.h" 
+#include "WorldObject.h" 
 
-class InventoryComponent;
-class Player : public CollisionManager, public GameObject
+class Player : public WorldObject
 {
 public:
-	Player(InventoryComponent* inventoryComponent);
-	~Player();
-	void LoadSprites();
-	// 플레이어 좌표
-	int GetX() const { return x; }
-	int GetY() const { return y; }
-	void SetPlusX(int dx, int dy)  { x += dx, y += dy;}
-	void SetMinusY(int dx, int dy) { x -= dx, y -= dy; }
-	RECT GetBoundingBox() const;
-	int GetResourceId(Tool toolType, Direction dir);
-	void Render(HDC hdc);	// 플레이어 렌더링
+	Player();
+	void Render(HDC hdc, int Tilesize)	override;// 플레이어 렌더링
+	void SetTilePosition(int px, int py) override;
+	void SetPosition(int px, int py);
+	//~Player();
+	ObjectType GetObjectType() const override;
+	//void LoadSprites();
+	// 플레이어 좌표 
+	int GetX() const { return pixelX; }
+	int GetY() const { return pixelY; }
+	int GetTileX()const { return tileX; }
+	int GetTileY()const { return tileY; }
+	//Player* GetPlayer() { return this; }
+	//void SetPlusX(int dx, int dy)  { x += dx, y += dy;}
+	//void SetMinusY(int dx, int dy) { x -= dx, y -= dy; }
+	//RECT GetBoundingBox() const;
+	//int GetResourceId(Tool toolType, Direction dir);
+	////void Render(HDC hdc);	// 플레이어 렌더링
 
-	void SetDirection(Direction dir) { currentDir = dir; }
-	Direction  GetDirection() const { return currentDir; }
+	//void SetDirection(Direction dir) { currentDir = dir; }
+	//Direction  GetDirection() const { return currentDir; }
 
-	std::vector<RECT> GetCollisionRects() const override;
+	//std::vector<RECT> GetCollisionRects() const override;
 
-	//플레이어 인벤토리 전달
-	InventoryComponent* GetInventory() { return inventory; }
+	////플레이어 인벤토리 전달
+	//InventoryComponent* GetInventory() { return inventory; }
 
-	void SetEquippedTool(Tool t) { equippedTool = t; }
-	Tool GetEquippedTool() const {return equippedTool;}
-
-	void StartAction();
+	//void SetEquippedTool(Tool t) { equippedTool = t; }
+	//Tool GetEquippedTool() const {return equippedTool;}
+	//void StartAction();
 private:
-	int x = 39;
-	int y = 250;
+	int tileX = 0;  // 타일 위치 (정수)
+	int tileY = 0;
+	float pixelX = 0.f;  // 실제 픽셀 위치 (자연스러운 이동용)
+	float pixelY = 0.f;
+
 	int playerSize = 35;
-	Direction currentDir = Direction::DOWN; // 초기 방향은 아래
-	WateringCan_Action canAction = WateringCan_Action::DOWN;
+	//Direction currentDir = Direction::DOWN; // 초기 방향은 아래
+	//WateringCan_Action canAction = WateringCan_Action::DOWN;
 
-	InventoryComponent* inventory = nullptr;
-	Tool equippedTool = Tool::None;
+	//InventoryComponent* inventory = nullptr;
+	//Tool equippedTool = Tool::None;
 
-	std::map<Tool, std::map<Direction, std::vector<HBITMAP>>> playerSprites;
+	//std::map<Tool, std::map<Direction, std::vector<HBITMAP>>> playerSprites;
 
 	HBITMAP hBmp = nullptr; // 비트맵 핸들 저장용
 	HDC memDC = nullptr;
 
 	
-	void ReleaseResources();  // 필요 시 구현
+	//void ReleaseResources();  // 필요 시 구현
 };

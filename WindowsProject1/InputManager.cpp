@@ -1,4 +1,8 @@
 #include "InputManager.h"
+#include "Gigagenie.h"
+#include "Direction.h"
+
+
 void InputManager::Init(HWND hwnd)
 {
     hWnd = hwnd;
@@ -93,6 +97,27 @@ int InputManager::GetPressedNumberKey()
     }
     return 0; // 아무 것도 안 눌렸으면 0
 }
+
+//void InputManager::HandleKey(WPARAM key)
+//{
+//    
+//    switch (key) {
+//    case VK_LEFT:
+//        genie->MovePlayer(Direction::LEFT);
+//        break;
+//    case VK_RIGHT:
+//        genie->MovePlayer(Direction::RIGHT);
+//        break;
+//    case VK_UP:
+//        genie->MovePlayer(Direction::UP);
+//        break;
+//    case VK_DOWN:
+//        genie->MovePlayer(Direction::DOWN);
+//        break;
+//    default:
+//        break;
+//    }
+//}
 
 bool InputManager::IsKeyPressedOnce(int key) {
     return (GetAsyncKeyState(key) & 0x0001); // ← 딱 한 번만 true

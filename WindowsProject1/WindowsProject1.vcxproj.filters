@@ -55,6 +55,18 @@
     <Filter Include="GameObject">
       <UniqueIdentifier>{bc0b06c2-7404-4dc5-874c-5a1058d807a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Gigagenie">
+      <UniqueIdentifier>{87b86496-259d-43a4-87ab-3b024971e7b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WorldObject">
+      <UniqueIdentifier>{913c6132-ff7c-4f20-8f77-d25cfed6dfd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{d83b6b9f-59d1-48f6-a68e-d7736ca83c5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TileData">
+      <UniqueIdentifier>{a05cbaf6-06f1-4017-9374-b1b6b838eed2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -150,11 +162,26 @@
     <ClInclude Include="Global.h">
       <Filter>Objects</Filter>
     </ClInclude>
+    <ClInclude Include="MainGame.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Gigagenie.h">
+      <Filter>Gigagenie</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldObject.h">
+      <Filter>WorldObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="TileData.h">
+      <Filter>TileData</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="WindowsProject1.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Crop.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
@@ -216,6 +243,24 @@
       <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Global.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="MainGame.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Gigagenie.cpp">
+      <Filter>Gigagenie</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsProject1.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldObject.cpp">
+      <Filter>WorldObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -394,6 +439,15 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\Character\Hoe_Actions3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Tree.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Tileset\Walls and Floors copiar.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\House\Interior.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

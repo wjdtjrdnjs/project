@@ -3,7 +3,6 @@
 #include "SingletonT.h"
 
 
-
 class InputManager : public SingletonT<InputManager>
 {
 public:
@@ -25,6 +24,7 @@ public:
     bool IsKeyDown(int vKey);        // 이번 프레임에 눌림
     bool IsKeyUp(int vKey);          // 이번 프레임에 뗌
 
+   // void HandleKey(WPARAM key);
     bool IsKeyPressedOnce(int key);
     int GetPressedNumberKey();
 private:
@@ -38,7 +38,6 @@ private:
     bool previousLeftClick = false;
     bool currentRightClick = false;
     bool previousRightClick = false;
-
     // 키 상태 추적
     BYTE currentKeys[256] = { 0 };
     BYTE previousKeys[256] = { 0 };

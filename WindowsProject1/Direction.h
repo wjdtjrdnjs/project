@@ -1,5 +1,6 @@
 #pragma once
 enum class  Direction {
+	None = -1,
 	DOWN = 0,
 	UP = 1,
 	RIGHT = 2,

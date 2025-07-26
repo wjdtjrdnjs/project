@@ -4,32 +4,41 @@
 #include "WindowsProject1.h"
 #include <windowsx.h>
 #include <wingdi.h> 
+#include <windows.h> 
 #include <math.h> 
 #include <iostream>
 #include <string>
 #include <vector>
 
 //Objects 파일
-#include "Fence.h"
+//#include "Fence.h"
 #include "Crop.h"
-#include "Animal.h"
+//#include "Animal.h"
 #include "Player.h"
-#include "Box.h"
-#include "House.h"
-
-//game파일
-#include "WorldMap.h"
-//Managers파일
+//#include "House.h"
+//
+////game파일
+//#include "WorldMap.h"
+////Managers파일
+//#include "SingletonT.h"
+//
+//#include "RenderManager.h"
+//#include "BitmapManager.h"
+//#include "InputManager.h"
+//#include "GameObjectManager.h"
+//#include "PlayerController.h"
+//#include "CollisionManager.h"
 #include "SingletonT.h"
-
-#include "RenderManager.h"
-#include "BitmapManager.h"
-#include "InputManager.h"
-#include "GameObjectManager.h"
-#include "PlayerController.h"
-#include "CollisionManager.h"
-
 #include "Global.h"
+#include "MainGame.h"
+#include "Gigagenie.h"
+#include "WorldObject.h"
+#include "Gigagenie.h"
+#include "Box.h"
+#include "TileData.h"
+#include "BitmapManager.h"
+
+MainGame game;
 
 #define MAX_LOADSTRING 100
 // 전역 변수:
@@ -48,11 +57,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
+   // hModule = hInstance;//////////////////////////////////////
     // TODO: 여기에 코드를 입력합니다.
-    BitmapManager::Instance().Load(hInstance);
+    //BitmapManager::Instance().Load(hInstance);
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_WINDOWSPROJECT1, szWindowClass, MAX_LOADSTRING);
@@ -65,16 +75,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINDOWSPROJECT1));
+    MSG msg = { 0 };
 
-    MSG msg;
-
-    // 기본 메시지 루프입니다:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (true)
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            if (msg.message == WM_QUIT)
+                break;
+
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        else
+        {
+            // 메시지가 없을 때 게임 로직 및 렌더링 수행
+            game.Update();  
+            InvalidateRect(game.GetHWND(), NULL, FALSE);
+            Sleep(16); // 약 60 FPS 유지
         }
     }
 
@@ -134,6 +155,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+   game.SetHWND(hWnd); //MainGame로 핸들 전달
+   game.Init();  //게임 초기화
+
+  // 
+
    return TRUE;
 }
 
@@ -147,54 +173,49 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 // 
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
- 
-    case WM_CREATE:
-    {
-        GameObjectManager::Instance().Init(hWnd);
-        SetTimer(hWnd, 999, 16, NULL); //플레이어 이동 타이머
 
 
-        return 0;
-    }
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // 메뉴 선택을 구문 분석합니다:
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
 
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            case IDM_ON:
-                g_bFenceRedFrameOn = true;
-                InvalidateRect(hWnd, NULL, TRUE);
-                break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        case IDM_ON:
+            g_bFenceRedFrameOn = true;
+            InvalidateRect(hWnd, NULL, TRUE);
+            break;
 
-            case IDM_OFF:
-                g_bFenceRedFrameOn = false;
-                InvalidateRect(hWnd, NULL, TRUE);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-          }
-          break;
-      
+        case IDM_OFF:
+            g_bFenceRedFrameOn = false;
+            InvalidateRect(hWnd, NULL, TRUE);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+    }
+    break;
+
     case WM_TIMER:
     {
-        switch (wParam) 
+        switch (wParam)
         {
         case 999:
-        {                            
-            GameObjectManager::Instance().Update();
+        {
+            // GameObjectManager::Instance().Update();
+            // game->Update();
             InvalidateRect(hWnd, NULL, FALSE); // 화면 다시 그리
             break;
         }
@@ -202,59 +223,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
     }
-    break;  
+    break;
     case WM_KEYDOWN: //상자 열기
-    {
-        Box* box = GameObjectManager::Instance().GetBox();
-        if (wParam == 'E' && box->IsPlayerNear())
-        {
-            if (box->IsOpen())
-            {
-                box->Close();
-                box->SetPlayerNear(FALSE);
-            }
-            else
-                box->Open();
-        }
-        else if (wParam == VK_ESCAPE)
-        {
-            // ESC 키 처리
-            if (box->IsOpen())
-                box->Close();
-        }
-    }
-        break;
+    case WM_KEYUP:
+    case WM_MOUSEMOVE:
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONUP:
+        game.Input(message, wParam, lParam);
+    break;
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-        HDC memDC = CreateCompatibleDC(hdc);
         RECT rect;
         GetClientRect(hWnd, &rect);
-        HBITMAP backBuffer = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
-        SelectObject(memDC, backBuffer);
 
+        HDC memDC = CreateCompatibleDC(hdc);
+        HBITMAP backBuffer = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
+        HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, backBuffer);
+
+        // 배경 지우기
         FillRect(memDC, &rect, (HBRUSH)(COLOR_WINDOW + 1));
-       
-        GameObjectManager::Instance().Render(memDC, hWnd);
-       
+
+        // 게임 렌더링
+         game.Render(memDC);
+
+        // 백버퍼를 실제 화면에 출력
         BitBlt(hdc, 0, 0, rect.right, rect.bottom, memDC, 0, 0, SRCCOPY);
 
+        // 원래 선택된 비트맵 복원
+        SelectObject(memDC, oldBitmap);
+
+        // 자원 해제
         DeleteObject(backBuffer);
         DeleteDC(memDC);
         EndPaint(hWnd, &ps);
         return 0;
     }
-
+    
 
 
 
 
     case WM_DESTROY:
-        KillTimer(hWnd, 999);  //타이머 종료
-        GameObjectManager::Instance().Release();
-        BitmapManager::Instance().Release();
+        //KillTimer(hWnd, 999);  //타이머 종료
+       // GameObjectManager::Instance().Release();
+        //BitmapManager::Instance().Release();
         PostQuitMessage(0);
         break;
     default:
@@ -282,3 +298,21 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return (INT_PTR)FALSE;
 }
+
+//Box* box = GameObjectManager::Instance().GetBox();
+       //if (wParam == 'E' && box->IsPlayerNear())
+       //{
+       //    if (box->IsOpen())
+       //    {
+       //        box->Close();
+       //        box->SetPlayerNear(FALSE);
+       //    }
+       //    else
+       //        box->Open();
+       //}
+       //else if (wParam == VK_ESCAPE)
+       //{
+       //    // ESC 키 처리
+       //    if (box->IsOpen())
+       //        box->Close();
+       //}

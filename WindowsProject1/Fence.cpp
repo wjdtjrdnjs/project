@@ -8,7 +8,7 @@
 #include "Global.h" //충돌영역 on/off
 Fence::Fence()
 {
-    hBmp = BitmapManager::Instance().GetBitmapFence();// itmapManager에서 울타리 비트맵 핸들 받아오기
+    //hBmp = BitmapManager::Instance().GetBitmapFence();// itmapManager에서 울타리 비트맵 핸들 받아오기
 }
 RECT Fence::GetBoundingBox() const //울타리 충돌 범위
 {

@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 //#define tileSize 32
-
+class Player;
 class Box: public WorldObject
 {
 public:
@@ -11,15 +11,23 @@ public:
     void Render(HDC hdc, int Tilesize) override;
     void SetTilePosition(int px, int py) override;
     ObjectType GetObjectType() const override;
+
+    std::vector<RECT> GetCollisionRects() const override;
+
+    //void Interact(Player& player) override;
+
+    void Open(); //열고
+    void Close(); //닫기
+    bool IsOpen() const;
+   // 
+   // 
    // ObjectType GetType() const override { return ObjectType::Box;}
 
     //Box(int x, int y);
    // void RenderUI(HDC hdc);     // 상자 아이템 칸 UI 
    // bool IsPlayerInRange(int playerX, int playerY); //플레이어가 박스 주변에 있는 지 확인
    // bool IsMouseOverIcon(int mouseX, int mouseY);//마우스 커서가 상자아이콘 위에 있는지 확인
-   // void Open(); //열고
-   // void Close(); //닫기
-   // bool IsOpen() const;
+   
    // void HandleClick(int row, int col, int num); //마우스 좌클릭 지점 확인(박스 칸 or 플레이어 툴바)
    // void RenderCursorItem(HDC hdc); //클릭된 아이템이 커서에 붙게 하는 함수
 
@@ -38,6 +46,7 @@ public:
 private:
     int x, y;                  
     bool isOpen = false;
+   
     bool playerNear = false;
     HBITMAP bmp;
     //InventoryItem* playerToolbar[9];

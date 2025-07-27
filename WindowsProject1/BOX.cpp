@@ -1,8 +1,11 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Box.h"
+#include "Global.h"
+
 #include "BitmapManager.h"
 #include "WorldObject.h"
 #include "TileData.h"
+
 #include <string>
 //#include "InputManager.h"
 //#include "InventoryItem.h"
@@ -441,6 +444,28 @@ void Box::Render(HDC hdc,  int Tilesize)
             bmpInfo.bmWidth, bmpInfo.bmHeight,
             RGB(255, 255, 255)
         );
+        //박스 충돌영역
+        if (g_bFenceRedFrameOn)
+        {     RECT r;
+            r.left = px + 5;
+            r.top = py + 5;
+            r.right = r.left + 20;
+            r.bottom = r.top + 20;
+            HBRUSH red = CreateSolidBrush(RGB(255, 0, 0));
+            FrameRect(hdc, &r, red);
+            DeleteObject(red);
+            //상호작용
+            r.left = px;
+            r.top = py;
+            r.right = r.left + 32;
+            r.bottom = r.top + 32;
+            HBRUSH green = CreateSolidBrush(RGB(0, 255, 0));
+            FrameRect(hdc, &r, green);
+            DeleteObject(green);
+        }
+   
+          
+
         SelectObject(memDC, oldBmp);
         DeleteDC(memDC);
 }
@@ -450,6 +475,47 @@ void Box::SetTilePosition(int px, int py) { x = px; y = py; }
 ObjectType Box::GetObjectType() const
 {
     return ObjectType::Box;
+}
+
+std::vector<RECT> Box::GetCollisionRects() const
+{
+    RECT r;
+    r.left = tileX * 32 + 5;
+    r.top = tileY * 32 + 5;
+    r.right = r.left + 20;
+    r.bottom = r.top + 20;
+    return { r };
+}
+
+//std::vector<RECT> Box::GetCollisionRects() const
+//{
+//        RECT r;
+//        r.left = static_cast<int>(x * 32);
+//        r.top = static_cast<int>(y * 32);
+//        r.right = r.left + 32;
+//        r.bottom = r.top + 32;
+//        return { r };
+//}
+
+//void Box::Interact(Player& player)  {
+//    if (isOpen) Close();
+//    else Open();
+//}
+
+void Box::Open()
+{
+    isOpen = TRUE;
+}
+
+void Box::Close()
+{
+    isOpen = FALSE;
+
+}
+
+bool Box::IsOpen() const
+{
+    return isOpen;
 }
 
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "Direction.h"
 class WorldObject;
 enum class TileType 
 {  
@@ -13,7 +14,6 @@ enum class ObjectType
     None,
     Crop,
     Box,
-    Player,
     Tree
 };
 
@@ -26,6 +26,13 @@ enum class CropType
 struct TileData {
     TileType tileType;
     std::shared_ptr<WorldObject> object = nullptr;
+};
+
+
+struct PlayerData {
+    float x, y;      // ÇÈ¼¿ ÁÂÇ¥ (¿¹: 100.0f, 120.5f)
+    float speed;     // ÀÌµ¿ ¼Óµµ
+    Direction dir;
 };
 
 

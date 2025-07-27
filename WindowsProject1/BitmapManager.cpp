@@ -1,7 +1,7 @@
 ﻿#include "BitmapManager.h"
 #include "Global.h"
 #include "resource.h"
-
+#include "Direction.h" 
 //
 // 
 // extern HINSTANCE hModule;  // 인스턴스 핸들
@@ -168,8 +168,6 @@ HBITMAP BitmapManager::GetObjectBitmap(ObjectType type)
         return GetBitmap("Box");
     case ObjectType::Crop:
         return GetBitmap("Crop");
-    case ObjectType::Player:
-        return GetBitmap("Player");
     case ObjectType::Tree:
         return GetBitmap("Tree");
     }
@@ -187,6 +185,20 @@ HBITMAP BitmapManager::GetCroptBitmap(CropType type)
               return GetBitmap("Water");*/
     }
     return nullptr;
+}
+HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
+{
+    switch (dir) {
+    case Direction::DOWN:
+        return GetBitmap("Player_Down");
+    case Direction::UP:
+        return GetBitmap("Player_UP");
+    case Direction::LEFT:
+        return GetBitmap("Player_LEFT");
+    case Direction::RIGHT:
+        return GetBitmap("Player_RIGHT");
+    }
+    return GetBitmap("Player_Down"); ;
 }
 void BitmapManager::Release()
 {

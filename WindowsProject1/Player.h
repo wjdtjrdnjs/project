@@ -3,23 +3,25 @@
 #include <map>
 #include <windows.h>
 #include "resource.h"
-#include "WorldObject.h" 
-
-class Player : public WorldObject
+#include "Direction.h" 
+class Player 
 {
-public:
+ public:
 	Player();
-	void Render(HDC hdc, int Tilesize)	override;// 플레이어 렌더링
-	void SetTilePosition(int px, int py) override;
-	void SetPosition(int px, int py);
+	void Render(HDC hdc, int Tilesize, Direction dir);
+	//void SetTilePosition(int px, int py) override;
+	void SetPosition(float px, float py);
 	//~Player();
-	ObjectType GetObjectType() const override;
+	//ObjectType GetObjectType() const override;
 	//void LoadSprites();
 	// 플레이어 좌표 
-	int GetX() const { return pixelX; }
-	int GetY() const { return pixelY; }
+	float GetX() const { return x; }
+	float GetY() const { return y; }
 	int GetTileX()const { return tileX; }
 	int GetTileY()const { return tileY; }
+	std::vector<RECT> GetCollisionRects() const;
+
+	void Update(float deltaTime, bool up, bool down, bool left, bool right);
 	//Player* GetPlayer() { return this; }
 	//void SetPlusX(int dx, int dy)  { x += dx, y += dy;}
 	//void SetMinusY(int dx, int dy) { x -= dx, y -= dy; }
@@ -38,12 +40,16 @@ public:
 	//void SetEquippedTool(Tool t) { equippedTool = t; }
 	//Tool GetEquippedTool() const {return equippedTool;}
 	//void StartAction();
-private:
+	private:
 	int tileX = 0;  // 타일 위치 (정수)
 	int tileY = 0;
 	float pixelX = 0.f;  // 실제 픽셀 위치 (자연스러운 이동용)
 	float pixelY = 0.f;
-
+	//
+	float x;
+	float y;
+	float speed = 5.0f;
+	//
 	int playerSize = 35;
 	//Direction currentDir = Direction::DOWN; // 초기 방향은 아래
 	//WateringCan_Action canAction = WateringCan_Action::DOWN;

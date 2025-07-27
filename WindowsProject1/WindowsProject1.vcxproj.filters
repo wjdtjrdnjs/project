@@ -180,6 +180,9 @@
     <ClInclude Include="Tree.h">
       <Filter>Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Renderable.h">
+      <Filter>WorldObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Crop.cpp">

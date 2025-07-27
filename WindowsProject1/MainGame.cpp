@@ -27,7 +27,12 @@ void MainGame::Init()
 	BitmapManager::Instance().Load("Box", IDB_BITMAP24);
 	BitmapManager::Instance().Load("Strawberry", IDB_BITMAP10);
 	BitmapManager::Instance().Load("Onion", IDB_BITMAP2);
-	BitmapManager::Instance().Load("Player", IDB_BITMAP27);
+
+	BitmapManager::Instance().Load("Player_Down", IDB_BITMAP27);
+	BitmapManager::Instance().Load("Player_UP", IDB_BITMAP28);
+	BitmapManager::Instance().Load("Player_LEFT", IDB_BITMAP30);
+	BitmapManager::Instance().Load("Player_RIGHT", IDB_BITMAP29);
+
 	BitmapManager::Instance().Load("Tree", IDB_BITMAP49);
 	////////////////////////////////////////////////////////////////
 
@@ -37,7 +42,7 @@ void MainGame::Init()
 
 	//초기 맵 설정 Farm맵
 	genie->addMap("Farm", 40, 19); //맵 생성
-	genie->addObjectToCurrentMap(TileType::None, ObjectType::Player, 8, 8); //타일타입, 설치할 오브젝트 타입, 좌표(x,y)
+	genie->addPlayer(15, 10);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -58,15 +63,20 @@ void MainGame::Init()
 
 void MainGame::Render(HDC hdc)
 {
-	if (!genie || genie->maps.empty())
+	if (!genie || !genie->HasMaps())
 		return;
 
 	genie->currentMap().Render(hdc);
 
+	genie->PlayerRender(hdc);
+
+
 }
 
-void MainGame::Update()
+void MainGame::Update(float deltaTime)
 {
+	if (genie)
+		genie->Update(deltaTime);
 }
 
 void MainGame::Run()
@@ -75,39 +85,38 @@ void MainGame::Run()
 
 	while (TRUE)
 	{
-		// Windows 메시지 큐에서 메시지가 있으면 가져온다 (없으면 루프 계속 돈다)
-		//if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		//{
-		//	// 메시지가 WM_QUIT이면 프로그램 종료
-		//	if (msg.message == WM_QUIT)
-		//		break;
-
-		//	// 키보드 키가 눌렸을 때의 메시지 처리
-		//	if (msg.message == WM_KEYDOWN) {
-		//		Input(msg.wParam); // 눌린 키 정보를 Input 함수에 전달 (예: VK_LEFT 등)
-		//	}
-
-		//	// 키 입력 등 메시지를 텍스트로 번역 (예: WM_KEYDOWN → 문자)
-		//	TranslateMessage(&msg);
-
-		//	// 메시지를 윈도우 프로시저(WndProc)로 전달해서 기본 처리
-		//	DispatchMessage(&msg);
-		//}
-		//Update();
+	
 	}
 	
+
 }
 
 void MainGame::Input(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	if (message == WM_KEYDOWN)
+	bool pressed = (message == WM_KEYDOWN);
+
+	switch (wParam)
 	{
-		switch (wParam)
-		{
-		case VK_LEFT:  genie->MovePlayer(Direction::LEFT);  break;
-		case VK_RIGHT: genie->MovePlayer(Direction::RIGHT); break;
-		case VK_UP:    genie->MovePlayer(Direction::UP);    break;
-		case VK_DOWN:  genie->MovePlayer(Direction::DOWN);  break;
-		}
+	case 'W': genie->SetKeyState(Direction::UP, pressed); OutputDebugStringA("플레이어 이동(위)\n"); break;
+	case 'S': genie->SetKeyState(Direction::DOWN, pressed); OutputDebugStringA("플레이어 이동(아래)\n"); break;
+	case 'A': genie->SetKeyState(Direction::LEFT, pressed); OutputDebugStringA("플레이어 이동(왼쪽)\n"); break;
+	case 'D': genie->SetKeyState(Direction::RIGHT, pressed); OutputDebugStringA("플레이어 이동(오른쪽)\n"); break;
 	}
+	switch (lParam)
+	{
+	case WM_RBUTTONDOWN:
+	{
+		int mouseX = LOWORD(lParam);
+		int mouseY = HIWORD(lParam);
+
+		int tileSize = 32;
+		int tileX = mouseX / tileSize;
+		int tileY = mouseY / tileSize;
+
+		//genie->TryHarvestCrop(tileX, tileY);
+		break;
+	}
+	}
+		
 }
+

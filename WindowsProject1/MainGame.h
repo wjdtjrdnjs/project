@@ -13,7 +13,7 @@ public:
 	HWND  GetHWND() { return hwnd; }// 윈도우 핸들 설정 함수
 	void Init();
 	void Render(HDC hdc);
-	void Update();
+	void Update(float deltaTime);
 	void Run();
 	void Input(UINT message, WPARAM wParam, LPARAM lParam);
 private:

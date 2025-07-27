@@ -7,6 +7,7 @@
 #include "InputManager.h"
 #include "WorldMap.h"
 #include "TileData.h"
+#include "Global.h"
 #include <string>
 
 Crop::Crop(CropType type) //: type(type), growthStage(0), growthTimer(0)
@@ -38,6 +39,19 @@ void Crop::Render(HDC hdc, int Tilesize)
         RGB(255, 255, 255)
     );
     
+    //상호작용
+    if (g_bFenceRedFrameOn)
+    {
+        RECT r;
+        r.left = px;
+        r.top = py;
+        r.right = r.left + 32;
+        r.bottom = r.top + 32;
+        HBRUSH b = CreateSolidBrush(RGB(0, 255, 0));
+        FrameRect(hdc, &r, b);
+        DeleteObject(b);
+    }
+ 
 
     SelectObject(memDC, oldBmp);
     DeleteDC(memDC);
@@ -48,6 +62,15 @@ ObjectType Crop::GetObjectType() const
 {
     return ObjectType::Crop;
 }
+
+
+//void Crop::Interact(Player& player)  {
+//   // if (isRipe) {
+//       // player.AddInventory(cropType);
+//     //   RemoveFromMap();
+//    }
+//}
+
 
 //Crop::~Crop()
 //{

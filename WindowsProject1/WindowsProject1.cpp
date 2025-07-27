@@ -77,6 +77,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINDOWSPROJECT1));
     MSG msg = { 0 };
 
+    LARGE_INTEGER frequency;
+    QueryPerformanceFrequency(&frequency);
+
+    LARGE_INTEGER prevTime;
+    QueryPerformanceCounter(&prevTime);
+
     while (true)
     {
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -92,10 +98,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            // 메시지가 없을 때 게임 로직 및 렌더링 수행
-            game.Update();  
+            LARGE_INTEGER currentTime;
+            QueryPerformanceCounter(&currentTime);
+
+            double deltaTime = double(currentTime.QuadPart - prevTime.QuadPart) / frequency.QuadPart;
+            prevTime = currentTime;
+
+            game.Update(static_cast<float>(deltaTime));
             InvalidateRect(game.GetHWND(), NULL, FALSE);
-            Sleep(16); // 약 60 FPS 유지
         }
     }
 

@@ -8,7 +8,7 @@
 #include "resource.h"
 #include "player.h"
 #include "SingletonT.h"
-
+#include "Direction.h" 
 #include "TileData.h"
 #include <unordered_map>
 #include <string>
@@ -24,6 +24,7 @@ public:
      HBITMAP GetTileBitmap(TileType type);
      HBITMAP GetObjectBitmap(ObjectType type);
      HBITMAP GetCroptBitmap(CropType type);
+     HBITMAP GetPlayerBitmap(Direction dir);
      
     // HBITMAP GetBitmapForCrop(InventoryItem type);
     // HBITMAP GetBitmapFence();

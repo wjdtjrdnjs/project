@@ -6,13 +6,23 @@
 #include "WorldObject.h"
 #include "TileData.h"
 class PlayerController;
-
+class Player;
 class Crop :public WorldObject{
 public:
     Crop(CropType type);  //생성자
     void Render(HDC hdc, int Tilesize) override;
     void SetTilePosition(int px, int py) override;
     ObjectType GetObjectType() const override;
+
+    //void Interact(Player& player) override;
+    // IsRipe() const { return ripe; }
+
+  //  void Harvest()
+   // {
+        // 나중에 플레이어 인벤토리에 아이템 추가도 가능
+        //ripe = false;
+        // 사운드 재생, 애니메이션, 경험치 등도 여기에
+   // }
 
     //~Crop();            //소멸자
 
@@ -31,6 +41,7 @@ public:
 private:
     CropType type;     //작물 타입(딸기, 양파)
     int x = 0, y = 0;  //작물 심은 위치
+    bool ripe = FALSE;
     HBITMAP bitmap; 
     //PlayerController* playercon = nullptr;
     //int growthStage = 0;          //현재 작물 단계

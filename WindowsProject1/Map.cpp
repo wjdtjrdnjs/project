@@ -8,28 +8,25 @@
 #include "WorldObject.h"
 #include "Player.h"
 #include <windows.h>
+#include <algorithm>
+#include<functional>
 using namespace std;
 //void Map::addBox(std::shared_ptr<WorldObject> box) { mapObjects.push_back(box); }
 
-std::shared_ptr<Player> Map::GetPlayer() 
-{ if (player) return player;
 
-    for (const TileData& tile : mapTiles) {
-        if (tile.object) {
-            auto player_1 = std::dynamic_pointer_cast<Player>(tile.object);
-            if (player_1) {
-                player = player_1;
-                return player;
-            }
-        }
-    }
 
-return nullptr;
+void Map::getTile(int x, int y)
+{
 }
 
-void Map::ResetPlayerCache()
+
+
+void Map::Update(float deltaTime)
 {
-    player.reset();
+   /* for (auto& obj : objects)
+    {
+        obj->Update(deltaTime);
+    }*/
 }
 
 Map::Map()
@@ -68,24 +65,26 @@ void Map::Render(HDC hdc)
         }
     }
 
-    // 2) 타일 위에 있는 오브젝트(플레이어 제외) 그리기
+    // 2) 작물(오브젝트) 렌더링
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             int index = y * width + x;
             auto& tile = mapTiles[index];
 
-            if (tile.object && tile.object->GetObjectType() != ObjectType::Player) {
+            if (tile.object) {
+                // 플레이어와 같은 타일인지 검사
+                //if (player &&
+                //    static_cast<int>(player->GetX()) == x &&
+                //    static_cast<int>(player->GetY()) == y)
+                //{
+                //    // 플레이어가 있는 타일이면 작물 렌더링 패스 (나중에 플레이어 아래에 그릴 거라서)
+                //    continue;
+                //}
                 tile.object->Render(hdc, tileSize);
             }
         }
     }
-
-    // 3) 플레이어 따로 그리기 (가장 위에)
-    auto player = GetPlayer();
-    if (player) {
-        player->Render(hdc, tileSize);
-    }
+  
 
     DeleteDC(memDC);
 }
-

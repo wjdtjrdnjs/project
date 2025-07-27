@@ -1,17 +1,25 @@
 #pragma once
-#include "Crop.h" 
-#include "ToolType.h"
-enum class ItemType {
-    NONE,
-    CROP,
-    TOOL
-};
+#include <Windows.h>
+#include <string>
+// InventoryItem.h
+#pragma once
+#include <Windows.h>
+#include <string>
 
-struct InventoryItem {
-    ItemType itemType = ItemType::NONE;
+class InventoryItem {
+public:
+    InventoryItem() = default;
 
-    CropType cropType = CropType::None;  // 작물일 경우
-    Tool toolType = Tool::hoe;
+    InventoryItem(const std::string& name, HBITMAP bitmap)
+        : name(name), bitmap(bitmap), valid(true) {
+    }
 
-    int count = 0;
+    bool IsValid() const { return valid; }
+    std::string GetName() const { return name; }
+    HBITMAP GetBitmap() const { return bitmap; }
+
+private:
+    std::string name = "";
+    HBITMAP bitmap = nullptr;
+    bool valid = false;
 };

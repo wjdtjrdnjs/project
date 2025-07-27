@@ -7,7 +7,8 @@ enum class TileType
     None,
     Grass, 
     Farmland,
-    Water
+    Water,
+    Path
 };
 enum class ObjectType
 {
@@ -21,7 +22,9 @@ enum class CropType
 {
     None,
     Strawberry,
-    Onion
+    Onion,
+    strawberryseed,
+    onionseed
 };
 struct TileData {
     TileType tileType;

@@ -22,11 +22,15 @@ void MainGame::Init()
 {
 	///////////////////³ªÁß¿¡ ºñÆ®¸Ê¸Å´ÏÀú·Î ¿Å°Ü¾ßÇÒ ÄÚµå/////////////////
 	BitmapManager::Instance().Load("Grass", IDB_BITMAP22);
+	BitmapManager::Instance().Load("Path", IDB_BITMAP21);
 	BitmapManager::Instance().Load("Farm", IDB_BITMAP42);
 	BitmapManager::Instance().Load("Water", IDB_BITMAP43);
 	BitmapManager::Instance().Load("Box", IDB_BITMAP24);
 	BitmapManager::Instance().Load("Strawberry", IDB_BITMAP10);
 	BitmapManager::Instance().Load("Onion", IDB_BITMAP2);
+
+	BitmapManager::Instance().Load("µþ±â¾¾¾ÑºÀÅõ", IDB_BITMAP18);
+	BitmapManager::Instance().Load("¾çÆÄ¾¾¾ÑºÀÅõ", IDB_BITMAP17);
 
 	BitmapManager::Instance().Load("Player_Down", IDB_BITMAP27);
 	BitmapManager::Instance().Load("Player_UP", IDB_BITMAP28);
@@ -41,19 +45,44 @@ void MainGame::Init()
 
 
 	//ÃÊ±â ¸Ê ¼³Á¤ Farm¸Ê
-	genie->addMap("Farm", 40, 19); //¸Ê »ý¼º
-	genie->addPlayer(15, 10);
+	genie->addMap("Farm",40, 19); //¸Ê »ý¼º
+	// 2. Æ÷Å» À§Ä¡ ¼³Á¤
+	RECT portalToMyroom = { 320, 160, 352, 192 };
+	genie->addPortal("Farm", portalToMyroom, 1);
+
+
+	genie->addPlayer(10, 10);
 
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			genie->addObjectToCurrentMap(TileType::Farmland, ObjectType::Crop, 10 + i, 9 + j, CropType::Strawberry); 
-			genie->addObjectToCurrentMap(TileType::Farmland, ObjectType::Crop, 14 + i, 9 + j, CropType::Onion); 
+			genie->addObjectToCurrentMap("Farm",TileType::Farmland, ObjectType::Crop, 10 + i, 9 + j, CropType::Strawberry);
+			genie->addObjectToCurrentMap("Farm",TileType::Farmland, ObjectType::Crop, 14 + i, 9 + j, CropType::Onion);
 		}
 	}
-	genie->addObjectToCurrentMap(TileType::None, ObjectType::Box, 11, 8); 
-	genie->addObjectToCurrentMap(TileType::None, ObjectType::Box, 15, 8);
+	genie->addObjectToCurrentMap("Farm",TileType::None, ObjectType::Box, 11, 8);
+	genie->addObjectToCurrentMap("Farm",TileType::None, ObjectType::Box, 15, 8);
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			genie->addObjectToCurrentMap("Farm",TileType::Path, ObjectType::None, 34 +i, 11+j);
+			genie->addObjectToCurrentMap("Farm",TileType::Path, ObjectType::None, 35+i, 11+j);
+		}
+	}
+	genie->addMap("Myroom",  40, 19); //¸Ê »ý¼º
+	RECT portalToFarm = { 64, 64, 96, 96 };
+	genie->addPortal("Myroom", portalToFarm, 0);
+
+	genie->addObjectToCurrentMap("Myroom",TileType::None, ObjectType::Box, 11, 8);
+	genie->addObjectToCurrentMap("Myroom",TileType::None, ObjectType::Box, 15, 8);
+
+	
+	//genie->addObjectToCurrentMap(TileType::Path, ObjectType::None, 38, 12);
+	//genie->addObjectToCurrentMap(TileType::Path, ObjectType::None, 39, 12);
+
 	//genie->addObjectToCurrentMap(TileType::None, ObjectType::Tree, 2, 15);
 
 	//genie->addMap("MyRoom",50, 30);
@@ -101,6 +130,16 @@ void MainGame::Input(UINT message, WPARAM wParam, LPARAM lParam)
 	case 'S': genie->SetKeyState(Direction::DOWN, pressed); OutputDebugStringA("ÇÃ·¹ÀÌ¾î ÀÌµ¿(¾Æ·¡)\n"); break;
 	case 'A': genie->SetKeyState(Direction::LEFT, pressed); OutputDebugStringA("ÇÃ·¹ÀÌ¾î ÀÌµ¿(¿ÞÂÊ)\n"); break;
 	case 'D': genie->SetKeyState(Direction::RIGHT, pressed); OutputDebugStringA("ÇÃ·¹ÀÌ¾î ÀÌµ¿(¿À¸¥ÂÊ)\n"); break;
+		// ¼ýÀÚÅ° 1~9: ÀÎº¥Åä¸® ½½·Ô ¼±ÅÃ
+	case '1': case '2': case '3':
+	case '4': case '5': case '6':
+	case '7': case '8': case '9':
+		if (pressed)
+		{
+			int slotIndex = wParam - '1';
+			genie->SelectInventorySlot(slotIndex);
+		}
+		break;
 	}
 	switch (lParam)
 	{

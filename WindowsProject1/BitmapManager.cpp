@@ -157,6 +157,8 @@ HBITMAP BitmapManager::GetTileBitmap(TileType type)
         return GetBitmap("Farm");
     case TileType::Water:
         return GetBitmap("Water");
+    case TileType::Path:
+        return GetBitmap("Path");
     }
     return nullptr;
 }
@@ -181,8 +183,10 @@ HBITMAP BitmapManager::GetCroptBitmap(CropType type)
         return GetBitmap("Strawberry");
     case CropType::Onion:
         return GetBitmap("Onion");
-        /*  case ObjectType::Water:
-              return GetBitmap("Water");*/
+    case CropType::strawberryseed:
+        return GetBitmap("딸기씨앗봉투");
+    case CropType::onionseed:
+        return GetBitmap("양파씨앗봉투");
     }
     return nullptr;
 }

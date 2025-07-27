@@ -183,6 +183,9 @@
     <ClInclude Include="Renderable.h">
       <Filter>WorldObject</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerInventory.h">
+      <Filter>Inventory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Crop.cpp">
@@ -265,6 +268,9 @@
     </ClCompile>
     <ClCompile Include="Tree.cpp">
       <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerInventory.cpp">
+      <Filter>Inventory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

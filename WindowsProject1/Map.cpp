@@ -29,20 +29,53 @@ void Map::Update(float deltaTime)
     }*/
 }
 
+void Map::MyRoomPortal()
+{
+    
+
+    RECT r;
+    r.left = 10;
+    r.top = 10;
+    r.right = 10;
+    r.bottom = 10;
+    HBRUSH red = CreateSolidBrush(RGB(255, 0, 0));
+    DeleteObject(red);
+}
+
+void Map::AddPortalRect(const RECT& rect, int targetMapIndex)
+{
+    portals.emplace_back(rect, targetMapIndex);
+}
+
+void Map::RenderPortals(HDC hdc)
+{
+    HBRUSH portalBrush = CreateSolidBrush(RGB(255, 0, 255)); // 보라색 포탈
+
+    for (const auto& portal : portals) {
+        FillRect(hdc, &portal.first, portalBrush);
+        FrameRect(hdc, &portal.first, (HBRUSH)GetStockObject(BLACK_BRUSH));
+    }
+
+    DeleteObject(portalBrush);
+}
 Map::Map()
 {
 }
 
-void Map::initTiles(int w, int h)
+void Map::initTiles( int w, int h)
 {
     width = w;
     height = h;
-	mapTiles.resize(w * h);
+    mapTiles.resize(w * h);
     for (auto& tile : mapTiles) {
         tile.tileType = TileType::Grass;
         tile.object = nullptr;
     }
+
 }
+
+
+
 
 void Map::Render(HDC hdc)
 {
@@ -84,7 +117,20 @@ void Map::Render(HDC hdc)
             }
         }
     }
-  
+
+    {
+        HBRUSH portalBrush = CreateSolidBrush(RGB(255, 0, 255));  // 보라색 포탈 표시
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, portalBrush);
+
+        for (const auto& portal : portals) {
+            const RECT& rect = portal.first;
+            FillRect(hdc, &rect, portalBrush);
+            FrameRect(hdc, &rect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+        }
+
+        SelectObject(hdc, oldBrush);
+        DeleteObject(portalBrush);
+    }
 
     DeleteDC(memDC);
 }

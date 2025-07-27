@@ -4,6 +4,7 @@
 #include <windows.h>
 #include "InventoryComponent.h"
 #include "InventoryUIController.h"
+#include "TileData.h"
 #include "InventoryItem.h"
 #include "Crop.h" 
 
@@ -19,13 +20,13 @@ InventoryComponent::InventoryComponent(InventoryUIController* uiController)
     }
 
     //기본 아이템
-    inventory[0].itemType = ItemType::CROP;//1번 딸기봉투와 5개
-    inventory[0].cropType = CropType::Strawberry_1; 
-    inventory[0].count = 5;
+    //inventory[0].itemType = ItemType::CROP;//1번 딸기봉투와 5개
+    //inventory[0].cropType = CropType::Strawberry_1; 
+    //inventory[0].count = 5;
 
-    inventory[1].itemType = ItemType::CROP;//1번 딸기봉투와 5개
-    inventory[1].cropType = CropType::Onion_1;      //2번 양파봉투 5개
-    inventory[1].count = 5;
+    //inventory[1].itemType = ItemType::CROP;//1번 딸기봉투와 5개
+    //inventory[1].cropType = CropType::Onion_1;      //2번 양파봉투 5개
+    //inventory[1].count = 5;
   
     inventory[2].itemType = ItemType::TOOL;//1번 딸기봉투와 5개
     inventory[2].toolType = Tool::hoe;        //괭이

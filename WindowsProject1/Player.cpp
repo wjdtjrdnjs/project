@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "BitmapManager.h"
 #include "TileData.h"
+#include "PlayerInventory.h"
 
 
 #include "Global.h" //충돌영역 on/off
@@ -13,7 +14,12 @@
 Player::Player()
 {
     // LoadSprites();
-   
+    inventory = new PlayerInventory(); //인벤토리 멤버 저장
+
+    InventoryItem item("딸기씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::strawberryseed)); //인벤토리 슬롯 1번에 딸기씨앗 집어넣음
+    inventory->AddItem(0, item);
+     item = InventoryItem("양파씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::onionseed)); //양파 씨앗 넣음
+    inventory->AddItem(1, item);
 
     OutputDebugStringA("플레이어 객체 생성완료\n");
 

@@ -1,5 +1,6 @@
 #include "PlayerInventory.h"
 #include "ToolType.h"
+#include "TIleData.h"
 
 void PlayerInventory::InventoryUIRender(HDC hdc)
 {
@@ -80,4 +81,15 @@ Tool PlayerInventory::GetSelectedTool()
     }
 
     return Tool::None; // 선택된 슬롯에 도구가 없을 때
+}
+
+ObjectType PlayerInventory::GetSelectedObjectType()
+{
+    const InventoryItem& item = inventorySlots[selectedSlot];
+
+    if (item.IsValid() && item.GetObjectType() != ObjectType::None) {
+        return item.GetObjectType(); // 예: Tool::hoe
+    }
+
+    return ObjectType::None;
 }

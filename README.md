@@ -1,20 +1,25 @@
 # project
-미완성
-충돌처리(집 울타리 나무 물타일)
-
-아이템 슬롯을 클래스로 만들고 호출(박스 칸, 플레이어 툴바)
-
-렌더에서는 그림 출력만 하기
-
-맵 만들기(월드맵, 집 내부)
+Gigagenine 분할 예정 -> Game Scene, Scene Manager
+오브젝트 추상클래스 + 템플릿 
 
 
-완성
-아이템 우클릭으로 수량 나누기 -1씩
-BitmapManager,InputManager,RenderManager 싱글톤
+Game Scene
+Update
+Render
+std::vector<Map> maps;
+std::shared_ptr<Player> player;
+int palyersize = 64;
+addMap
+addObjectToCurrentMap
+addPlayer
+addPortal
+GetMapIndexByName
 
-
-
+Scene Manager
+HasMaps
+currentMap
+ChangeMap
+int currentMapIndex = 0;
 
 
 

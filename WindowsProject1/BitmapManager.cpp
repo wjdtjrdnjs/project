@@ -160,6 +160,7 @@ void BitmapManager::LoadAllBitmaps()
    Load("Strawberry", IDB_BITMAP10);
    Load("Onion", IDB_BITMAP2);
    Load("House", IDB_BITMAP38);
+   Load("Fence", IDB_BITMAP39);
 
     //씨앗봉투들
    Load("딸기씨앗봉투", IDB_BITMAP18);
@@ -171,7 +172,7 @@ void BitmapManager::LoadAllBitmaps()
    Load("Player_LEFT", IDB_BITMAP30);
    Load("Player_RIGHT", IDB_BITMAP29);
 
-    BitmapManager::Instance().Load("Tree", IDB_BITMAP49);
+    Load("Tree", IDB_BITMAP49);
 }
 
 HBITMAP BitmapManager::GetTileBitmap(TileType type)
@@ -200,6 +201,8 @@ HBITMAP BitmapManager::GetObjectBitmap(ObjectType type)
         return GetBitmap("Tree");
     case ObjectType::House:
         return GetBitmap("House");
+    case ObjectType::Fence:
+        return GetBitmap("Fence");
     }
     return nullptr;
 }

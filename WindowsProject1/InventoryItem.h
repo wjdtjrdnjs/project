@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <string>
 #include "ToolType.h"
+#include "TileData.h"
 class InventoryItem {
 public:
     InventoryItem() = default;
@@ -17,11 +18,13 @@ public:
     void SetCount(int newCount) { count = newCount; }
     void AddCount(int delta) { count += delta; }
     Tool GetToolType() const { return toolType; }
+    ObjectType GetObjectType() const { return objectType; }
 private:
     std::string name = "";
     HBITMAP bitmap = nullptr;
     int count = 0;
     bool valid = false;
     Tool toolType = Tool::None;
+    ObjectType objectType = ObjectType::None;
 
 };

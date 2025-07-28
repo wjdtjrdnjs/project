@@ -21,8 +21,6 @@ MainGame::~MainGame()
 
 void MainGame::Init()
 {
-	
-
 	//  ex)	addMap(맵 이름, 가로 세로, 전체 타일타입)  
 	//	ex)	addObjectToCurrentMap(타일타입::타일이름,오브젝트타입::오브젝트이름, x , y, 작물타입::작물이름) 마지막은 오브젝트타입이 작물이면 사용
 	genie->addPlayer(10, 10);
@@ -31,10 +29,12 @@ void MainGame::Init()
 	//초기 맵 설정 Farm맵
 	//0번 맵
 	genie->addMap("Farm",40, 19, TileType::Grass); //맵 생성
-	RECT portalToMyroom = { 1260, 350, 1280, 416 }; //포탈 위치 지정
+	RECT portalToMyroom = { 1260, 350, 1280, 416 }; //포탈 z위치 지정
 	genie->addPortal("Farm", portalToMyroom, 1); //포탈 생성
 	
 
+	// 230, 580, 320, 600
+	// 
 	//(포탈이름, x,y) 포탈 입장 후 플레이어 위치 설정 -진행 중-
 	//포탈에 입장했을 때 플레이어 위치 설정 -- 나중에 추가 현재 
 
@@ -52,7 +52,8 @@ void MainGame::Init()
 	genie->addObjectToCurrentMap("Farm",TileType::None, ObjectType::Box, 11, 6);
 	genie->addObjectToCurrentMap("Farm", TileType::None, ObjectType::Box, 16, 6);
 	genie->addObjectToCurrentMap("Farm", TileType::None, ObjectType::Tree, 5, 3);
-	genie->addObjectToCurrentMap("Farm",TileType::None, ObjectType::House, 3, 10);
+	genie->addObjectToCurrentMap("Farm", TileType::None, ObjectType::House, 3, 10);
+	genie->addObjectToCurrentMap("Farm",TileType::None, ObjectType::Fence, 1, 1);
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -94,25 +95,23 @@ void MainGame::Init()
 	genie->addObjectToCurrentMap("Myroom",TileType::None, ObjectType::Box, 5, 8);
 	genie->addObjectToCurrentMap("Myroom",TileType::None, ObjectType::Box, 25, 8);
 	
-	
+
+
+
+	//300, 100, 500, 180
 	OutputDebugStringA("디버겅용\n");
 
 }
 
 void MainGame::Render(HDC hdc)
 {
-	if (!genie || !genie->HasMaps())
-		return;
-
-	genie->currentMap().Render(hdc);
-
-	genie->PlayerRender(hdc);
-
-
+	if (!genie)return;
+	genie->Render(hdc);
 }
 
 void MainGame::Update(float deltaTime)
 {
+	if (!genie)return;
 	genie->Update(deltaTime);
 }
 

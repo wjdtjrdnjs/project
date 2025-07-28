@@ -20,14 +20,16 @@ Player::Player()
 
     InventoryItem item("딸기씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::strawberryseed), 5); // 5개
     inventory->AddItem(0, item);
-
     item = InventoryItem("양파씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::onionseed), 3); // 3개
     inventory->AddItem(1, item);
+    item = InventoryItem("Fence", BitmapManager::Instance().GetObjectBitmap(ObjectType::Fence), 3); // 3개
+    inventory->AddItem(2, item);
+
 
     OutputDebugStringA("플레이어 객체 생성완료\n");
 
 }
-void Player::Render(HDC hdc, int Tilesize)
+void Player::Render(HDC hdc)
 {
     HBITMAP hPlayerBmp = BitmapManager::Instance().GetPlayerBitmap(lastPressedDirection);
     if (hPlayerBmp) {
@@ -179,6 +181,24 @@ void Player::HandleLeftClick(Map& map) //좌클릭 사용
 void Player::HandleRightClick(Map& map) //우클릭으로 사용
 {
    // 오브젝트 설치 함수로 사용 예정
+     if (InputManager::Instance().IsRightClickUp())
+    {
+         ObjectType type = inventory->GetSelectedObjectType();
+
+        int tileX = static_cast<int>(x);
+        int tileY = static_cast<int>(y);
+
+        //설치 or 삭제로 구현
+        if (type == ObjectType::Fence /*&& map.GetTile(tileX, tileY) == TileType::Water*/) { 
+            map.SetTile(tileX, tileY, TileType::Farmland);  //타일변경
+        }
+        //else if (type == ObjectType::Box && map.GetTile(tileX, tileY) == TileType::Farmland) {
+        //    map.WaterTile(tileX, tileY);  // 
+        //}
+        //else if (type == ObjectType::Fence && map.HasFenceAt(tileX, tileY)) {
+        //    map.RemoveFence(tileX, tileY); //울타리 삭제
+        //}
+    }
 }
 
 void Player::SetKeyState(Direction dir, bool pressed)

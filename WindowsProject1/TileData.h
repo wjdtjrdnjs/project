@@ -16,7 +16,8 @@ enum class ObjectType
     Crop,
     Box,
     Tree,
-    House
+    House,
+    Fence
 };
 
 enum class CropType
@@ -27,6 +28,7 @@ enum class CropType
     strawberryseed,
     onionseed
 };
+
 struct TileData {
     TileType tileType;
     std::shared_ptr<WorldObject> object = nullptr;

@@ -13,15 +13,12 @@ public:
 
 	//std::vector<std::shared_ptr<Monster>> monsters; 
 	/// 
-	void getTile(int x, int y);
 
-	void ResetPlayerCache();
 
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
 	void Update(float deltaTime);
 	//
-	void MyRoomPortal();
 
 	void AddPortalRect(const RECT& rect, int targetMapIndex);
 
@@ -30,6 +27,8 @@ public:
 	Map();
 	void initTiles(int width, int height, TileType type);
 	void Render(HDC hdc);
+
+	//진행 증
 	void SetTile(int tileX, int tileY, TileType type); //타일 변경
 	void GetTile(int tileX, int tileY);
 	void WaterTile(int tileX, int tileY); //땅에 물 뿌림

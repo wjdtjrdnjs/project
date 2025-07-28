@@ -7,11 +7,11 @@ class WorldObject
 {
 public:
 	virtual void Render(HDC hdc, int Tilesize) = 0;
-	virtual void SetTilePosition(int tileX, int tileY) = 0;
+	virtual void SetTilePosition(int tileX, int tileY) = 0;  // 선언만 된 순수 가상 함수 (구현 없음) 
 	virtual std::vector<RECT> GetCollisionRects() const { return {}; }  // 기본은 충돌 없음
 	
 	virtual bool IsCollidable() const { return false; }
-	//virtual void Interact(Player& player) {}
+	//virtual void Interact(Player& player) {}		
 
 	virtual ObjectType GetObjectType() const = 0;
 	

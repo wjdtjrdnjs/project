@@ -15,16 +15,17 @@ public:
 	
 	//맵
 	Map& currentMap() {return maps[currentMapIndex];}
+
+	//사용xx
 	const std::vector<Map>& GetMaps() const { return maps; }// 전체 맵 리스트 (읽기 전용)
-	
-	int GetCurrentMapIndex() const { return currentMapIndex; }// 현재 맵 인덱스 확인
+	int GetCurrentMapIndex() const { return currentMapIndex; }// 현재 맵 인덱스 확인  
 
 	bool HasMaps() const { return !maps.empty(); } //맵 존재 여부
 	/////
 
 	//플레이어 데이터 함수
-	std::shared_ptr<Player> GetPlayer() const {return player;}
-	void SetPlayer(std::shared_ptr<Player> p) { player = p; }
+	//std::shared_ptr<Player> GetPlayer() const {return player;}
+	//void SetPlayer(std::shared_ptr<Player> p) { player = p; }
 
 	void Update(float deltaTime);
 	void Render(HDC hdc);
@@ -45,13 +46,12 @@ public:
 	//  맵 이름 검색으로 해당하는 맵 인덱스를 반환.
 	int GetMapIndexByName(const std::string& mapName);
 
-	void InPortal();
+	void InPortal(); //포탈 플레이어 충돌
 
-	void PlayerRender(HDC hdc);
 
 	
 
-	void ChangeMapToNext();
+	//void ChangeMapToNext();
 	void ChangeMap(int index);
 
 	//업데이트
@@ -64,6 +64,8 @@ public:
 private:
 	std::vector<Map> maps;
 	std::shared_ptr<Player> player;
+	
+	int palyersize = 64;
 	int currentMapIndex = 0;
 	
 };

@@ -1,30 +1,29 @@
 #pragma once
-#include "resource.h"
 #include <windows.h>
-#include "CropType.h"
-#include "CollisionManager.h"
-#include "PlaceableObject.h"
-class PlayerController;
-class Fence :public PlaceableObject, public CollisionManager{
+#include "WorldObject.h"
+
+class Fence :public WorldObject
+{
 public:
 	Fence();
-	~Fence();
+	void SetTilePosition(int tileX, int tileY) override;
+	void Render(HDC hdc, int tilesize) override;
+	ObjectType GetObjectType()const override;
 
-	int GetX() const { return x; }  //울타리 위치 x
-	int GetY() const { return y; }  //울타리 위치 y
-	RECT GetBoundingBox() const;
-	std::vector<RECT>GetCollisionRects()const override;
+	//int GetX() const { return x; }  //울타리 위치 x
+	//int GetY() const { return y; }  //울타리 위치 y
+	//RECT GetBoundingBox() const;
+	//std::vector<RECT>GetCollisionRects()const override;
 
-	//PlaceableObject.h
-	void Install(int x, int y, InventoryComponent& inventory) override; //설치 
-	void Remove(int tileX, int tileY, InventoryComponent& inventory) override; //삭제
+	////PlaceableObject.h
+	//void Install(int x, int y, InventoryComponent& inventory) override; //설치 
+	//void Remove(int tileX, int tileY, InventoryComponent& inventory) override; //삭제
 
-	void SetPosition(int x, int y) { this->x = x; this->y = y; }
-	void Render(HDC hdc);
+	
+
 private:
-	PlayerController* playercon = nullptr;
 	int x, y;
 	int Fencesize = 10;
-	HBITMAP hBmp = nullptr; // 비트맵 핸들 저장용
+	HBITMAP hBmp; // 비트맵 핸들 저장용
 };
 

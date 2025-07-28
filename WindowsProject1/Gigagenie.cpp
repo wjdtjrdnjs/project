@@ -9,6 +9,7 @@
 #include "Direction.h"
 #include "House.h"
 #include "Renderable.h"
+#include "Fence.h"
 #include "InputManager.h"
 #include <string>
 #include <iostream>
@@ -30,7 +31,11 @@ void Gigagenie::Update(float deltaTime)
 
 void Gigagenie::Render(HDC hdc)
 {
+    if (!HasMaps()) return;
 
+    maps[currentMapIndex].Render(hdc);
+    player->Render(hdc);
+ 
 }
 
 void Gigagenie::addMap(const std::string& mapName, int width, int height, TileType type)
@@ -50,33 +55,27 @@ void Gigagenie::addObjectToCurrentMap(const std::string& mapName,TileType tileTy
     int mapIndex = GetMapIndexByName(mapName);
     if (mapIndex == -1) return; // 맵이 없으면 리턴
 
-    Map& map = maps[mapIndex];
+    Map& map = maps[mapIndex]; //인덱스를 가져와 현재 맵 참조
 
     int index = y * map.getWidth() + x;
-    TileData& tile = map.mapTiles[index];
+    TileData& tile = map.mapTiles[index]; //현재 맵 타일 참조
 
-    if (tileType != TileType::None)
+    if (tileType != TileType::None)  //타일 none이 아닐 때 변경
         tile.tileType = tileType;
 
     if (objectType != ObjectType::None && !tile.object)
     {
-        std::shared_ptr<WorldObject> obj;
-        if (objectType == ObjectType::Box)
+        std::shared_ptr<WorldObject> obj; 
+        switch (objectType)
         {
-            obj = std::make_shared<Box>();
+        case ObjectType::None:break;
+        case ObjectType::Crop:obj = std::make_shared<Crop>(cropType); break;
+        case ObjectType::Box:obj = std::make_shared<Box>(); break;
+        case ObjectType::Tree:obj = std::make_shared<Tree>(); break;
+        case ObjectType::House:obj = std::make_shared<House>(); break;
+        case ObjectType::Fence:obj = std::make_shared<Fence>(); break;
         }
-        else if (objectType == ObjectType::Crop)
-        {
-            obj = std::make_shared<Crop>(cropType);
-        }
-        else if (objectType == ObjectType::Tree)
-        {
-            obj = std::make_shared<Tree>();
-        }
-        else if (objectType == ObjectType::House)
-        {
-            obj = std::make_shared<House>();
-        }
+
         if (obj)
         {
             tile.object = obj;
@@ -85,16 +84,16 @@ void Gigagenie::addObjectToCurrentMap(const std::string& mapName,TileType tileTy
     }
 }
 
-void Gigagenie::addPlayer(int x, int y)
+void Gigagenie::addPlayer(int x, int y)  //플레이어 생성 및 위치 설정
 {
-    auto newPlayer = std::make_shared<Player>();
-    newPlayer->SetPosition(x, y);
+    auto newPlayer = std::make_shared<Player>(); //스마트포인터로 생성
+    newPlayer->SetPosition(x, y); 
 
     player = newPlayer;
 
 }
 
-int Gigagenie::GetMapIndexByName(const std::string& mapName) {
+int Gigagenie::GetMapIndexByName(const std::string& mapName) { //맵 이름으로 인덱스 반환
     for (int i = 0; i < (int)maps.size(); i++) {
         if (maps[i].name == mapName)
             return i;
@@ -102,37 +101,38 @@ int Gigagenie::GetMapIndexByName(const std::string& mapName) {
     return -1; // 못 찾으면 -1 반환
 }
 
-void Gigagenie::addPortal(const std::string& mapName, const RECT& rect, int targetMapIndex)
+void Gigagenie::addPortal(const std::string& mapName, const RECT& rect, int targetMapIndex) //포탈 생성
 {
-    int index = GetMapIndexByName(mapName);
-    if (index != -1) {
-        maps[index].AddPortalRect(rect, targetMapIndex);
+    int index = GetMapIndexByName(mapName); //맵 번호 검사
+    if (index != -1) { //동일한 이름의 맵이 없다면 -1
+        maps[index].AddPortalRect(rect, targetMapIndex);  //포탈 벡터 추가 도형, 나올 맵 번호
         OutputDebugStringA(("포탈 추가: " + mapName + "\n").c_str());
     }
 }
 
-void Gigagenie::ChangeMap(int index) //맵 전환과 플레이어 위치 설정
+void Gigagenie::ChangeMap(int index) //맵과 플레이어 시작 위치 변경
 {
-    if (index >= 0 && index < (int)maps.size()) {
-        currentMapIndex = index;
+    if (index >= 0 && index < (int)maps.size()) { //인덱스 범위 확인
+        currentMapIndex = index;        //addPortal만들 때 입력한 번호의 맵으로 변경
         player->SetPosition(5, 5); // 새 맵에서 시작 위치 설정
         OutputDebugStringA("맵 전환됨\n");
     }
 }
 
-void Gigagenie::InPortal() //플레이어 포탈 입장
+void Gigagenie::InPortal() //플레이어가 포탈 영역에 있는지 확인 후 맵전환
 {
+    //플레이어는 픽셀 좌표로 계산한다.
     float px_pixel = player->GetX() * 32;
     float py_pixel = player->GetY() * 32;
 
-    for (const auto& portal : currentMap().GetPortalRects()) {
-        RECT rect = portal.first;
-        int targetMapIndex = portal.second;
+    for (const auto& portal : currentMap().GetPortalRects()) { //포탈 정보를 가져옴
+        RECT rect = portal.first;  //도형 
+        int targetMapIndex = portal.second; // 번호
 
-
+        //IntersectRect 범위가 너무 안맞으면 사용 예정
         if (px_pixel >= rect.left && px_pixel <= rect.right &&
-            py_pixel >= rect.top && py_pixel <= rect.bottom) {
-            ChangeMap(targetMapIndex);
+            py_pixel >= rect.top && py_pixel <= rect.bottom) { //플레이어와 포탈 범위가 닿으면//
+            ChangeMap(targetMapIndex); // 저장되있던 번호의 맵으로 이동
             OutputDebugStringA("포탈 감지, 맵 변경\n");
             break;
         }
@@ -214,15 +214,7 @@ void Gigagenie::InPortal() //플레이어 포탈 입장
 
 
 
-void Gigagenie::PlayerRender(HDC hdc)
-{
-   
-    if (player) {      //64를 준 이유는 플레이어 비트맵을 더 키우키 위함이다
-        player->Render(hdc, 64);
-        player->GetInventory()->InventoryUIRender(hdc);
-    }
-        
-}
+
 
 
 

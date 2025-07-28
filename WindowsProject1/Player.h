@@ -11,7 +11,7 @@ class Player
 {
  public:
 	Player();
-	void Render(HDC hdc, int Tilesize);
+	void Render(HDC hdc);
 	void SetPosition(float px, float py);
 	
 	// 플레이어 좌표 
@@ -37,7 +37,7 @@ class Player
 
 	void SetDirection(Direction dir); //무슨 방향인지 데이터 가져옴
 
-	bool IsPlayerOnPortal(float  x, float  y);
+	//bool IsPlayerOnPortal(float  x, float  y);
 
 
 
@@ -48,6 +48,7 @@ class Player
 	float speed = 1.0f;
 	//
 	int playerSize = 35;
+	int Tilesize = 64;
 	bool move = FALSE;
 	PlayerInventory* inventory = nullptr;
 	//현재 4개밖에 map 없으니 사용

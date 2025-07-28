@@ -16,9 +16,7 @@ using namespace std;
 
 
 
-void Map::getTile(int x, int y)
-{
-}
+
 
 
 
@@ -30,18 +28,6 @@ void Map::Update(float deltaTime)
     }*/
 }
 
-void Map::MyRoomPortal()
-{
-    
-
-    RECT r;
-    r.left = 10;
-    r.top = 10;
-    r.right = 10;
-    r.bottom = 10;
-    HBRUSH red = CreateSolidBrush(RGB(255, 0, 0));
-    DeleteObject(red);
-}
 
 void Map::AddPortalRect(const RECT& rect, int targetMapIndex)
 {

@@ -103,8 +103,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             double deltaTime = double(currentTime.QuadPart - prevTime.QuadPart) / frequency.QuadPart;
             prevTime = currentTime;
+
             InputManager::Instance().Update();
             game.Update(static_cast<float>(deltaTime));
+
             InvalidateRect(game.GetHWND(), NULL, FALSE);
         }
     }

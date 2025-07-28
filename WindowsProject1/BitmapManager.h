@@ -20,6 +20,9 @@ public:
     ~BitmapManager();
      void Load(const std::string& name, int resourceID);// 초기 로딩
      HBITMAP GetBitmap(const std::string& name);           // 비트맵 가져오기
+
+     void LoadAllBitmaps();
+
      void Release();                              // 메모리 해제
      HBITMAP GetTileBitmap(TileType type);
      HBITMAP GetObjectBitmap(ObjectType type);

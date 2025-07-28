@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include "InventoryItem.h"
+#include "InventoryItem.h"
 
 class PlayerInventory
 {
@@ -9,6 +10,7 @@ public:
 	void InventoryUIRender(HDC hdc);
 	void AddItem(int slotIndex, const InventoryItem& item); //아이템 추가 함수
 	void SetSelectedSlot(int index) { selectedSlot = index; }
+	Tool GetSelectedTool();//도구반환
 
 private:
 	InventoryItem inventorySlots[9];

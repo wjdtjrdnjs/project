@@ -27,6 +27,8 @@ public:
    // void HandleKey(WPARAM key);
     bool IsKeyPressedOnce(int key);
     int GetPressedNumberKey();
+
+    bool IsKeyPressed(int key);
 private:
     HWND hWnd = nullptr;
     POINT mousePos{ 0, 0 };

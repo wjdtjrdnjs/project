@@ -1,7 +1,7 @@
 #include "Tree.h"
 #include "BitmapManager.h"
 #include "TileData.h"
-
+#include "Global.h"
 Tree::Tree()
 {
 	bmp = BitmapManager::Instance().GetObjectBitmap(ObjectType::Tree);
@@ -34,7 +34,25 @@ void Tree::Render(HDC hdc, int Tilesize)
     TransparentBlt(hdc, px, py, drawSize, drawSize, memDC, 0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight, RGB(255, 255, 255));
 
 
-  
+    if (g_bFenceRedFrameOn)
+    {
+        RECT r;
+        r.left = px;
+        r.top = py;
+        r.right = r.left + Tilesize;
+        r.bottom = r.top + Tilesize;
+        HBRUSH red = CreateSolidBrush(RGB(255, 0, 0));
+        FrameRect(hdc, &r, red);
+        DeleteObject(red);
+        //상호작용
+        r.left = px + 47;
+        r.top = py + 75;
+        r.right = r.left + 32;
+        r.bottom = r.top + 40;
+        HBRUSH green = CreateSolidBrush(RGB(0, 255, 0));
+        FrameRect(hdc, &r, green);
+        DeleteObject(green);
+    }
 
    
 

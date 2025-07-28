@@ -129,7 +129,8 @@
 //            FillRect(hdc, &slotRect, brush);
 //            FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));  // Å×µÎ¸®
 //            if (items[y][i].itemType != ItemType::NONE) {
-//                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(items[y][i]);
+//                HBITMAP bmp = 
+// .GetBitmapForCrop(items[y][i]);
 //                if (!bmp)  return;
 //
 //                HDC memDC = CreateCompatibleDC(hdc);

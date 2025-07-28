@@ -4,6 +4,8 @@
 #include "BitmapManager.h"
 #include "TileData.h"
 #include "PlayerInventory.h"
+#include "InputManager.h"
+#include "Map.h"
 
 
 #include "Global.h" //충돌영역 on/off
@@ -16,17 +18,18 @@ Player::Player()
     // LoadSprites();
     inventory = new PlayerInventory(); //인벤토리 멤버 저장
 
-    InventoryItem item("딸기씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::strawberryseed)); //인벤토리 슬롯 1번에 딸기씨앗 집어넣음
+    InventoryItem item("딸기씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::strawberryseed), 5); // 5개
     inventory->AddItem(0, item);
-     item = InventoryItem("양파씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::onionseed)); //양파 씨앗 넣음
+
+    item = InventoryItem("양파씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::onionseed), 3); // 3개
     inventory->AddItem(1, item);
 
     OutputDebugStringA("플레이어 객체 생성완료\n");
 
 }
-void Player::Render(HDC hdc, int Tilesize, Direction dir)
+void Player::Render(HDC hdc, int Tilesize)
 {
-    HBITMAP hPlayerBmp = BitmapManager::Instance().GetPlayerBitmap(dir);
+    HBITMAP hPlayerBmp = BitmapManager::Instance().GetPlayerBitmap(lastPressedDirection);
     if (hPlayerBmp) {
         HDC memDC = CreateCompatibleDC(hdc);
         HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, hPlayerBmp);
@@ -56,6 +59,7 @@ void Player::Render(HDC hdc, int Tilesize, Direction dir)
             r.bottom = r.top + 20;
             HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
             FrameRect(hdc, &r, b);
+            DeleteObject(b);
             // 상호작용
             r.left = (x * 32) - offsetX + 8;
             r.top = (y * 32) - offsetY + 12;
@@ -89,29 +93,150 @@ std::vector<RECT> Player::GetCollisionRects() const
     }
 }
 
-void Player::Update(float deltaTime, bool up, bool down, bool left, bool right)
+void Player::Update(float deltaTime)
 {
-    float dx = 0, dy = 0;
-    if (up) dy -= 1;
-    if (down) dy += 1;
-    if (left) dx -= 1;
-    if (right) dx += 1;
 
-    // 대각선 속도 보정 (optional)
-    if (dx != 0 && dy != 0) {
-        dx *= 0.707f;
-        dy *= 0.707f;
-    }
+    MovePlayer(deltaTime);
 
-    x += dx * speed * deltaTime;
-    y += dy * speed * deltaTime;
-
-    // TODO: 충돌 체크 후 위치 보정 필요
+   
 }
 
+void Player::MovePlayer(float deltaTime)
+{
+    float speed = 7.0f; // px/sec
+    float dx = 0.0f, dy = 0.0f;
+
+    HandleInput();  // 방향 입력 상태 갱신
+
+    if (keyUp)    dy -= 1.0f;
+    if (keyDown)  dy += 1.0f;
+    if (keyLeft)  dx -= 1.0f;
+    if (keyRight) dx += 1.0f;
+
+    // 대각선 이동 시 속도 보정 (정규화)
+    if (dx != 0.0f && dy != 0.0f)
+    {
+        const float invSqrt2 = 0.7071f; // 1 / sqrt(2)
+        dx *= invSqrt2;
+        dy *= invSqrt2;
+    }
+
+    float newX = GetX() + dx * speed * deltaTime;
+    float newY = GetY() + dy * speed * deltaTime;
+
+    SetPosition(newX, newY);
+}
+void Player::HandleInput()
+{
+    keyUp = InputManager::Instance().IsKeyHeld('W');
+    keyDown = InputManager::Instance().IsKeyHeld('S');
+    keyLeft = InputManager::Instance().IsKeyHeld('A');
+    keyRight = InputManager::Instance().IsKeyHeld('D');
+
+    // 마지막으로 눌린 키 방향 저장 (애니메이션 등에 활용 가능)
+    if (keyUp)        lastPressedDirection = Direction::UP;
+    else if (keyDown) lastPressedDirection = Direction::DOWN;
+    else if (keyLeft) lastPressedDirection = Direction::LEFT;
+    else if (keyRight)lastPressedDirection = Direction::RIGHT;
 
 
   
+
+    for (int i = 0; i < 9; ++i) //번호 키 인벤 슬롯
+    {
+        if (InputManager::Instance().IsKeyDown('1' + i))
+        {
+            inventory->SetSelectedSlot(i);
+            break; // 한 번에 하나만 처리
+        }
+    }
+
+}
+
+void Player::HandleLeftClick(Map& map) //좌클릭 사용
+{
+      //오브젝트 제거와 타일 변경으로 사용될 예정
+      
+    //if (InputManager::Instance().IsLeftClickUp())
+    //{
+    //    Tool tool = inventory->GetSelectedTool();
+
+    //    int tileX = static_cast<int>(x);
+    //    int tileY = static_cast<int>(y);
+
+    //    if (tool == Tool::hoe && map.GetTile(tileX, tileY) == TileType::Path) {
+    //        map.SetTile(tileX, tileY, TileType::Farmland);  //타일변경
+    //    }
+    //    else if (tool == Tool::watering && map.GetTile(tileX, tileY) == TileType::Farmland) {
+    //        map.WaterTile(tileX, tileY);  // 작물 성장
+    //    }
+    //    else if (tool == Tool::Axe && map.HasFenceAt(tileX, tileY)) {
+    //        map.RemoveFence(tileX, tileY); //울타리 삭제
+    //    }
+    //}
+}
+
+void Player::HandleRightClick(Map& map) //우클릭으로 사용
+{
+   // 오브젝트 설치 함수로 사용 예정
+}
+
+void Player::SetKeyState(Direction dir, bool pressed)
+{
+
+    keyStates[dir] = pressed;
+
+    if (pressed)
+        lastPressedDirection = dir;
+
+    SetDirection(lastPressedDirection);  // 방향 갱신
+
+}
+
+void Player::SetDirection(Direction dir)//플레이어 방향 전환을 위한 함수
+{
+    PlayerDirection = dir;
+
+}
+
+  
+
+//bool Player::IsPlayerOnPortal(float px, float py)
+//{
+//    const int playerWidth = 32;
+//    const int playerHeight = 32;
+//
+//    // 플레이어 좌표(px, py)는 중심 기준이라고 가정
+//    // offsetX, offsetY는 플레이어 충돌박스를 포탈에 맞게 조정하기 위한 보정값
+//
+//    const int offsetX = 50; // 오른쪽 보정값
+//    const int offsetY = 50; // 아래 보정값
+//
+//    RECT playerRect = {
+//        static_cast<LONG>(px - playerWidth / 2 + offsetX),
+//        static_cast<LONG>(py - playerHeight / 2 + offsetY),
+//        static_cast<LONG>(px + playerWidth / 2 + offsetX),
+//        static_cast<LONG>(py + playerHeight / 2 + offsetY)
+//    };
+//    char buffer[128];
+//    sprintf_s(buffer, "플레이어 위치박스: L=%d, T=%d, R=%d, B=%d\n", playerRect.left, playerRect.top, playerRect.right, playerRect.bottom);
+//    OutputDebugStringA(buffer);
+//    // currentMap의 포탈 리스트를 가지고 있다고 가정
+//    for (const auto& portal : currentMap().GetPortalRects()) {
+//        const RECT& portalRect = portal.first;
+//        int targetMap = portal.second;
+//
+//        if (playerRect.right >= portalRect.left &&
+//            playerRect.left <= portalRect.right &&
+//            playerRect.bottom >= portalRect.top &&
+//            playerRect.top <= portalRect.bottom) {
+//            OutputDebugStringA("포탈 감지: 충돌 성공!\n");
+//            return true;
+//        }
+//    }
+//    return false;
+//}
+
 
 //void Player::Render(HDC hdc, int Tilesize)
 //{

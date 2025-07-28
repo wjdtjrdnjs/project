@@ -15,7 +15,8 @@ enum class ObjectType
     None,
     Crop,
     Box,
-    Tree
+    Tree,
+    House
 };
 
 enum class CropType

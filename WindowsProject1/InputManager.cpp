@@ -98,6 +98,12 @@ int InputManager::GetPressedNumberKey()
     return 0; // 아무 것도 안 눌렸으면 0
 }
 
+bool InputManager::IsKeyPressed(int vKey)
+{
+    // 현재 키 상태가 눌린 상태면 true, 아니면 false
+    return (currentKeys[vKey] & 0x80) != 0;
+}
+
 //void InputManager::HandleKey(WPARAM key)
 //{
 //    

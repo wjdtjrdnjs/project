@@ -1,62 +1,64 @@
 #include "PlayerInventory.h"
+#include "ToolType.h"
 
 void PlayerInventory::InventoryUIRender(HDC hdc)
 {
     int slotSize = 50;
     int startX = 10;
     int startY = 500;
-
-    HBRUSH grayBrush = CreateSolidBrush(RGB(200, 200, 200));
-    HBRUSH darkGrayBrush = CreateSolidBrush(RGB(100, 100, 100));
-    HBRUSH blackBrush = (HBRUSH)GetStockObject(BLACK_BRUSH);
-
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 9; i++)
+    {
+        // 슬롯 배경색
+        HBRUSH brush = CreateSolidBrush(i == selectedSlot ? RGB(150, 150, 150) : RGB(200, 200, 200));
         RECT slotRect = {
-            startX + i * (slotSize + 5) + 350,
-            startY,
-            startX + i * (slotSize + 5) + slotSize + 350,
-            startY + slotSize
+        startX + i * (slotSize + 5) + 350,
+        startY,
+        startX + i * (slotSize + 5) + slotSize + 350,
+        startY + slotSize
         };
 
-        HBRUSH bgBrush = (i == selectedSlot) ? darkGrayBrush : grayBrush;
-        FillRect(hdc, &slotRect, bgBrush);
+        // 슬롯 배경 및 테두리
+        FillRect(hdc, &slotRect, brush);
+        FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+        DeleteObject(brush);
 
-        if (inventorySlots[i].IsValid()) {
-            HBITMAP hBitmap = inventorySlots[i].GetBitmap();
-            if (hBitmap) {
-                BITMAP bmpInfo;
-                GetObject(hBitmap, sizeof(BITMAP), &bmpInfo);
+        // 아이템 렌더링
+        const InventoryItem& item = inventorySlots[i];
+        if (item.IsValid())
+        {
+            HBITMAP bmp = item.GetBitmap();
+            if (!bmp) continue;
 
-                int bmpWidth = bmpInfo.bmWidth;
-                int bmpHeight = bmpInfo.bmHeight;
+            HDC memDC = CreateCompatibleDC(hdc);
+            HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
 
-                HDC memDC = CreateCompatibleDC(hdc);
-                HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, hBitmap);
+            BITMAP bm;
+            GetObject(bmp, sizeof(BITMAP), &bm);
 
-                // 투명색 지정 (예: 핑크색을 투명 처리)
-                COLORREF transparentColor = RGB(255, 255, 255);
+            int drawSize = 40;
+            int offsetX = slotRect.left + (slotSize - drawSize) / 2;
+            int offsetY = slotRect.top + (slotSize - drawSize) / 2;
 
-                // 슬롯 크기에 딱 맞게 확대해서 그리기
-                TransparentBlt(
-                    hdc,
-                    slotRect.left, slotRect.top,
-                    slotSize, slotSize,
-                    memDC,
-                    0, 0,
-                    bmpWidth, bmpHeight,
-                    transparentColor
-                );
+            TransparentBlt(
+                hdc,
+                offsetX, offsetY,
+                drawSize, drawSize,
+                memDC,
+                0, 0,
+                bm.bmWidth,
+                bm.bmHeight,
+                RGB(255, 255, 255)
+            );
 
-                SelectObject(memDC, oldBmp);
-                DeleteDC(memDC);
-            }
+            SelectObject(memDC, oldBmp);
+            DeleteDC(memDC);
+
+            // 수량 텍스트
+            std::string countText = std::to_string(item.GetCount());
+            SetBkMode(hdc, TRANSPARENT);
+            TextOutA(hdc, offsetX + 30, offsetY + 30, countText.c_str(), countText.length());
         }
-
-        FrameRect(hdc, &slotRect, blackBrush);
     }
-
-    DeleteObject(grayBrush);
-    DeleteObject(darkGrayBrush);
 }
 
 
@@ -66,4 +68,16 @@ void PlayerInventory::AddItem(int slotIndex, const InventoryItem& item) {
     if (slotIndex >= 0 && slotIndex < 9) {
         inventorySlots[slotIndex] = item;
     }
+}
+
+Tool PlayerInventory::GetSelectedTool() 
+{
+    const InventoryItem& item = inventorySlots[selectedSlot];
+
+    // 도구 아이템만 판단하고 반환
+    if (item.IsValid() && item.GetToolType() != Tool::None) {
+        return item.GetToolType(); // 예: Tool::hoe
+    }
+
+    return Tool::None; // 선택된 슬롯에 도구가 없을 때
 }

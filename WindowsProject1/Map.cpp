@@ -6,6 +6,7 @@
 #include "Global.h"
 #include "BitmapManager.h"
 #include "WorldObject.h"
+#include "TileData.h"
 #include "Player.h"
 #include <windows.h>
 #include <algorithm>
@@ -47,28 +48,18 @@ void Map::AddPortalRect(const RECT& rect, int targetMapIndex)
     portals.emplace_back(rect, targetMapIndex);
 }
 
-void Map::RenderPortals(HDC hdc)
-{
-    HBRUSH portalBrush = CreateSolidBrush(RGB(255, 0, 255)); // 보라색 포탈
 
-    for (const auto& portal : portals) {
-        FillRect(hdc, &portal.first, portalBrush);
-        FrameRect(hdc, &portal.first, (HBRUSH)GetStockObject(BLACK_BRUSH));
-    }
-
-    DeleteObject(portalBrush);
-}
 Map::Map()
 {
 }
 
-void Map::initTiles( int w, int h)
+void Map::initTiles( int w, int h, TileType type)
 {
     width = w;
     height = h;
     mapTiles.resize(w * h);
     for (auto& tile : mapTiles) {
-        tile.tileType = TileType::Grass;
+        tile.tileType = type;
         tile.object = nullptr;
     }
 
@@ -118,7 +109,9 @@ void Map::Render(HDC hdc)
         }
     }
 
+    if(g_bFenceRedFrameOn) //포탈 영역
     {
+
         HBRUSH portalBrush = CreateSolidBrush(RGB(255, 0, 255));  // 보라색 포탈 표시
         HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, portalBrush);
 
@@ -133,4 +126,29 @@ void Map::Render(HDC hdc)
     }
 
     DeleteDC(memDC);
+}
+
+void Map::SetTile(int tileX, int tileY, TileType type)
+{
+    //여기는 좌표 타일에 타입을 변경해주는 함수~
+}
+
+void Map::GetTile(int tileX, int tileY)
+{
+    //여기는 좌표 타일을 반환해주는 함수~
+}
+
+void Map::WaterTile(int tileX, int tileY) //작물 성장
+{
+    //여기는 타일 Farmland에 물을 뿌리면 작물이 성장하는 함수~
+}
+
+bool Map::HasFenceAt(int tileX, int tileY)
+{
+    return false;   //해당 타일에 울타리가 있나~없나 확인하는 함수~
+}
+
+void Map::RemoveFence(int tileX, int tileY)
+{
+    //울타리 삭제
 }

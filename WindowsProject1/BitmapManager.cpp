@@ -119,7 +119,7 @@ BitmapManager::~BitmapManager()
 //{
 //    
 //    return bitmapMap[IDB_BITMAP39];
-//}
+//} 
 
 void BitmapManager::Load(const std::string& name, int resourceID)
 {
@@ -148,6 +148,32 @@ HBITMAP BitmapManager::GetBitmap(const std::string& name)
     return nullptr;
 }
 
+void BitmapManager::LoadAllBitmaps()
+{
+    //타일
+   Load("Grass", IDB_BITMAP22);
+   Load("Path", IDB_BITMAP21);
+   Load("Farm", IDB_BITMAP42);
+   Load("Water", IDB_BITMAP43);
+    //오브젝트
+   Load("Box", IDB_BITMAP24);
+   Load("Strawberry", IDB_BITMAP10);
+   Load("Onion", IDB_BITMAP2);
+   Load("House", IDB_BITMAP38);
+
+    //씨앗봉투들
+   Load("딸기씨앗봉투", IDB_BITMAP18);
+   Load("양파씨앗봉투", IDB_BITMAP17);
+
+     //플레이어 비트맵
+   Load("Player_Down", IDB_BITMAP27);
+   Load("Player_UP", IDB_BITMAP28);
+   Load("Player_LEFT", IDB_BITMAP30);
+   Load("Player_RIGHT", IDB_BITMAP29);
+
+    BitmapManager::Instance().Load("Tree", IDB_BITMAP49);
+}
+
 HBITMAP BitmapManager::GetTileBitmap(TileType type)
 {
     switch (type) {
@@ -172,6 +198,8 @@ HBITMAP BitmapManager::GetObjectBitmap(ObjectType type)
         return GetBitmap("Crop");
     case ObjectType::Tree:
         return GetBitmap("Tree");
+    case ObjectType::House:
+        return GetBitmap("House");
     }
     return nullptr;
 }
@@ -192,6 +220,7 @@ HBITMAP BitmapManager::GetCroptBitmap(CropType type)
 }
 HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
 {
+
     switch (dir) {
     case Direction::DOWN:
         return GetBitmap("Player_Down");

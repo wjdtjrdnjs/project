@@ -24,7 +24,7 @@
 //
 //#include "RenderManager.h"
 //#include "BitmapManager.h"
-//#include "InputManager.h"
+#include "InputManager.h"
 //#include "GameObjectManager.h"
 //#include "PlayerController.h"
 //#include "CollisionManager.h"
@@ -103,7 +103,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             double deltaTime = double(currentTime.QuadPart - prevTime.QuadPart) / frequency.QuadPart;
             prevTime = currentTime;
-
+            InputManager::Instance().Update();
             game.Update(static_cast<float>(deltaTime));
             InvalidateRect(game.GetHWND(), NULL, FALSE);
         }
@@ -164,7 +164,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
-
+   BitmapManager::Instance().LoadAllBitmaps(); //모든 비트맵 로드
    game.SetHWND(hWnd); //MainGame로 핸들 전달
    game.Init();  //게임 초기화
 

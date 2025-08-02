@@ -1,16 +1,19 @@
 #pragma once
 #include <Windows.h>
 #include "InventoryItem.h"
-
+class Map;
 class PlayerInventory
 {
 public:
 	//PlayerInventory();
 	void InventoryUIRender(HDC hdc);
 	void AddItem(int slotIndex, const InventoryItem& item); //아이템 추가 함수
+	void DecreaseItem(int delta); //인벤토리 수량 감소
+
 	void SetSelectedSlot(int index) { selectedSlot = index; }
 	Tool GetSelectedTool();//도구반환
-	ObjectType GetSelectedObjectType();//도구반환
+	ObjectType GetSelectedObjectType();//오브젝트 반환
+	CropType GetSelectedCropType();//오브젝트 반환
 
 private:
 	InventoryItem inventorySlots[9];

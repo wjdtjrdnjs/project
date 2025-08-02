@@ -17,11 +17,11 @@ public:
 	void Render(HDC hdc, int tilesize) override;
 	void SetTilePosition(int tileX, int tileY) override;
 	ObjectType GetObjectType() const override;
-
+	RECT GetCollisionRect();
 
 	//std::vector<RECT>GetCollisionRects()const override;
-	RECT GetBoundingBox() const;
-	RECT GetDoorBoundingBox()const;
+	//RECT GetBoundingBox() const;
+	//RECT GetDoorBoundingBox()const;
 	void Update();
 private:
 	int x = 39;

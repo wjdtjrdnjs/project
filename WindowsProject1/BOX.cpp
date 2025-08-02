@@ -478,15 +478,20 @@ ObjectType Box::GetObjectType() const
     return ObjectType::Box;
 }
 
-std::vector<RECT> Box::GetCollisionRects() const
+RECT Box::GetCollisionRect()
 {
-    RECT r;
-    r.left = tileX * 32 + 5;
-    r.top = tileY * 32 + 5;
-    r.right = r.left + 20;
-    r.bottom = r.top + 20;
-    return { r };
+    return RECT();
 }
+
+//std::vector<RECT> Box::GetCollisionRects() const
+//{
+//    RECT r;
+//    r.left = tileX * 32 + 5;
+//    r.top = tileY * 32 + 5;
+//    r.right = r.left + 20;
+//    r.bottom = r.top + 20;
+//    return { r };
+//}
 
 //std::vector<RECT> Box::GetCollisionRects() const
 //{

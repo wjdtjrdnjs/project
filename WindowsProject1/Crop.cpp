@@ -20,7 +20,9 @@ Crop::Crop(CropType type) //: type(type), growthStage(0), growthTimer(0)
 }
 void Crop::Render(HDC hdc, int Tilesize)
 {
+
    if (!bitmap) return;
+
     int px = tileX * Tilesize;
     int py = tileY * Tilesize;
 
@@ -38,7 +40,6 @@ void Crop::Render(HDC hdc, int Tilesize)
         bmpInfo.bmWidth, bmpInfo.bmHeight,
         RGB(255, 255, 255)
     );
-    
     //상호작용
     if (g_bFenceRedFrameOn)
     {
@@ -61,6 +62,11 @@ void Crop::SetTilePosition(int px, int py) { x = px; y = py; }
 ObjectType Crop::GetObjectType() const
 {
     return ObjectType::Crop;
+}
+
+RECT Crop::GetCollisionRect()
+{
+    return RECT();
 }
 
 

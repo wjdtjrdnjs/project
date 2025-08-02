@@ -13,7 +13,7 @@ public:
 
 	//std::vector<std::shared_ptr<Monster>> monsters; 
 	/// 
-
+	 TileData& getTile(int x, int y);
 
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }

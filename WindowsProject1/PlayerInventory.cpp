@@ -25,41 +25,43 @@ void PlayerInventory::InventoryUIRender(HDC hdc)
 
         // 아이템 렌더링
         const InventoryItem& item = inventorySlots[i];
-        if (item.IsValid())
-        {
-            HBITMAP bmp = item.GetBitmap();
-            if (!bmp) continue;
+            if (item.IsValid())
+            {
 
-            HDC memDC = CreateCompatibleDC(hdc);
-            HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+                HBITMAP bmp = item.GetBitmap();
+                if (!bmp) continue;
 
-            BITMAP bm;
-            GetObject(bmp, sizeof(BITMAP), &bm);
+                HDC memDC = CreateCompatibleDC(hdc);
+                HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
 
-            int drawSize = 40;
-            int offsetX = slotRect.left + (slotSize - drawSize) / 2;
-            int offsetY = slotRect.top + (slotSize - drawSize) / 2;
+                BITMAP bm;
+                GetObject(bmp, sizeof(BITMAP), &bm);
 
-            TransparentBlt(
-                hdc,
-                offsetX, offsetY,
-                drawSize, drawSize,
-                memDC,
-                0, 0,
-                bm.bmWidth,
-                bm.bmHeight,
-                RGB(255, 255, 255)
-            );
+                int drawSize = 40;
+                int offsetX = slotRect.left + (slotSize - drawSize) / 2;
+                int offsetY = slotRect.top + (slotSize - drawSize) / 2;
 
-            SelectObject(memDC, oldBmp);
-            DeleteDC(memDC);
+                TransparentBlt(
+                    hdc,
+                    offsetX, offsetY,
+                    drawSize, drawSize,
+                    memDC,
+                    0, 0,
+                    bm.bmWidth,
+                    bm.bmHeight,
+                    RGB(255, 255, 255)
+                );
 
-            // 수량 텍스트
-            std::string countText = std::to_string(item.GetCount());
-            SetBkMode(hdc, TRANSPARENT);
-            TextOutA(hdc, offsetX + 30, offsetY + 30, countText.c_str(), countText.length());
+                SelectObject(memDC, oldBmp);
+                DeleteDC(memDC);
+
+                // 수량 텍스트
+                std::string countText = std::to_string(item.GetCount());
+                SetBkMode(hdc, TRANSPARENT);
+                TextOutA(hdc, offsetX + 30, offsetY + 30, countText.c_str(), countText.length());
+            }
         }
-    }
+        
 }
 
 
@@ -70,6 +72,20 @@ void PlayerInventory::AddItem(int slotIndex, const InventoryItem& item) {
         inventorySlots[slotIndex] = item;
     }
 }
+
+void PlayerInventory::DecreaseItem( int delta)
+{
+    InventoryItem& item = inventorySlots[selectedSlot];
+    item.DecreaseItem(delta);
+    if (item.GetCount() <= 0)
+    {
+        inventorySlots[selectedSlot] = InventoryItem(); //빈슬롯으로 초기화
+    }
+}
+
+
+
+
 
 Tool PlayerInventory::GetSelectedTool() 
 {
@@ -88,8 +104,17 @@ ObjectType PlayerInventory::GetSelectedObjectType()
     const InventoryItem& item = inventorySlots[selectedSlot];
 
     if (item.IsValid() && item.GetObjectType() != ObjectType::None) {
-        return item.GetObjectType(); // 예: Tool::hoe
+        return item.GetObjectType();
     }
 
     return ObjectType::None;
+}
+
+CropType PlayerInventory::GetSelectedCropType()
+{
+    const InventoryItem& item = inventorySlots[selectedSlot];
+    if (item.IsValid() && item.GetCropType() != CropType::None) {
+        return item.GetCropType();
+    }
+    return CropType::None;
 }

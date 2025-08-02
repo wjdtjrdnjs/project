@@ -9,6 +9,7 @@ public:
 	void Render(HDC hdc, int Tilesize) override;
 	void SetTilePosition(int px, int py) override;
 	ObjectType GetObjectType() const override;
+	RECT GetCollisionRect();
  private:
 	 int x;
 	int y;

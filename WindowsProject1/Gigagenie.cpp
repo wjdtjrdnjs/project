@@ -11,133 +11,11 @@
 #include "Renderable.h"
 #include "Fence.h"
 #include "InputManager.h"
+#include "GameObjectManager.h"
 #include <string>
 #include <iostream>
 
-void Gigagenie::Update(float deltaTime)
-{
 
-    if (player)
-    {
-        player->Update(deltaTime);
-        InPortal(); //포탈 입장
-
-        //-------위치 점검-------해야함
-        player->HandleLeftClick(currentMap()); //좌클릭
-        player->HandleRightClick(currentMap()); //우클릭
-    }
-
-}
-
-void Gigagenie::Render(HDC hdc)
-{
-    if (!HasMaps()) return;
-
-    maps[currentMapIndex].Render(hdc);
-    player->Render(hdc);
- 
-}
-
-void Gigagenie::addMap(const std::string& mapName, int width, int height, TileType type)
-{
-    Map newMap;
-    newMap.name = mapName;
-    newMap.initTiles( width, height , type);
-    maps.push_back(newMap);
-    OutputDebugStringA(("맵 생성 "+ mapName + "\n").c_str());
-
-    if (maps.size() == 1) //첫맵이면 0으로 초기화
-        currentMapIndex = 0;
-}
-
-void Gigagenie::addObjectToCurrentMap(const std::string& mapName,TileType tileType, ObjectType objectType, int x, int y, CropType cropType)
-{
-    int mapIndex = GetMapIndexByName(mapName);
-    if (mapIndex == -1) return; // 맵이 없으면 리턴
-
-    Map& map = maps[mapIndex]; //인덱스를 가져와 현재 맵 참조
-
-    int index = y * map.getWidth() + x;
-    TileData& tile = map.mapTiles[index]; //현재 맵 타일 참조
-
-    if (tileType != TileType::None)  //타일 none이 아닐 때 변경
-        tile.tileType = tileType;
-
-    if (objectType != ObjectType::None && !tile.object)
-    {
-        std::shared_ptr<WorldObject> obj; 
-        switch (objectType)
-        {
-        case ObjectType::None:break;
-        case ObjectType::Crop:obj = std::make_shared<Crop>(cropType); break;
-        case ObjectType::Box:obj = std::make_shared<Box>(); break;
-        case ObjectType::Tree:obj = std::make_shared<Tree>(); break;
-        case ObjectType::House:obj = std::make_shared<House>(); break;
-        case ObjectType::Fence:obj = std::make_shared<Fence>(); break;
-        }
-
-        if (obj)
-        {
-            tile.object = obj;
-            obj->SetPosition(x, y);
-        }
-    }
-}
-
-void Gigagenie::addPlayer(int x, int y)  //플레이어 생성 및 위치 설정
-{
-    auto newPlayer = std::make_shared<Player>(); //스마트포인터로 생성
-    newPlayer->SetPosition(x, y); 
-
-    player = newPlayer;
-
-}
-
-int Gigagenie::GetMapIndexByName(const std::string& mapName) { //맵 이름으로 인덱스 반환
-    for (int i = 0; i < (int)maps.size(); i++) {
-        if (maps[i].name == mapName)
-            return i;
-    }
-    return -1; // 못 찾으면 -1 반환
-}
-
-void Gigagenie::addPortal(const std::string& mapName, const RECT& rect, int targetMapIndex) //포탈 생성
-{
-    int index = GetMapIndexByName(mapName); //맵 번호 검사
-    if (index != -1) { //동일한 이름의 맵이 없다면 -1
-        maps[index].AddPortalRect(rect, targetMapIndex);  //포탈 벡터 추가 도형, 나올 맵 번호
-        OutputDebugStringA(("포탈 추가: " + mapName + "\n").c_str());
-    }
-}
-
-void Gigagenie::ChangeMap(int index) //맵과 플레이어 시작 위치 변경
-{
-    if (index >= 0 && index < (int)maps.size()) { //인덱스 범위 확인
-        currentMapIndex = index;        //addPortal만들 때 입력한 번호의 맵으로 변경
-        player->SetPosition(5, 5); // 새 맵에서 시작 위치 설정
-        OutputDebugStringA("맵 전환됨\n");
-    }
-}
-
-void Gigagenie::InPortal() //플레이어가 포탈 영역에 있는지 확인 후 맵전환
-{
-    //플레이어는 픽셀 좌표로 계산한다.
-    float px_pixel = player->GetX() * 32;
-    float py_pixel = player->GetY() * 32;
-
-    for (const auto& portal : currentMap().GetPortalRects()) { //포탈 정보를 가져옴
-        RECT rect = portal.first;  //도형 
-        int targetMapIndex = portal.second; // 번호
-
-        //IntersectRect 범위가 너무 안맞으면 사용 예정
-        if (px_pixel >= rect.left && px_pixel <= rect.right &&
-            py_pixel >= rect.top && py_pixel <= rect.bottom) { //플레이어와 포탈 범위가 닿으면//
-            ChangeMap(targetMapIndex); // 저장되있던 번호의 맵으로 이동
-            OutputDebugStringA("포탈 감지, 맵 변경\n");
-            break;
-        }
-    }
-}
 //void Gigagenie::Update(float deltaTime)
 //{
 //    currentMap().Update(deltaTime);
@@ -262,3 +140,81 @@ void Gigagenie::InPortal() //플레이어가 포탈 영역에 있는지 확인 후 맵전환
 //
 //    player->SetTilePosition(newTileX, newTileY);
 //}
+
+void Gigagenie::init()
+{
+	auto& objectManager = GameObjectManager::Instance();  // 싱글톤 접근
+	objectManager.addPlayer(10, 10);
+
+
+	//초기 맵 설정 Farm맵
+	//0번 맵
+	objectManager.addMap("Farm", 40, 19, TileType::Grass); //맵 생성
+	RECT portalToMyroom = { 1260, 350, 1280, 416 }; //포탈 z위치 지정
+	objectManager.addPortal("Farm", portalToMyroom, 1); //포탈 생성
+
+
+	// 230, 580, 320, 600
+	// 
+	//(포탈이름, x,y) 포탈 입장 후 플레이어 위치 설정 -진행 중-
+	//포탈에 입장했을 때 플레이어 위치 설정 -- 나중에 추가 현재 
+
+
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			objectManager.addObjectToCurrentMap("Farm", 10 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Strawberry);
+			objectManager.addObjectToCurrentMap("Farm", 15 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Onion);
+		}
+	}
+
+	objectManager.addObjectToCurrentMap("Farm", 11, 6, TileType::None, ObjectType::Box);
+	objectManager.addObjectToCurrentMap("Farm", 16, 6, TileType::None, ObjectType::Box);
+	objectManager.addObjectToCurrentMap("Farm", 5, 3, TileType::None, ObjectType::Tree);
+	objectManager.addObjectToCurrentMap("Farm", 3, 10, TileType::None, ObjectType::House);
+	objectManager.addObjectToCurrentMap("Farm", 1, 1, TileType::None, ObjectType::Fence);
+
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			objectManager.addObjectToCurrentMap("Farm", 8 + i, 11 + j, TileType::Path);
+		}
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			objectManager.addObjectToCurrentMap("Farm", 13 + j, 10 - i, TileType::Path);
+
+		}
+	}
+	for (int i = 0; i < 6; i++)
+	{
+		objectManager.addObjectToCurrentMap("Farm", 12 - i, 13 + i, TileType::Path);
+		objectManager.addObjectToCurrentMap("Farm", 13 - i, 13 + i, TileType::Path);
+		objectManager.addObjectToCurrentMap("Farm", 14 - i, 13 + i, TileType::Path);
+
+	}
+
+
+	//objectManager.SetCollisionManager(&collisionManager); // 주입
+
+	//objectManager.LoadMap("farm"); // 이 과정에서 충돌 오브젝트 등록
+	//objectManager.getPlayer()->SetCollisionManager(&collisionManager);
+}
+
+void Gigagenie::Render(HDC hdc)
+{
+	auto& objectManager = GameObjectManager::Instance();
+	objectManager.Render(hdc);
+}
+
+void Gigagenie::Update(float deltaTime)
+{
+	auto& objectManager = GameObjectManager::Instance();
+	objectManager.Update(deltaTime);  // 맵, 오브젝트, 플레이어 상태 갱신
+	// 추가로 UI 상태, 입력 처리 등
+}

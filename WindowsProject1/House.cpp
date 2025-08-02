@@ -83,6 +83,11 @@ ObjectType House::GetObjectType() const
     return ObjectType::House;
 }
 
+RECT House::GetCollisionRect()
+{
+    return RECT();
+}
+
 //std::vector<RECT> House::GetCollisionRects()const
 //{
 //    std::vector<RECT> rects;

@@ -48,7 +48,6 @@ bool InputManager::IsLeftClickUp()
 bool InputManager::IsRightClickUp()
 {
     return !currentRightClick &&  previousRightClick;
-    ;
 }
 
 bool InputManager::IsRightClickDown()
@@ -64,7 +63,10 @@ bool InputManager::IsRightClickHeld()
 
 POINT InputManager::GetMousePosition()  //클릭한 좌표
 {
-    return mousePos; 
+    POINT p;
+    GetCursorPos(&p);               // 화면 좌표로 마우스 위치 받기
+    ScreenToClient(hWnd, &p);      // hwnd는 게임 윈도우 핸들, 클라이언트 좌표로 변환
+    return p;
 }
 
 // 키가 계속 눌려 있는 상태인지

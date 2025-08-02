@@ -74,3 +74,8 @@ ObjectType Tree::GetObjectType() const
 {
     return ObjectType::Tree;
 }
+
+RECT Tree::GetCollisionRect()
+{
+    return RECT();
+}

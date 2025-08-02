@@ -28,7 +28,7 @@ public:
      HBITMAP GetObjectBitmap(ObjectType type);
      HBITMAP GetCroptBitmap(CropType type);
      HBITMAP GetPlayerBitmap(Direction dir);
-     
+     HBITMAP GetNameBitMap(ObjectName name);
     // HBITMAP GetBitmapForCrop(InventoryItem type);
     // HBITMAP GetBitmapFence();
      /*const std::vector<HBITMAP>& GetGrowthBitmaps(CropType type);

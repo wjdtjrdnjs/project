@@ -5,8 +5,9 @@
 #include "TileData.h"
 #include "PlayerInventory.h"
 #include "InputManager.h"
+#include "GameObjectManager.h"
 #include "Map.h"
-
+#include "CollisionManager.h"
 
 #include "Global.h" //충돌영역 on/off
 #include <string>
@@ -18,11 +19,11 @@ Player::Player()
     // LoadSprites();
     inventory = new PlayerInventory(); //인벤토리 멤버 저장
 
-    InventoryItem item("딸기씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::strawberryseed), 5); // 5개
+    InventoryItem item = InventoryItem("양파씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::onionseed), 3, ObjectType::Crop, CropType::Onion); // 3개
     inventory->AddItem(0, item);
-    item = InventoryItem("양파씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::onionseed), 3); // 3개
+    item = InventoryItem("딸기씨앗봉투", BitmapManager::Instance().GetCroptBitmap(CropType::strawberryseed), 3, ObjectType::Crop, CropType::Strawberry); // 3개
     inventory->AddItem(1, item);
-    item = InventoryItem("Fence", BitmapManager::Instance().GetObjectBitmap(ObjectType::Fence), 3); // 3개
+    item = InventoryItem("Fence", BitmapManager::Instance().GetObjectBitmap(ObjectType::Fence), 3, ObjectType::Fence); // 3개
     inventory->AddItem(2, item);
 
 
@@ -40,6 +41,8 @@ void Player::Render(HDC hdc)
         const int drawSize = 48;           // 키운 플레이어 사이즈 (예: 48x48)
         const int offsetX = (drawSize - 32) / 2;  // 중앙 정렬
         const int offsetY = (drawSize - 32);      // 발을 타일에 맞추기
+        int pixelX = static_cast<int>(x * 32) - offsetX;
+        int pixelY = static_cast<int>(y * 32) - offsetY;
 
         TransparentBlt(
             hdc,
@@ -62,14 +65,17 @@ void Player::Render(HDC hdc)
             HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
             FrameRect(hdc, &r, b);
             DeleteObject(b);
-            // 상호작용
-            r.left = (x * 32) - offsetX + 8;
-            r.top = (y * 32) - offsetY + 12;
-            r.right = r.left + 32;
-            r.bottom = r.top + 32;
-            b = CreateSolidBrush(RGB(0, 0, 255));
-            FrameRect(hdc, &r, b);
-            DeleteObject(b);
+
+            auto plusRects = GetPlayerPlusRangeRects(pixelX, pixelY);
+
+            // 빨간색 브러시 생성
+            HBRUSH brushPlus = CreateSolidBrush(RGB(0, 255, 0));
+
+            for (const RECT& rect : plusRects) {
+                FrameRect(hdc, &rect, brushPlus);
+            }
+            DeleteObject(brushPlus);
+
         }
    
 
@@ -83,24 +89,39 @@ void Player::SetPosition(float px, float py)
     y = py;
 }
 
-std::vector<RECT> Player::GetCollisionRects() const
+RECT Player::GetCollisionRects() const
 {
-    {
-        RECT r;
-        r.left = (x * 32) - 8 + 15;
-        r.top = (y * 32) - 8 + 20;
-        r.right = r.left + 23;
-        r.bottom = r.top + 20;
-        return { r };
-    }
+    RECT r;
+    const int tileSize = 32;
+
+    // 실제 월드 좌표(px)
+    int px = static_cast<int>(x * tileSize);
+    int py = static_cast<int>(y * tileSize);
+
+    // 보정값을 상수로 분리하면 의도 파악 쉬움
+    const int offsetX = 7;   // 예: 중앙 정렬 보정
+    const int offsetY = 12;
+    const int width = 23;
+    const int height = 20;
+
+    r.left = px + offsetX;
+    r.top = py + offsetY;
+    r.right = r.left + width;
+    r.bottom = r.top + height;
+
+    return { r };
 }
+
 
 void Player::Update(float deltaTime)
 {
 
     MovePlayer(deltaTime);
-
+    //-------위치 점검-------해야함
+   //HandleLeftClick(map); //좌클릭
+   HandleRightClick(); //우클릭
    
+
 }
 
 void Player::MovePlayer(float deltaTime)
@@ -126,8 +147,15 @@ void Player::MovePlayer(float deltaTime)
     float newX = GetX() + dx * speed * deltaTime;
     float newY = GetY() + dy * speed * deltaTime;
 
+
+
+
+   
+
     SetPosition(newX, newY);
 }
+
+
 void Player::HandleInput()
 {
     keyUp = InputManager::Instance().IsKeyHeld('W');
@@ -149,57 +177,141 @@ void Player::HandleInput()
         if (InputManager::Instance().IsKeyDown('1' + i))
         {
             inventory->SetSelectedSlot(i);
+            char msg[100];
+            snprintf(msg, sizeof(msg), "선택한 슬롯 번호: %d (키: %c)\n", i, '1' + i);
+            OutputDebugStringA(msg);
             break; // 한 번에 하나만 처리
         }
     }
 
 }
-
-void Player::HandleLeftClick(Map& map) //좌클릭 사용
+std::vector<RECT> Player::GetPlayerPlusRangeRects(int playerPixelX, int playerPixelY) //플레이어 작동 범위
 {
-      //오브젝트 제거와 타일 변경으로 사용될 예정
-      
-    //if (InputManager::Instance().IsLeftClickUp())
-    //{
-    //    Tool tool = inventory->GetSelectedTool();
+    std::vector<RECT> rects;
 
-    //    int tileX = static_cast<int>(x);
-    //    int tileY = static_cast<int>(y);
+    // 1. 픽셀 좌표 -> 타일 좌표 변환
+    int tileX = playerPixelX / 32;
+    int tileY = playerPixelY / 32;
 
-    //    if (tool == Tool::hoe && map.GetTile(tileX, tileY) == TileType::Path) {
-    //        map.SetTile(tileX, tileY, TileType::Farmland);  //타일변경
-    //    }
-    //    else if (tool == Tool::watering && map.GetTile(tileX, tileY) == TileType::Farmland) {
-    //        map.WaterTile(tileX, tileY);  // 작물 성장
-    //    }
-    //    else if (tool == Tool::Axe && map.HasFenceAt(tileX, tileY)) {
-    //        map.RemoveFence(tileX, tileY); //울타리 삭제
-    //    }
-    //}
-}
+    // 2. 중심 타일과 상하좌우 4개 타일 좌표
+    std::vector<std::pair<int, int>> plusTiles = {
+        {tileX+1, tileY+1},         // 중심
+        {tileX+1, tileY},     // 위
+        {tileX+1, tileY + 2},     // 아래
+        {tileX , tileY+1},     // 왼쪽
+        {tileX + 2, tileY+1}      // 오른쪽
+    };
 
-void Player::HandleRightClick(Map& map) //우클릭으로 사용
-{
-   // 오브젝트 설치 함수로 사용 예정
-     if (InputManager::Instance().IsRightClickUp())
-    {
-         ObjectType type = inventory->GetSelectedObjectType();
+    // 3. 각 타일 좌표 -> RECT 변환
+    for (auto& t : plusTiles) {
+        RECT r;
+        r.left = t.first * 32;
+        r.top = t.second * 32;
+        r.right = r.left + 32;
+        r.bottom = r.top + 32;
 
-        int tileX = static_cast<int>(x);
-        int tileY = static_cast<int>(y);
-
-        //설치 or 삭제로 구현
-        if (type == ObjectType::Fence /*&& map.GetTile(tileX, tileY) == TileType::Water*/) { 
-            map.SetTile(tileX, tileY, TileType::Farmland);  //타일변경
-        }
-        //else if (type == ObjectType::Box && map.GetTile(tileX, tileY) == TileType::Farmland) {
-        //    map.WaterTile(tileX, tileY);  // 
-        //}
-        //else if (type == ObjectType::Fence && map.HasFenceAt(tileX, tileY)) {
-        //    map.RemoveFence(tileX, tileY); //울타리 삭제
-        //}
+        rects.push_back(r);
     }
+
+    return rects;
 }
+
+
+//void Player::HandleLeftClick() //좌클릭 사용
+//{
+//      //오브젝트 제거와 타일 변경으로 사용될 예정
+//      
+//    //if (InputManager::Instance().IsLeftClickUp())
+//    //{
+//    //    Tool tool = inventory->GetSelectedTool();
+//
+//    //    int tileX = static_cast<int>(x);
+//    //    int tileY = static_cast<int>(y);
+//
+//    //    if (tool == Tool::hoe && map.GetTile(tileX, tileY) == TileType::Path) {
+//    //        map.SetTile(tileX, tileY, TileType::Farmland);  //타일변경
+//    //    }
+//    //    else if (tool == Tool::watering && map.GetTile(tileX, tileY) == TileType::Farmland) {
+//    //        map.WaterTile(tileX, tileY);  // 작물 성장
+//    //    }
+//    //    else if (tool == Tool::Axe && map.HasFenceAt(tileX, tileY)) {
+//    //        map.RemoveFence(tileX, tileY); //울타리 삭제
+//    //    }
+//    //}
+//}
+
+bool Player::CanInteractAt(int targetPixelX, int targetPixelY)
+{
+    auto rects = GetPlayerPlusRangeRects(static_cast<int>(x * 32), static_cast<int>(y * 32));
+    for (auto& r : rects) {
+        if (targetPixelX >= r.left && targetPixelX < r.right &&
+            targetPixelY >= r.top && targetPixelY < r.bottom)
+            return true;
+    }
+    return false;
+}
+
+
+
+
+
+void Player::HandleRightClick() //우클릭으로 사용
+{
+    // 오브젝트 설치 함수로 사용 예정
+    if (InputManager::Instance().IsRightClickUp())
+    {
+        ObjectType type = inventory->GetSelectedObjectType();
+        CropType croptype = inventory->GetSelectedCropType();
+
+
+        POINT p = InputManager::Instance().GetMousePosition();
+
+
+
+        int worldX = p.x;
+        int worldY = p.y;
+
+        int tileX = worldX / 32;
+        int tileY = worldY / 32;
+
+        if (!CanInteractAt(worldX, worldY)) //플레이어 작동 범위
+        {
+            OutputDebugStringA("작동 범위 밖입니다.\n");
+            return; // 범위 밖이면 설치 불가
+        }
+        
+        switch (type)
+        {
+        case ObjectType::Fence:
+        {
+            if (GameObjectManager::Instance().CheckTile(tileX, tileY, type)) 
+            {//타일체크함수
+                OutputDebugStringA("울타리 설치\n");
+                GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, ObjectType::Fence);
+                inventory->DecreaseItem(1);
+            }
+            break;
+        }
+        case ObjectType::Crop:
+        {
+            if (GameObjectManager::Instance().CheckTile(tileX, tileY, type)) //클릭한 타일의 오브젝트가 nuLL인지 확인
+            {
+                OutputDebugStringA("작물 설치\n");
+                GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, ObjectType::Crop, croptype);
+                inventory->DecreaseItem(1); //아이템 수량 감소
+            }
+           
+            break;
+        }
+
+        }
+       
+     
+    }
+          
+}
+
+
 
 void Player::SetKeyState(Direction dir, bool pressed)
 {

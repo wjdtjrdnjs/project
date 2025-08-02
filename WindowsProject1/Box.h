@@ -11,8 +11,8 @@ public:
     void Render(HDC hdc, int Tilesize) override;
     void SetTilePosition(int px, int py) override;
     ObjectType GetObjectType() const override;
-
-    std::vector<RECT> GetCollisionRects() const override;
+    RECT GetCollisionRect();
+    //std::vector<RECT> GetCollisionRects() const override;
 
     //void Interact(Player& player) override;
 

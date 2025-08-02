@@ -9,7 +9,10 @@ public:
 	virtual void Render(HDC hdc, int Tilesize) = 0;
 	virtual void SetTilePosition(int tileX, int tileY) = 0;  // 선언만 된 순수 가상 함수 (구현 없음) 
 	virtual std::vector<RECT> GetCollisionRects() const { return {}; }  // 기본은 충돌 없음
-	
+
+	virtual RECT GetCollisionRect() { return RECT{ 0, 0, 0, 0 }; }
+
+
 	virtual bool IsCollidable() const { return false; }
 	//virtual void Interact(Player& player) {}		
 

@@ -31,8 +31,9 @@
 
 Fence::Fence()
 {
-    hBmp = BitmapManager::Instance().GetObjectBitmap(ObjectType::Fence); //tmapManager에서 울타리 비트맵 핸들 받아오기
+    hBmp = BitmapManager::Instance().GetObjectBitmap(ObjectType::Fence);
 }
+
 
 void Fence::SetTilePosition(int tileX, int tileY)
 {
@@ -54,10 +55,10 @@ void Fence::Render(HDC hdc, int tilesize)
     BITMAP bmp;
     GetObject(hBmp, sizeof(BITMAP), &bmp);
 
-   
+  
 
     TransparentBlt(hdc,
-        px, py,
+        px+ 8, py+10,
         15, 15,
         memDC,
         0, 0,
@@ -72,6 +73,25 @@ void Fence::Render(HDC hdc, int tilesize)
         FrameRect(hdc, &r, b);
         DeleteObject(b);
     }*/
+    if (g_bFenceRedFrameOn)
+    {
+        RECT r;
+        r.left = px + 5;
+        r.top = py + 5;
+        r.right = r.left + 20;
+        r.bottom = r.top + 20;
+        HBRUSH red = CreateSolidBrush(RGB(255, 0, 0));
+        FrameRect(hdc, &r, red);
+        DeleteObject(red);
+        //상호작용
+        r.left = px;
+        r.top = py;
+        r.right = r.left + 32;
+        r.bottom = r.top + 32;
+        HBRUSH green = CreateSolidBrush(RGB(0, 255, 0));
+        FrameRect(hdc, &r, green);
+        DeleteObject(green);
+    }
 
     // DC 정리
     SelectObject(memDC, oldBmp);
@@ -81,6 +101,20 @@ void Fence::Render(HDC hdc, int tilesize)
 ObjectType Fence::GetObjectType() const
 {
     return ObjectType::Fence;
+}
+
+RECT Fence::GetCollisionRect()
+{
+
+    int px = x * 32;
+    int py = y * 32;
+
+    RECT r;
+    r.left = px + 5;
+    r.top = py + 5;
+    r.right = r.left + 20;
+    r.bottom = r.top + 20;
+    return RECT(r);
 }
 
 //void Fence::Install(int tileX, int tileY, InventoryComponent& inventory)

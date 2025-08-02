@@ -167,6 +167,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
    BitmapManager::Instance().LoadAllBitmaps(); //모든 비트맵 로드
+
+   InputManager::Instance().Init(hWnd);
    game.SetHWND(hWnd); //MainGame로 핸들 전달
    game.Init();  //게임 초기화
 

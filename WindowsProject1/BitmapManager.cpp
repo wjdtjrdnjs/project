@@ -135,32 +135,34 @@ void BitmapManager::Load(const std::string& name, int resourceID)
 
    
     if (bmp) {
-
         bitmapMap[name] = bmp;
     }
+   
 }
 
 HBITMAP BitmapManager::GetBitmap(const std::string& name)
 {
-    if (bitmapMap.find(name) != bitmapMap.end())
+    if (bitmapMap.find(name) != bitmapMap.end()) {
         return bitmapMap[name];
+    }
   
     return nullptr;
 }
 
 void BitmapManager::LoadAllBitmaps()
 {
+    Load("Box", IDB_BITMAP24);
+    Load("Strawberry", IDB_BITMAP10);
+    Load("Onion", IDB_BITMAP2);
+    Load("House", IDB_BITMAP38);
+    Load("Fence", IDB_BITMAP39);
     //타일
    Load("Grass", IDB_BITMAP22);
    Load("Path", IDB_BITMAP21);
    Load("Farm", IDB_BITMAP42);
    Load("Water", IDB_BITMAP43);
     //오브젝트
-   Load("Box", IDB_BITMAP24);
-   Load("Strawberry", IDB_BITMAP10);
-   Load("Onion", IDB_BITMAP2);
-   Load("House", IDB_BITMAP38);
-   Load("Fence", IDB_BITMAP39);
+  
 
     //씨앗봉투들
    Load("딸기씨앗봉투", IDB_BITMAP18);
@@ -196,13 +198,14 @@ HBITMAP BitmapManager::GetObjectBitmap(ObjectType type)
     case ObjectType::Box:
         return GetBitmap("Box");
     case ObjectType::Crop:
-        return GetBitmap("Crop");
+        return GetCroptBitmap(CropType::Strawberry);
     case ObjectType::Tree:
         return GetBitmap("Tree");
     case ObjectType::House:
         return GetBitmap("House");
     case ObjectType::Fence:
         return GetBitmap("Fence");
+ 
     }
     return nullptr;
 }
@@ -236,6 +239,34 @@ HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
     }
     return GetBitmap("Player_Down"); ;
 }
+
+HBITMAP BitmapManager::GetNameBitMap(ObjectName name)
+{
+
+    switch (name) {
+    case ObjectName::Box:
+        return GetBitmap("Box");
+    case ObjectName::Crop:
+        return GetBitmap("Crop");
+    case ObjectName::Tree:
+        return GetBitmap("Tree");
+    case ObjectName::House:
+        return GetBitmap("House");
+    case ObjectName::Fence:
+        return GetBitmap("Fence");
+    case ObjectName::Strawberry:
+        return GetBitmap("Strawberry");
+    case ObjectName::Onion:
+        return GetBitmap("Onion");
+    case ObjectName::strawberryseed:
+        return GetBitmap("딸기씨앗봉투");
+    case ObjectName::onionseed:
+        return GetBitmap("양파씨앗봉투");
+    }
+    return nullptr;
+}
+
+
 void BitmapManager::Release()
 {
     for (auto& pair : bitmapMap) {

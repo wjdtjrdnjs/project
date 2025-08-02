@@ -5,6 +5,7 @@
 #include "resource.h"
 #include "Direction.h" 
 #include "PlayerInventory.h"
+#include "CollisionManager.h"
 
 class Map;
 class Player 
@@ -13,7 +14,9 @@ class Player
 	Player();
 	void Render(HDC hdc);
 	void SetPosition(float px, float py);
-	
+	void SetCollisionManager(CollisionManager* cm) {
+		collisionManager = cm;
+	}
 	// 플레이어 좌표 
 	float GetX() const { return x; }
 	float GetY() const { return y; }
@@ -23,12 +26,10 @@ class Player
 	void HandleInput(); //플레이어 입력 처리
 
 	//좌클릭 우클릭
-	void HandleLeftClick(Map& map);
-	void HandleRightClick(Map& map);
-	
-	std::vector<RECT> GetCollisionRects() const;
+	void HandleLeftClick();
+	void HandleRightClick();
+	RECT GetCollisionRects() const;
 	PlayerInventory* GetInventory() { return inventory; }; //인벤토리를 가져옴
-
 	void Update(float deltaTime); //플레이어 업데이트 (방향전환)
 	int GetSize() const { return playerSize; } //플래이어 사이즈
 
@@ -39,6 +40,10 @@ class Player
 
 	//bool IsPlayerOnPortal(float  x, float  y);
 
+
+	//작동 범위
+	std::vector<RECT> GetPlayerPlusRangeRects(int playerPixelX, int playerPixelY);//플레이어 작동 범위
+	bool CanInteractAt(int targetPixelX, int targetPixelY);
 
 
 	private:
@@ -58,7 +63,7 @@ class Player
 
 	int currentMapIndex = 0;
 	int selectedSlot = 0;
-
+	CollisionManager* collisionManager = nullptr;
 	Direction PlayerDirection;
 	//키 누름 상태 감지 변수
 	bool keyUp = false;

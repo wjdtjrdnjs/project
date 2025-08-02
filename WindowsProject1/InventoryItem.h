@@ -5,20 +5,32 @@
 #include "TileData.h"
 class InventoryItem {
 public:
-    InventoryItem() = default;
-
-    InventoryItem(const std::string& name, HBITMAP bitmap, int count = 1)
-        : name(name), bitmap(bitmap), count(count), valid(true) {
+    InventoryItem() : name(""), bitmap(nullptr), count(0), valid(false), //기본생성자
+        objectType(ObjectType::None), croptype(CropType::None)
+    {
     }
+    //사용자 생성자
+    InventoryItem(const std::string& name, HBITMAP bitmap, int count = 1, ObjectType objectType = ObjectType::None, CropType cropType = CropType::None)
+        : name(name), bitmap(bitmap), count(count), valid(true), objectType(objectType), croptype(cropType)
+    {
+    }
+
+    //이름과 개수 넣으면 비트맵이랑 오브젝트 타입이 불러와지게
+    // 이름으로 비트맵을 검색
 
     bool IsValid() const { return valid; }
     std::string GetName() const { return name; } 
     HBITMAP GetBitmap() const { return bitmap; } //바트맵
+
+    //수량
     int GetCount() const { return count; } //수량
     void SetCount(int newCount) { count = newCount; }
     void AddCount(int delta) { count += delta; }
+    void DecreaseItem(int delta) { count -= delta; }
+    //반환
     Tool GetToolType() const { return toolType; }
     ObjectType GetObjectType() const { return objectType; }
+    CropType GetCropType() const { return croptype; }
 private:
     std::string name = "";
     HBITMAP bitmap = nullptr;
@@ -26,5 +38,6 @@ private:
     bool valid = false;
     Tool toolType = Tool::None;
     ObjectType objectType = ObjectType::None;
+    CropType croptype = CropType::None;
 
 };

@@ -11,7 +11,7 @@ public:
 	void DecreaseItem(int delta); //인벤토리 수량 감소
 
 	void SetSelectedSlot(int index) { selectedSlot = index; }
-	Tool GetSelectedTool();//도구반환
+	ToolType GetSelectedTool();//도구반환
 	ObjectType GetSelectedObjectType();//오브젝트 반환
 	CropType GetSelectedCropType();//오브젝트 반환
 

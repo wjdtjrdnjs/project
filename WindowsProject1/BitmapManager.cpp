@@ -192,37 +192,53 @@ HBITMAP BitmapManager::GetTileBitmap(TileType type)
     return nullptr;
 }
 
-HBITMAP BitmapManager::GetObjectBitmap(ObjectType type)
+HBITMAP BitmapManager::GetObjectBitmap(const InventoryItem& item)
 {
-    switch (type) {
-    case ObjectType::Box:
-        return GetBitmap("Box");
-    case ObjectType::Crop:
-        return GetCroptBitmap(CropType::Strawberry);
-    case ObjectType::Tree:
-        return GetBitmap("Tree");
-    case ObjectType::House:
-        return GetBitmap("House");
-    case ObjectType::Fence:
-        return GetBitmap("Fence");
- 
+    // 1. Crop
+    if (item.GetObjectType() == ObjectType::Crop) {
+        return GetCroptBitmap(item.GetCropType());
     }
-    return nullptr;
+
+
+    // 2. Tool
+    if (item.GetToolType() != ToolType::None) {
+        return GetToolBitmap(item.GetToolType());
+    }
+
+    // 3. 일반 오브젝트
+    return GetObjectBitmap(item.GetObjectType());
+
 }
 
-HBITMAP BitmapManager::GetCroptBitmap(CropType type)
+HBITMAP BitmapManager::GetObjectBitmap(ObjectType type) {
+    switch (type) {
+    case ObjectType::Box: return GetBitmap("Box");
+    case ObjectType::Tree: return GetBitmap("Tree");
+    case ObjectType::Fence: return GetBitmap("Fence");
+    case ObjectType::House: return GetBitmap("House");
+    default: return nullptr;
+    }
+}
+
+HBITMAP BitmapManager::GetToolBitmap(ToolType type) {
+    switch (type) {
+    case ToolType::hoe: return GetBitmap("hoe");
+    case ToolType::Axe: return GetBitmap("Axe");
+    case ToolType::watering: return GetBitmap("watering");
+    default: return nullptr;
+    }
+}
+
+
+HBITMAP BitmapManager::GetCroptBitmap(CropType type) 
 {
     switch (type) {
-    case CropType::Strawberry:
-        return GetBitmap("Strawberry");
-    case CropType::Onion:
-        return GetBitmap("Onion");
-    case CropType::strawberryseed:
-        return GetBitmap("딸기씨앗봉투");
-    case CropType::onionseed:
-        return GetBitmap("양파씨앗봉투");
+    case CropType::Strawberry: return GetBitmap("Strawberry");
+    case CropType::Onion: return GetBitmap("Onion");
+    case CropType::strawberryseed: return GetBitmap("딸기씨앗봉투");
+    case CropType::onionseed: return GetBitmap("양파씨앗봉투");
+    default: return nullptr;
     }
-    return nullptr;
 }
 HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
 {
@@ -240,31 +256,32 @@ HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
     return GetBitmap("Player_Down"); ;
 }
 
-HBITMAP BitmapManager::GetNameBitMap(ObjectName name)
+HBITMAP BitmapManager::GetAllBitMap(AllType type)
 {
 
-    switch (name) {
-    case ObjectName::Box:
+    switch (type) {
+    case AllType::Box:
         return GetBitmap("Box");
-    case ObjectName::Crop:
+    case AllType::Crop:
         return GetBitmap("Crop");
-    case ObjectName::Tree:
+    case AllType::Tree:
         return GetBitmap("Tree");
-    case ObjectName::House:
+    case AllType::House:
         return GetBitmap("House");
-    case ObjectName::Fence:
+    case AllType::Fence:
         return GetBitmap("Fence");
-    case ObjectName::Strawberry:
+    case AllType::Strawberry:
         return GetBitmap("Strawberry");
-    case ObjectName::Onion:
+    case AllType::Onion:
         return GetBitmap("Onion");
-    case ObjectName::strawberryseed:
+    case AllType::strawberryseed:
         return GetBitmap("딸기씨앗봉투");
-    case ObjectName::onionseed:
+    case AllType::onionseed:
         return GetBitmap("양파씨앗봉투");
     }
     return nullptr;
 }
+
 
 
 void BitmapManager::Release()

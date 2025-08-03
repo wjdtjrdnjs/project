@@ -6,12 +6,16 @@
 class InventoryItem {
 public:
     InventoryItem() : name(""), bitmap(nullptr), count(0), valid(false), //기본생성자
-        objectType(ObjectType::None), croptype(CropType::None)
+        objectType(ObjectType::None), cropType(CropType::None), toolType(ToolType::None)
     {
     }
     //사용자 생성자
-    InventoryItem(const std::string& name, HBITMAP bitmap, int count = 1, ObjectType objectType = ObjectType::None, CropType cropType = CropType::None)
-        : name(name), bitmap(bitmap), count(count), valid(true), objectType(objectType), croptype(cropType)
+    InventoryItem(const std::string& name,  int count = 1, 
+        ObjectType objectType = ObjectType::None,
+        CropType cropType = CropType::None,
+        ToolType toolType = ToolType::None
+    )
+        : name(name), count(count), valid(true), objectType(objectType), cropType(cropType), toolType(toolType)
     {
     }
 
@@ -28,16 +32,16 @@ public:
     void AddCount(int delta) { count += delta; }
     void DecreaseItem(int delta) { count -= delta; }
     //반환
-    Tool GetToolType() const { return toolType; }
+    ToolType GetToolType() const { return toolType; }
     ObjectType GetObjectType() const { return objectType; }
-    CropType GetCropType() const { return croptype; }
+    CropType GetCropType() const { return cropType; }
 private:
     std::string name = "";
     HBITMAP bitmap = nullptr;
     int count = 0;
     bool valid = false;
-    Tool toolType = Tool::None;
     ObjectType objectType = ObjectType::None;
-    CropType croptype = CropType::None;
+    CropType cropType = CropType::None;
+    ToolType toolType = ToolType::None;
 
 };

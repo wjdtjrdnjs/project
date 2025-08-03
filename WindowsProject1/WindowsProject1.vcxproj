@@ -211,6 +211,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Tree.h" />
+    <ClInclude Include="UIManager.h" />
     <ClInclude Include="UpdateManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -260,6 +261,7 @@
     </ClCompile>
     <ClCompile Include="PlayerInventory.cpp" />
     <ClCompile Include="Tree.cpp" />
+    <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="WorldMap.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>

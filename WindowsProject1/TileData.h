@@ -18,8 +18,6 @@ enum class ObjectType
     Tree,
     House,
     Fence
-   
-
 };
 
 enum class CropType
@@ -31,7 +29,15 @@ enum class CropType
     onionseed
 };
 
-enum class ObjectName
+enum class  ToolType {
+    None = 0,
+    hoe = 1,  //±ªÀÌ
+    Axe = 2,  //µµ³¢
+    watering = 3 //¹°»Ñ¸®°³
+};
+
+
+enum class AllType
 {
     None,
     Crop,

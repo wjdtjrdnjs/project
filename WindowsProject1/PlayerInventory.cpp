@@ -87,16 +87,16 @@ void PlayerInventory::DecreaseItem( int delta)
 
 
 
-Tool PlayerInventory::GetSelectedTool() 
+ToolType PlayerInventory::GetSelectedTool()
 {
     const InventoryItem& item = inventorySlots[selectedSlot];
 
     // 도구 아이템만 판단하고 반환
-    if (item.IsValid() && item.GetToolType() != Tool::None) {
+    if (item.IsValid() && item.GetToolType() != ToolType::None) {
         return item.GetToolType(); // 예: Tool::hoe
     }
 
-    return Tool::None; // 선택된 슬롯에 도구가 없을 때
+    return ToolType::None; // 선택된 슬롯에 도구가 없을 때
 }
 
 ObjectType PlayerInventory::GetSelectedObjectType()

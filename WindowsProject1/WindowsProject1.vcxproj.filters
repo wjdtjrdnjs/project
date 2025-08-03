@@ -186,6 +186,9 @@
     <ClInclude Include="PlayerInventory.h">
       <Filter>Inventory</Filter>
     </ClInclude>
+    <ClInclude Include="UIManager.h">
+      <Filter>Managers\SingletonT</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Crop.cpp">
@@ -271,6 +274,9 @@
     </ClCompile>
     <ClCompile Include="PlayerInventory.cpp">
       <Filter>Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="UIManager.cpp">
+      <Filter>Managers\SingletonT</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

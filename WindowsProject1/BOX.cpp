@@ -129,8 +129,7 @@
 //            FillRect(hdc, &slotRect, brush);
 //            FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));  // 테두리
 //            if (items[y][i].itemType != ItemType::NONE) {
-//                HBITMAP bmp = 
-// .GetBitmapForCrop(items[y][i]);
+//                HBITMAP bmp =  .GetBitmapForCrop(items[y][i]);
 //                if (!bmp)  return;
 //
 //                HDC memDC = CreateCompatibleDC(hdc);
@@ -525,4 +524,9 @@ bool Box::IsOpen() const
 }
 
 
-  
+void Box::SetPlayerToolbar(const InventoryItem* toolbar)
+{
+    for (int i = 0; i < 9; ++i) {
+        playerToolbar[i] = toolbar[i]; // playerToolbar는 InventoryItem playerToolbar[9];
+    }
+}

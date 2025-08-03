@@ -1,5 +1,6 @@
 #pragma once
 #include "WorldObject.h"
+#include "InventoryItem.h"
 #include <Windows.h>
 
 //#define tileSize 32
@@ -37,20 +38,22 @@ public:
    // std::vector<RECT>GetCollisionRects()const override;
 
    // RECT GetBoundingBox() const; //상자 충돌 범위(빨간 테투리)
-   //// InventoryItem* GetItems();
-   // void SetPlayerToolbar(InventoryItem* toolbar);
    // 
    // void SetPlayerNear(bool ch);
    // bool IsPlayerNear() { return playerNear; }
-       
+
+    void SetPlayerToolbar(const InventoryItem* toolbar);
+    InventoryItem* GetPlayerToolbar() { return playerToolbar; }
+    InventoryItem* GetItems() { return items; }
+
 private:
     int x, y;                  
     bool isOpen = false;
    
     bool playerNear = false;
     HBITMAP bmp;
-    //InventoryItem* playerToolbar[9];
-    //InventoryItem items[3][9];    // 3x9 인벤토리 슬롯(임시)
+    InventoryItem playerToolbar[9];
+    InventoryItem items[27];   // 3x9 인벤토리 슬롯(임시)
     //InventoryItem heldItem;
     //HBITMAP hIconBitmap;
     //RECT iconRect;              // 아이콘 영역 (3x9 타일 크기)

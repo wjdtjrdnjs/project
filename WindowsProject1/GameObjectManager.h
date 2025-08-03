@@ -24,7 +24,8 @@ public:
 
 	bool HasMaps() const { return !maps.empty(); } //맵 존재 여부
 	/////
-
+	void InteractWithTile(int tileX, int tileY, Player& player);
+		
 	//플레이어 데이터 함수
 	//std::shared_ptr<Player> GetPlayer() const {return player;}
 	//void SetPlayer(std::shared_ptr<Player> p) { player = p; }

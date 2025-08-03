@@ -25,10 +25,12 @@ public:
 
      void Release();                              // 메모리 해제
      HBITMAP GetTileBitmap(TileType type);
-     HBITMAP GetObjectBitmap(ObjectType type);
+     HBITMAP GetObjectBitmap(const InventoryItem& item);
+     HBITMAP GetObjectBitmap(ObjectType type);;
      HBITMAP GetCroptBitmap(CropType type);
      HBITMAP GetPlayerBitmap(Direction dir);
-     HBITMAP GetNameBitMap(ObjectName name);
+     HBITMAP GetToolBitmap(ToolType type);
+     HBITMAP GetAllBitMap(AllType type);
     // HBITMAP GetBitmapForCrop(InventoryItem type);
     // HBITMAP GetBitmapFence();
      /*const std::vector<HBITMAP>& GetGrowthBitmaps(CropType type);

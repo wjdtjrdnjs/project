@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "TileData.h"
+#include "UIManager.h"
 #include <memory>
 
 
@@ -28,59 +29,92 @@ void GameObjectManager::Init()
     }
 }
 
+
+void GameObjectManager::InteractWithTile(int tileX, int tileY, Player& player)
+{
+    static int lastTypeValue = -1;
+
+    TileData tileData = currentMap().getTile(tileX, tileY);
+    auto currentObject = tileData.object;
+
+    if (currentObject)
+    {
+        int currentTypeValue = static_cast<int>(currentObject->GetObjectType());
+
+        if (currentTypeValue == static_cast<int>(ObjectType::Box) && !player.IsInteracting())
+        {
+            player.StartInteraction();
+            Box* box = dynamic_cast<Box*>(currentObject.get());  // 여기서 .get() 필요!
+            if (box)
+            {
+                UIManager::Instance().OpenBoxUI(box, player.GetInventory());
+            }
+        }
+    }
+    else
+    {
+        if (lastTypeValue != -1)
+        {
+            OutputDebugStringA("해당 위치에 오브젝트가 없습니다 (nullptr).\n");
+            lastTypeValue = -1;
+        }
+    }
+}
+
+
 void GameObjectManager::LoadMap(const std::string& mapName)
 {
-    addPlayer(10, 10);
-    addMap(mapName, 40, 19, TileType::Grass);
+    //addPlayer(10, 10);
+    //addMap(mapName, 40, 19, TileType::Grass);
 
-    // 맵에 따라 다른 오브젝트와 설정 추가
+    //// 맵에 따라 다른 오브젝트와 설정 추가
 
-        RECT portalToMyroom = { 1260, 350, 1280, 416 }; //포탈 z위치 지정
-        addPortal(mapName, portalToMyroom, 1); //포탈 생성
+    //    RECT portalToMyroom = { 1260, 350, 1280, 416 }; //포탈 z위치 지정
+    //    addPortal(mapName, portalToMyroom, 1); //포탈 생성
 
-        // 230, 580, 320, 600
-        // 
-        //(포탈이름, x,y) 포탈 입장 후 플레이어 위치 설정 -진행 중-
-        //포탈에 입장했을 때 플레이어 위치 설정 -- 나중에 추가 현재 
+    //    // 230, 580, 320, 600
+    //    // 
+    //    //(포탈이름, x,y) 포탈 입장 후 플레이어 위치 설정 -진행 중-
+    //    //포탈에 입장했을 때 플레이어 위치 설정 -- 나중에 추가 현재 
 
 
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                addObjectToCurrentMap(mapName, 10 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Strawberry);
-                addObjectToCurrentMap(mapName, 15 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Onion);
-            }
-        }
+    //    for (int i = 0; i < 3; i++)
+    //    {
+    //        for (int j = 0; j < 3; j++)
+    //        {
+    //            addObjectToCurrentMap(mapName, 10 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Strawberry);
+    //            addObjectToCurrentMap(mapName, 15 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Onion);
+    //        }
+    //    }
 
-        addObjectToCurrentMap(mapName, 11, 6, TileType::None, ObjectType::Box);
-        addObjectToCurrentMap(mapName, 16, 6, TileType::None, ObjectType::Box);
-        addObjectToCurrentMap(mapName, 5, 3, TileType::None, ObjectType::Tree);
-        addObjectToCurrentMap(mapName, 3, 10, TileType::None, ObjectType::House);
-        addObjectToCurrentMap(mapName, 1, 1, TileType::None, ObjectType::Fence);
+    //    addObjectToCurrentMap(mapName, 11, 6, TileType::None, ObjectType::Box);
+    //    addObjectToCurrentMap(mapName, 16, 6, TileType::None, ObjectType::Box);
+    //    addObjectToCurrentMap(mapName, 5, 3, TileType::None, ObjectType::Tree);
+    //    addObjectToCurrentMap(mapName, 3, 10, TileType::None, ObjectType::House);
+    //    addObjectToCurrentMap(mapName, 1, 1, TileType::None, ObjectType::Fence);
 
-        for (int i = 0; i < 32; i++)
-        {
-            for (int j = 0; j < 2; j++)
-            {
-                addObjectToCurrentMap(mapName, 8 + i, 11 + j, TileType::Path);
-            }
-        }
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 2; j++)
-            {
-                addObjectToCurrentMap(mapName, 13 + j, 10 - i, TileType::Path);
+    //    for (int i = 0; i < 32; i++)
+    //    {
+    //        for (int j = 0; j < 2; j++)
+    //        {
+    //            addObjectToCurrentMap(mapName, 8 + i, 11 + j, TileType::Path);
+    //        }
+    //    }
+    //    for (int i = 0; i < 8; i++)
+    //    {
+    //        for (int j = 0; j < 2; j++)
+    //        {
+    //            addObjectToCurrentMap(mapName, 13 + j, 10 - i, TileType::Path);
 
-            }
-        }
-        for (int i = 0; i < 6; i++)
-        {
-            addObjectToCurrentMap(mapName, 12 - i, 13 + i, TileType::Path);
-            addObjectToCurrentMap(mapName, 13 - i, 13 + i, TileType::Path);
-            addObjectToCurrentMap(mapName, 14 - i, 13 + i, TileType::Path);
+    //        }
+    //    }
+    //    for (int i = 0; i < 6; i++)
+    //    {
+    //        addObjectToCurrentMap(mapName, 12 - i, 13 + i, TileType::Path);
+    //        addObjectToCurrentMap(mapName, 13 - i, 13 + i, TileType::Path);
+    //        addObjectToCurrentMap(mapName, 14 - i, 13 + i, TileType::Path);
 
-        }
+    //    }
 }
  
 
@@ -97,7 +131,7 @@ void GameObjectManager::Render(HDC hdc)
     if (player)
     {
         player->Render(hdc);
-        player->GetInventory()->InventoryUIRender(hdc);
+        UIManager::Instance().Render(hdc);
     }
 }
 
@@ -158,6 +192,7 @@ void GameObjectManager::addPlayer(int x, int y)  //플레이어 생성 및 위치 설정
     newPlayer->SetPosition(x, y);
 
     player = newPlayer;
+    UIManager::Instance().SetPlayerInventory(player->GetInventory()); //플레이어가 갖고 있는 인벤토리를 uimanager에 연결
 
 }
 

@@ -3,45 +3,73 @@
 #include <string>
 #include "ToolType.h"
 #include "TileData.h"
+//enum class ItemCategory {
+//    None,
+//    Tool,
+//    Seed,
+//    Crop,
+//    Placeable
+//};
+
 class InventoryItem {
 public:
-    InventoryItem() : name(""), bitmap(nullptr), count(0), valid(false), //기본생성자
-        objectType(ObjectType::None), cropType(CropType::None), toolType(ToolType::None)
-    {
-    }
-    //사용자 생성자
-    InventoryItem(const std::string& name,  int count = 1, 
-        ObjectType objectType = ObjectType::None,
-        CropType cropType = CropType::None,
-        ToolType toolType = ToolType::None
-    )
-        : name(name), count(count), valid(true), objectType(objectType), cropType(cropType), toolType(toolType)
-    {
+    InventoryItem() = default;
+
+    // Tool 생성자
+     InventoryItem(ToolType type, int count = 1)
+        : category(ItemCategory::Tool), toolType(type), count(count), valid(true) {
     }
 
-    //이름과 개수 넣으면 비트맵이랑 오브젝트 타입이 불러와지게
-    // 이름으로 비트맵을 검색
+    // Seed 생성자
+     InventoryItem(SeedType type, int count = 1)
+        : category(ItemCategory::Seed), seedType(type), count(count), valid(true) {
+    }
 
-    bool IsValid() const { return valid; }
-    std::string GetName() const { return name; } 
-    HBITMAP GetBitmap() const { return bitmap; } //바트맵
+    // Crop 생성자
+     InventoryItem(CropType type, int count = 1)
+        : category(ItemCategory::Crop), cropType(type), count(count), valid(true) {
+    }
 
-    //수량
-    int GetCount() const { return count; } //수량
+    // Placeable 생성자
+     InventoryItem(PlaceableType type, int count = 1)
+        : category(ItemCategory::Placeable), placeableType(type), count(count), valid(true) {
+    }
+
+
+    // 속성 접근자
+    std::string GetName() const { return name; }
+    HBITMAP GetBitmap() const { return bitmap; }
+
+    int GetCount() const { return count; }
     void SetCount(int newCount) { count = newCount; }
     void AddCount(int delta) { count += delta; }
     void DecreaseItem(int delta) { count -= delta; }
-    //반환
+
+    ItemCategory GetCategory() const { return category; }
     ToolType GetToolType() const { return toolType; }
-    ObjectType GetObjectType() const { return objectType; }
+    SeedType GetSeedType() const { return seedType; }
     CropType GetCropType() const { return cropType; }
+    PlaceableType GetPlaceableType() const { return placeableType; }
+
+    bool IsValid() const { return valid; }
+    bool IsEmpty() const { return category == ItemCategory::None || count <= 0; }
+
+    // 스택 가능 여부
+    bool CanStackWith(const InventoryItem& other) const;
+    void Clear();
+
 private:
     std::string name = "";
     HBITMAP bitmap = nullptr;
+
     int count = 0;
     bool valid = false;
-    ObjectType objectType = ObjectType::None;
-    CropType cropType = CropType::None;
-    ToolType toolType = ToolType::None;
 
+    ItemCategory category = ItemCategory::None;
+
+    // 세부 타입들
+    ToolType toolType = ToolType::None;
+    SeedType seedType = SeedType::None;
+    CropType cropType = CropType::None;
+    PlaceableType placeableType = PlaceableType::None;
 };

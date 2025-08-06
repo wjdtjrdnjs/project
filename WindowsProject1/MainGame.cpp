@@ -45,27 +45,15 @@ void MainGame::Update(float deltaTime)
 	GameObjectManager::Instance().Update(deltaTime);
 }
 
-//void MainGame::Update(float deltaTime)
-//{
-//	if (genie)
-//		GameObjectManager::Instance().Update(deltaTime);
-//}
+
 
 void MainGame::Run()
 {
-	//HDC hdc = GetDC(hwnd);
-
-	while (TRUE)
-	{
-	
-	}
-	
-
 }
 
 void MainGame::Input(UINT message, WPARAM wParam, LPARAM lParam)
 {
 
-		
+	InputManager::Instance().ProcessMessage(message, wParam, lParam);
 }
 

@@ -1,4 +1,4 @@
-#include "Crop.h"
+ï»¿#include "Crop.h"
 #include "RenderManager.h"
 #include "GameObjectManager.h"
 #include "PlayerController.h"
@@ -10,13 +10,17 @@
 #include "Global.h"
 #include <string>
 
-Crop::Crop(CropType type) //: type(type), growthStage(0), growthTimer(0)
+Crop::Crop(CropType type) : type(type), growthStage(0), growthTimer(0)
 {
+    // ì„±ì¥ ë‹¨ê³„ë³„ ë¹„íŠ¸ë§µ ë¶ˆëŸ¬ì˜¤ê¸°
 
-    bitmap = BitmapManager::Instance().GetCroptBitmap(type);
+    for (int i = 0; i < maxGrowthStage; ++i) {
+        HBITMAP bmp = BitmapManager::Instance().GetCropGrowthBitmap(type, i);
+        growthBitmaps.push_back(bmp);
+    }
 
-    //if (!growthBitmaps.empty())
-    //    bitmap = growthBitmaps[0]; // Ã¹ ´Ü°è ºñÆ®¸Ê
+    if (!growthBitmaps.empty())
+        bitmap = growthBitmaps[0]; // ì´ˆê¸° ì„±ì¥ ë‹¨ê³„ ë¹„íŠ¸ë§µ
 }
 void Crop::Render(HDC hdc, int Tilesize)
 {
@@ -40,7 +44,7 @@ void Crop::Render(HDC hdc, int Tilesize)
         bmpInfo.bmWidth, bmpInfo.bmHeight,
         RGB(255, 255, 255)
     );
-    //»óÈ£ÀÛ¿ë
+    //ìƒí˜¸ì‘ìš©
     if (g_bFenceRedFrameOn)
     {
         RECT r;
@@ -59,14 +63,37 @@ void Crop::Render(HDC hdc, int Tilesize)
 }
 void Crop::SetTilePosition(int px, int py) { x = px; y = py; }
 
-ObjectType Crop::GetObjectType() const
+PlaceableType Crop::GetPlaceableType() const
 {
-    return ObjectType::Crop;
+    return PlaceableType::Crop;
 }
 
 RECT Crop::GetCollisionRect()
 {
     return RECT();
+}
+
+void Crop::Update(float deltaTime)
+{
+    int tileX = GetX() / TILE_SIZE;
+    int tileY = GetY() / TILE_SIZE;
+
+    //Map& map = GameObjectManager::Instance().currentMap(); //ë¬¼ ë¿Œë¦¬ë©´ ì„±ì¥ ì‹œì‘ êµ¬í˜„xxxx
+    //if (!map.getTile(tileX, tileY).IsWatered()) {
+    //    return;
+    //}
+
+    
+    growthTimer += deltaTime;
+    
+   
+
+    if (growthTimer >= growthInterval && growthStage < maxGrowthStage - 1) {
+        growthStage++;
+        growthTimer = 0;
+        OutputDebugStringA("ì„±ì¥ ì¤‘!!\n");
+        bitmap = BitmapManager::Instance().GetCropGrowthBitmap(type, growthStage);
+    }
 }
 
 
@@ -83,20 +110,20 @@ RECT Crop::GetCollisionRect()
 //   
 //}
 //
-//void Crop::Update()  //¼º°ü °ü¸®
+//void Crop::Update()  //ì„±ê´€ ê´€ë¦¬
 //{
 //    int tileX = GetX() / tileSize;;
 //    int tileY = GetY() / tileSize;;
 //    WorldMap* worldMap = GameObjectManager::Instance().GetWorldMap();
-//    if (!worldMap->IsWatered(tileX, tileY)) { //¶¥¿¡ ¹°À» »Ñ¸®Áö ¾ÊÀ¸¸é ÀÛ¹° ¼ºÀåX
+//    if (!worldMap->IsWatered(tileX, tileY)) { //ë•…ì— ë¬¼ì„ ë¿Œë¦¬ì§€ ì•Šìœ¼ë©´ ì‘ë¬¼ ì„±ì¥X
 //        return;
 //    }
 //    growthTimer += 16; 
 //    if (growthTimer >= growthInterval && growthStage < maxGrowthStage - 1)
 //    {
-//        growthStage++; //ÀÛ¹° ¼ºÀå ´Ü°è +1
+//        growthStage++; //ì‘ë¬¼ ì„±ì¥ ë‹¨ê³„ +1
 //        growthTimer = 0;
-//        bitmap = growthBitmaps[growthStage]; // ´ÙÀ½ ´Ü°è·Î ¼ºÀå ::ÀÌ¹ÌÁö ¹Ù²ãÁÖ±â
+//        bitmap = growthBitmaps[growthStage]; // ë‹¤ìŒ ë‹¨ê³„ë¡œ ì„±ì¥ ::ì´ë¯¸ì§€ ë°”ê¿”ì£¼ê¸°
 //    }
 //}
 //
@@ -104,22 +131,22 @@ RECT Crop::GetCollisionRect()
 //{
 //    WorldMap* worldMap = GameObjectManager::Instance().GetWorldMap();
 //
-//    if ((worldMap->GetTile(tileX, tileY) == tile_path || worldMap->GetTile(tileX, tileY) == tile_farmland)&&!GameObjectManager::Instance().GetCropAt(tileX, tileY)) //Áßº¹¼³Ä¡ ¾ÈµÇ°Ô
+//    if ((worldMap->GetTile(tileX, tileY) == tile_path || worldMap->GetTile(tileX, tileY) == tile_farmland)&&!GameObjectManager::Instance().GetCropAt(tileX, tileY)) //ì¤‘ë³µì„¤ì¹˜ ì•ˆë˜ê²Œ
 //    {
 //        int tool = inventory.GetSelectedTool();
-//        if (inventory[tool].count > 0) // 1°³ ÀÌ»óÀÏ ¶§
+//        if (inventory[tool].count > 0) // 1ê°œ ì´ìƒì¼ ë•Œ
 //        {
-//            CropType baseCropType = CropType::None; //Ã³À½Àº ºó¼Õ
-//            if (inventory[tool].cropType == CropType::Strawberry_1) baseCropType = CropType::Strawberry; //µş±â¾¾¾Ñ ºÀÅõ¸é µş±â 
-//            else if (inventory[tool].cropType == CropType::Onion_1) baseCropType = CropType::Onion;     //¾çÆÄ¾¾¾Ñ ºÀÅõ¸é ¾çÆÄ 
+//            CropType baseCropType = CropType::None; //ì²˜ìŒì€ ë¹ˆì†
+//            if (inventory[tool].cropType == CropType::Strawberry_1) baseCropType = CropType::Strawberry; //ë”¸ê¸°ì”¨ì•— ë´‰íˆ¬ë©´ ë”¸ê¸° 
+//            else if (inventory[tool].cropType == CropType::Onion_1) baseCropType = CropType::Onion;     //ì–‘íŒŒì”¨ì•— ë´‰íˆ¬ë©´ ì–‘íŒŒ 
 //
-//            if (baseCropType != CropType::None) { //ºó¼ÕÀÌ ¾Æ´Ò ¶§
-//                Crop* crop = new Crop(baseCropType);  //¼±ÅÃµÈ ÀÛ¹° Á¤º¸ °¡Á®¿È
-//                crop->SetPosition(tileX * tileSize, tileY * tileSize); //¼³Ä¡ÇÒ À§Ä¡
-//                GameObjectManager::Instance().AddCrop(crop);  //ÀÛ¹° Ãß°¡
-//                inventory[tool].count--;  // µé°íÀÖ´Â ¾ÆÀÌÅÛ -1
-//                if (inventory[tool].count == 0) //µé°íÀÖ´Â ¾ÆÀÌÅÛ °³¼ö°¡ 0°³ÀÌ´Ù
-//                    inventory[tool].itemType = ItemType::NONE; //¾ÆÀÌÅÛÀÌ 0°³¸é ºó ½½·Ô
+//            if (baseCropType != CropType::None) { //ë¹ˆì†ì´ ì•„ë‹ ë•Œ
+//                Crop* crop = new Crop(baseCropType);  //ì„ íƒëœ ì‘ë¬¼ ì •ë³´ ê°€ì ¸ì˜´
+//                crop->SetPosition(tileX * tileSize, tileY * tileSize); //ì„¤ì¹˜í•  ìœ„ì¹˜
+//                GameObjectManager::Instance().AddCrop(crop);  //ì‘ë¬¼ ì¶”ê°€
+//                inventory[tool].count--;  // ë“¤ê³ ìˆëŠ” ì•„ì´í…œ -1
+//                if (inventory[tool].count == 0) //ë“¤ê³ ìˆëŠ” ì•„ì´í…œ ê°œìˆ˜ê°€ 0ê°œì´ë‹¤
+//                    inventory[tool].itemType = ItemType::NONE; //ì•„ì´í…œì´ 0ê°œë©´ ë¹ˆ ìŠ¬ë¡¯
 //            }
 //        }
 //    }
@@ -127,24 +154,24 @@ RECT Crop::GetCollisionRect()
 //void Crop::Remove(int tileX, int tileY, InventoryComponent& inventory)
 //{
 //
-//    Crop* crop = GameObjectManager::Instance().GetCropAt(tileX, tileY); //¼±ÅÃµÈ Å¸ÀÏ À§¿¡ ¹«¾ùÀÌ ÀÖ´ÂÁö È®ÀÎ 
+//    Crop* crop = GameObjectManager::Instance().GetCropAt(tileX, tileY); //ì„ íƒëœ íƒ€ì¼ ìœ„ì— ë¬´ì—‡ì´ ìˆëŠ”ì§€ í™•ì¸ 
 //    if (!IsActive())
 //    {
-//        OutputDebugStringA("ÀÛ¹° ¼öÈ® ¾ÈµÊ(´Ù¸¥ ¸Ê)\n");
+//        OutputDebugStringA("ì‘ë¬¼ ìˆ˜í™• ì•ˆë¨(ë‹¤ë¥¸ ë§µ)\n");
 //        return;
 //    }
-//    if (crop && crop->IsFullyGrown()) //ÀÛ¹°ÀÌ ÀÖ°í ¼ºÀåÀÌ ³¡¾ÒÀ» ¶§
+//    if (crop && crop->IsFullyGrown()) //ì‘ë¬¼ì´ ìˆê³  ì„±ì¥ì´ ëì•˜ì„ ë•Œ
 //    { 
-//        CropType type = crop->GetType();  //ÀÛ¹° Á¤º¸ °¡Á®¿È
-//        GameObjectManager::Instance().RemoveCrop(crop);  //ÀÛ¹° »èÁ¦
-//        delete crop;  //ÀÛ¹° »èÁ¦
-//        inventory.AddItem(type);  //ÀÎº¥Åä¸®¿¡ Ãß°¡
-//        OutputDebugStringA("ÀÛ¹° ¼öÈ®");
+//        CropType type = crop->GetType();  //ì‘ë¬¼ ì •ë³´ ê°€ì ¸ì˜´
+//        GameObjectManager::Instance().RemoveCrop(crop);  //ì‘ë¬¼ ì‚­ì œ
+//        delete crop;  //ì‘ë¬¼ ì‚­ì œ
+//        inventory.AddItem(type);  //ì¸ë²¤í† ë¦¬ì— ì¶”ê°€
+//        OutputDebugStringA("ì‘ë¬¼ ìˆ˜í™•");
 //    }
 //}
 //void Crop::Render(HDC hdc)
 //{
-//    if (!bitmap)  //µî·ÏµÈ ºñÆ®¸ÊÀÌ ¾øÀ¸¸é ¸®ÅÏ
+//    if (!bitmap)  //ë“±ë¡ëœ ë¹„íŠ¸ë§µì´ ì—†ìœ¼ë©´ ë¦¬í„´
 //        return;
 //
 //    HDC memDC = CreateCompatibleDC(hdc);
@@ -153,7 +180,7 @@ RECT Crop::GetCollisionRect()
 //    BITMAP bmp;
 //    GetObject(bitmap, sizeof(bmp), &bmp);
 //
-//    // Áß¾Ó Á¤·ÄÀ» À§ÇØ x, y¸¦ Å¸ÀÏ Áß¾Ó ±âÁØÀ¸·Î Á¶Á¤
+//    // ì¤‘ì•™ ì •ë ¬ì„ ìœ„í•´ x, yë¥¼ íƒ€ì¼ ì¤‘ì•™ ê¸°ì¤€ìœ¼ë¡œ ì¡°ì •
 //    int drawX = x + (tileSize - bmp.bmWidth) / 2;
 //    int drawY = y + (tileSize - bmp.bmHeight) / 2;
 //

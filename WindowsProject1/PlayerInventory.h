@@ -6,15 +6,21 @@ class PlayerInventory
 {
 public:
 	//PlayerInventory();
-	void InventoryUIRender(HDC hdc);
+	void InventoryUIRender(HDC hdc); //상시로 그려주는 인벤토리 툴바
+	void InventoryBoxUIRender(HDC hdc); //상시로 그려주는 인벤토리 툴바
+
 	void AddItem(int slotIndex, const InventoryItem& item); //아이템 추가 함수
 	void DecreaseItem(int delta); //인벤토리 수량 감소
 
 	void SetSelectedSlot(int index) { selectedSlot = index; }
+	void MoveSelectedSlot(int dir);
 	ToolType GetSelectedTool();//도구반환
-	ObjectType GetSelectedObjectType();//오브젝트 반환
-	CropType GetSelectedCropType();//오브젝트 반환
+	PlaceableType GetSelectedPlaceable();//배치 가능한 것을 반환
+	CropType GetSelectedCropType();//작물 반환
+	SeedType GetSelectedSeedType(); //씨앗봉투 반환
 
+	InventoryItem GetSelectedItem() const { return inventorySlots[selectedSlot]; }
+	InventoryItem* GetInventory() { return inventorySlots; }
 private:
 	InventoryItem inventorySlots[9];
 	int selectedSlot = 0; // 아무것도 선택되지 않은 상태

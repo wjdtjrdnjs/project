@@ -40,7 +40,7 @@ public:
 
 	//오브젝트 생성 
 	void addObjectToCurrentMap(const std::string& mapName, int x, int y, TileType tileType = TileType::None,
-		ObjectType objType = ObjectType::None, CropType cropType = CropType::None);
+		PlaceableType objType = PlaceableType::None, CropType cropType = CropType::None);
 
 	//플레이어 생성
 	void addPlayer(int x, int y);
@@ -53,7 +53,7 @@ public:
 
 	void InPortal(); //포탈 플레이어 충돌
 
-	bool CheckTile(int TileX, int TileY, ObjectType type); //타일 검사
+	bool CheckTile(int TileX, int TileY, ItemCategory type); //타일 검사
 
 	//void ChangeMapToNext();
 	void ChangeMap(int index);

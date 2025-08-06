@@ -29,13 +29,16 @@ public:
     int GetPressedNumberKey();
 
     bool IsKeyPressed(int key);
+
+    void  ProcessMessage(UINT msg, WPARAM wParam, LPARAM lParam);
+    int GetWheelDirection();
 private:
     HWND hWnd = nullptr;
     POINT mousePos{ 0, 0 };
 
     bool mouseClicked = false;
     bool mouseClickedPrev = false;
-
+    int wheelDelta = 0; //¸¶¿ì½º ÈÙ
     bool currentLeftClick = false;
     bool previousLeftClick = false;
     bool currentRightClick = false;

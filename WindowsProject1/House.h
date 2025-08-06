@@ -16,7 +16,7 @@ public:
 
 	void Render(HDC hdc, int tilesize) override;
 	void SetTilePosition(int tileX, int tileY) override;
-	ObjectType GetObjectType() const override;
+	PlaceableType GetPlaceableType() const override;
 	RECT GetCollisionRect();
 
 	//std::vector<RECT>GetCollisionRects()const override;

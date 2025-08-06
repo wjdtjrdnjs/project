@@ -103,7 +103,7 @@
 //        return;
 //
 //    TileData& tile = map.getTile(x, y);
-//    if (tile.object && tile.object->GetObjectType() == ObjectType::Crop)
+//    if (tile.object && tile.object->GetPlaceableType() == PlaceableType::Crop)
 //    {
 //        auto crop = std::dynamic_pointer_cast<Crop>(tile.object);
 //        if (crop && crop->IsRipe()) {
@@ -165,16 +165,16 @@ void Gigagenie::init()
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			objectManager.addObjectToCurrentMap("Farm", 10 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Strawberry);
-			objectManager.addObjectToCurrentMap("Farm", 15 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Onion);
+			objectManager.addObjectToCurrentMap("Farm", 10 + i, 7 + j, TileType::Farmland, PlaceableType::Crop, CropType::Strawberry);
+			objectManager.addObjectToCurrentMap("Farm", 15 + i, 7 + j, TileType::Farmland, PlaceableType::Crop, CropType::Onion);
 		}
 	}
 
-	objectManager.addObjectToCurrentMap("Farm", 11, 6, TileType::None, ObjectType::Box);
-	objectManager.addObjectToCurrentMap("Farm", 16, 6, TileType::None, ObjectType::Box);
-	objectManager.addObjectToCurrentMap("Farm", 5, 3, TileType::None, ObjectType::Tree);
-	objectManager.addObjectToCurrentMap("Farm", 3, 10, TileType::None, ObjectType::House);
-	objectManager.addObjectToCurrentMap("Farm", 1, 1, TileType::None, ObjectType::Fence);
+	objectManager.addObjectToCurrentMap("Farm", 11, 6, TileType::None, PlaceableType::Box);
+	objectManager.addObjectToCurrentMap("Farm", 16, 6, TileType::None, PlaceableType::Box);
+	objectManager.addObjectToCurrentMap("Farm", 5, 3, TileType::None, PlaceableType::Tree);
+	objectManager.addObjectToCurrentMap("Farm", 3, 10, TileType::None, PlaceableType::House);
+	objectManager.addObjectToCurrentMap("Farm", 1, 1, TileType::None, PlaceableType::Fence);
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -215,6 +215,6 @@ void Gigagenie::Render(HDC hdc)
 void Gigagenie::Update(float deltaTime)
 {
 	auto& objectManager = GameObjectManager::Instance();
-	objectManager.Update(deltaTime);  // 맵, 오브젝트, 플레이어 상태 갱신
-	// 추가로 UI 상태, 입력 처리 등
+	objectManager.Update(deltaTime);  // 맵, 오브젝트, 플레이어  갱신
+	
 }

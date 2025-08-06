@@ -5,7 +5,7 @@
 
 House::House()
 {
-    bmp = BitmapManager::Instance().GetObjectBitmap(ObjectType::House);
+    bmp = BitmapManager::Instance().GetObjectBitmap(PlaceableType::House);
 }
 
 House::~House() //µ¿¹° ¼Ò¸êÀÚ
@@ -78,9 +78,9 @@ void House::SetTilePosition(int tileX, int tileY)
     y = tileY;
 }
 
-ObjectType House::GetObjectType() const
+PlaceableType House::GetPlaceableType() const
 {
-    return ObjectType::House;
+    return PlaceableType::House;
 }
 
 RECT House::GetCollisionRect()

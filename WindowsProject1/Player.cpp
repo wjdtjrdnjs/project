@@ -7,6 +7,7 @@
 #include "InputManager.h"
 #include "GameObjectManager.h"
 #include "Map.h"
+#include "Box.h"
 #include "CollisionManager.h"
 #include "UIManager.h"
 
@@ -23,12 +24,18 @@ Player::Player()
     // LoadSprites();
     inventory = new PlayerInventory(); //인벤토리 멤버 저장
 
-    InventoryItem item = InventoryItem("양파씨앗봉투", 3, ObjectType::Crop, CropType::Onion); // 3개
+    InventoryItem item = InventoryItem(SeedType::OnionSeed, 3); // 3개
     inventory->AddItem(0, item);
-    item = InventoryItem("딸기씨앗봉투",  3, ObjectType::Crop, CropType::Strawberry); // 3개
+    item = InventoryItem(SeedType::StrawberrySeed, 3 ); // 3개
     inventory->AddItem(1, item);
-    item = InventoryItem("Fence", 3, ObjectType::Fence); // 3개
+    item = InventoryItem(PlaceableType::Fence, 3); // 3개
     inventory->AddItem(2, item);
+    item = InventoryItem(ToolType::Axe, 1); // 3개
+    inventory->AddItem(3, item);
+    item = InventoryItem(ToolType::Hoe, 1); // 3개
+    inventory->AddItem(4, item);
+    item = InventoryItem(ToolType::Watering, 1); // 3개
+    inventory->AddItem(5, item);
 
 
     OutputDebugStringA("플레이어 객체 생성완료\n");
@@ -111,8 +118,7 @@ RECT Player::GetCollisionRects() const
     int px = static_cast<int>(x * tileSize);
     int py = static_cast<int>(y * tileSize);
 
-    // 보정값을 상수로 분리하면 의도 파악 쉬움
-    const int offsetX = 7;   // 예: 중앙 정렬 보정
+    const int offsetX = 7;  
     const int offsetY = 12;
     const int width = 23;
     const int height = 20;
@@ -129,6 +135,7 @@ RECT Player::GetCollisionRects() const
 void Player::Update(float deltaTime)
 {
     HandleRightClick(); //우클릭
+    HandleLeftClick();
     HandleInput();  // 방향 입력 상태 갱신
 
     if (isInteracting) return; // UI 열려 있으면 이동 금지
@@ -164,6 +171,47 @@ void Player::MovePlayer(float deltaTime)
     float newY = GetY() + dy * speed * deltaTime;
 
     SetPosition(newX, newY);
+}
+
+
+void Player::HandleLeftClick()
+{
+    if (InputManager::Instance().IsLeftClickDown())
+    {
+
+        if (UIManager::Instance().IsBoxUIOpen()) {
+            POINT mousePos = InputManager::Instance().GetMousePosition();
+           // int slotX = mousePos.x / 32;
+            //   int slotY = mousePos.y / 32;
+            
+            // 박스 or 플레이어 슬롯 클릭 시에는 다른 처리 차단
+            bool clickedOnSlot = UIManager::Instance().GetOpenedBox()->HandleClick(mousePos.x, mousePos.y, 1);
+            if (clickedOnSlot) return;
+
+            return; // 슬롯 외 클릭이더라도 무조건 차단
+        }
+    }
+   
+
+    // 상자가 안 열렸으면 일반 클릭 처리
+    //TryPlaceObject();
+}
+
+void Player::OpenBox(Box* box)
+{
+    UIManager::Instance().SetOpenedBox(box);
+    isInteracting = true; // 상호작용 상태로 변경
+}
+
+
+void Player::CloseBox()
+{
+    UIManager::Instance().SetOpenedBox(nullptr);
+    isInteracting = false;
+}
+
+void Player::TryPlaceObject()
+{
 }
 
 
@@ -205,7 +253,14 @@ void Player::HandleInput()
         }
     }
   
+    //마우스 휠로 인벤토리 툴바 아이템 선택
+    int wheelDir = InputManager::Instance().GetWheelDirection();
+    if (wheelDir != 0) {
+        OutputDebugStringA("반응 있음\n");
+        inventory->MoveSelectedSlot(wheelDir);  // 인벤토리 슬롯 이동
+    }
 
+    //카보드 눌림으로 인벤토리 툴바 선택
     for (int i = 0; i < 9; ++i) //번호 키 인벤 슬롯
     {
         if (InputManager::Instance().IsKeyDown('1' + i))
@@ -219,6 +274,9 @@ void Player::HandleInput()
     }
 
 }
+
+
+
 std::pair<int, int> Player::GetFacingTilePos() const
 {
     auto plusRects = GetPlayerPlusRangeRects(static_cast<int>(x * 32), static_cast<int>(y * 32));
@@ -286,6 +344,7 @@ void Player::StartInteraction()
 {
     isInteracting = true;
     OutputDebugStringA("상자와 상호작용 시작\n");
+
     // TODO: UI 열기 로직 추가
 }
 
@@ -298,17 +357,33 @@ void Player::EndInteraction()
 
 
 
+
 void Player::HandleRightClick() //우클릭으로 사용
 {
     // 오브젝트 설치 함수로 사용 예정
     if (InputManager::Instance().IsRightClickUp())
     {
-        ObjectType type = inventory->GetSelectedObjectType();
-        CropType croptype = inventory->GetSelectedCropType();
+     
+        
+            ///xxxxxxxxxxxxxxxxxxxxxx임시xxxxxxxxxxxxxxxxxxx
+            if (UIManager::Instance().IsBoxUIOpen()) {
+                POINT mousePos = InputManager::Instance().GetMousePosition();
+                // int slotX = mousePos.x / 32;
+                 //   int slotY = mousePos.y / 32;
 
+                 // 박스 or 플레이어 슬롯 클릭 시에는 다른 처리 차단
+                bool clickedOnSlot = UIManager::Instance().GetOpenedBox()->HandleClick(mousePos.x, mousePos.y, 2);
+                if (clickedOnSlot) return;
+
+                return; // 슬롯 외 클릭이더라도 무조건 차단
+            }
+        // 상자가 안 열렸으면 일반 클릭 처리
+        //TryPlaceObject();
+
+        InventoryItem selectedItem = inventory->GetSelectedItem();
+        ItemCategory category = selectedItem.GetCategory();
 
         POINT p = InputManager::Instance().GetMousePosition();
-
 
 
         int worldX = p.x;
@@ -322,32 +397,63 @@ void Player::HandleRightClick() //우클릭으로 사용
             OutputDebugStringA("작동 범위 밖입니다.\n");
             return; // 범위 밖이면 설치 불가
         }
-
-        switch (type)
+        if (GameObjectManager::Instance().CheckTile(tileX, tileY, category))
         {
-        case ObjectType::Fence:
-        {
-            if (GameObjectManager::Instance().CheckTile(tileX, tileY, type))
-            {//타일체크함수
-                OutputDebugStringA("울타리 설치\n");
-                GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, ObjectType::Fence);
-                inventory->DecreaseItem(1);
-            }
-            break;
-        }
-        case ObjectType::Crop:
-        {
-            if (GameObjectManager::Instance().CheckTile(tileX, tileY, type)) //클릭한 타일의 오브젝트가 nuLL인지 확인
+            switch (category)
             {
-                OutputDebugStringA("작물 설치\n");
-                GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, ObjectType::Crop, croptype);
-                inventory->DecreaseItem(1); //아이템 수량 감소
+            case ItemCategory::Placeable: //설치 가능한 오브젝트
+            {
+                PlaceableType placeable = inventory->GetSelectedPlaceable();
+                 GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, placeable);
+                // 필요한 설치물 처리...
+                break;
             }
+            case ItemCategory::Seed:  //씨앗봉투 
+            {
+                SeedType croptype = inventory->GetSelectedSeedType();
+                CropType type = CropType::None;
 
-            break;
+                switch (croptype) //무슨 씨앗봉투인지 감별
+                {
+                case SeedType::StrawberrySeed:  type = CropType::Strawberry; break;
+                case SeedType::OnionSeed:  type = CropType::Onion; break;
+                }
+                GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, PlaceableType::Crop, type);
+               
+                // 작물 설치 처리
+                break;
+            }
+            // Tool 등 다른 카테고리도 처리 가능
+            }
+            inventory->DecreaseItem(1);
+
         }
 
-        }
+        //switch (type)
+        //{
+        //case PlaceableType::Fence:
+        //{
+        //    if (GameObjectManager::Instance().CheckTile(tileX, tileY, type))
+        //    {//타일체크함수
+        //        OutputDebugStringA("울타리 설치\n");
+        //        GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, PlaceableType::Fence);
+        //        inventory->DecreaseItem(1);
+        //    }
+        //    break;
+        //}
+        //case PlaceableType::Crop:
+        //{
+        //    if (GameObjectManager::Instance().CheckTile(tileX, tileY, type)) //클릭한 타일의 오브젝트가 nuLL인지 확인
+        //    {
+        //        OutputDebugStringA("작물 설치\n");
+        //        GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, PlaceableType::Crop, croptype);
+        //        inventory->DecreaseItem(1); //아이템 수량 감소
+        //    }
+
+        //    break;
+        //}
+
+        //}
 
 
     }
@@ -495,9 +601,9 @@ void Player::SetDirection(Direction dir)//플레이어 방향 전환을 위한 �
 //    pixelY = tileY * tileSize;
 //}
 //
-//ObjectType Player::GetObjectType() const
+//PlaceableType Player::GetPlaceableType() const
 //{
-//    return ObjectType::Player;
+//    return PlaceableType::Player;
 //}
 //
 //

@@ -14,14 +14,16 @@
 using namespace std;
 
 
-
-
-
-
-
 void Map::Update(float deltaTime)
 {
- 
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            TileData& tile = mapTiles[y * width + x];
+            if (tile.object) {
+                tile.object->Update(deltaTime);  //현재 작물만 업데이트 
+            }
+        }
+    }
 }
 
 

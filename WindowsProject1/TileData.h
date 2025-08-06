@@ -10,46 +10,44 @@ enum class TileType
     Water,
     Path
 };
-enum class ObjectType
-{
+enum class ItemCategory {
     None,
+    Tool,
     Crop,
-    Box,
-    Tree,
-    House,
-    Fence
+    Seed,
+    Placeable
 };
 
-enum class CropType
-{
+enum class ToolType {
+    None,
+    Hoe,
+    Axe,
+    Watering
+};
+
+enum class CropType {
     None,
     Strawberry,
-    Onion,
-    strawberryseed,
-    onionseed
+    Onion
 };
 
-enum class  ToolType {
-    None = 0,
-    hoe = 1,  //괭이
-    Axe = 2,  //도끼
-    watering = 3 //물뿌리개
-};
-
-
-enum class AllType
-{
+enum class SeedType {
     None,
-    Crop,
+    StrawberrySeed,
+    OnionSeed
+};
+
+// 필요하다면 PlaceableType 도 가능
+enum class PlaceableType {
+    None,
     Box,
-    Tree,
-    House,
     Fence,
-    Strawberry,
-    Onion,
-    strawberryseed,
-    onionseed
+    Tree,
+    House,
+    Crop
 };
+
+
 struct TileData {
     TileType tileType;
     std::shared_ptr<WorldObject> object = nullptr;

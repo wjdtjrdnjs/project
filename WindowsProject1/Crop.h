@@ -12,8 +12,9 @@ public:
     Crop(CropType type);  //생성자
     void Render(HDC hdc, int Tilesize) override;
     void SetTilePosition(int px, int py) override;
-    ObjectType GetObjectType() const override;
+    PlaceableType GetPlaceableType() const override;
     RECT GetCollisionRect();
+    void Update(float deltaTime) override;
     //void Interact(Player& player) override;
     // IsRipe() const { return ripe; }
 
@@ -26,8 +27,8 @@ public:
 
     //~Crop();            //소멸자
 
-    //int GetX() const { return x; }  //작물 위치 x
-    //int GetY() const { return y; }  //작물 위치 y
+    int GetX() const { return x; }  //작물 위치 x
+    int GetY() const { return y; }  //작물 위치 y
 
     //void Install(int x, int y, InventoryComponent& inventory) override;
     //void Remove(int tileX, int tileY, InventoryComponent& inventory) override;
@@ -41,6 +42,13 @@ public:
 private:
     CropType type;     //작물 타입(딸기, 양파)
     int x = 0, y = 0;  //작물 심은 위치
+    int growthStage = 0;
+    float growthTimer = 0.0f;
+    const int maxGrowthStage = 5;
+    float growthInterval = 10.0f;
+    std::vector<HBITMAP> growthBitmaps;
+
+
     bool ripe = FALSE;
     HBITMAP bitmap; 
     //PlayerController* playercon = nullptr;
@@ -49,6 +57,5 @@ private:
    
     //std::vector<HBITMAP> growthBitmaps; //작물 성장 이미지
 
-    int growthTimer = 0;       // 누적 시간(ms)
-    const int growthInterval = 1000; // 5초마다 성장 (임의 설정)
+   
 };

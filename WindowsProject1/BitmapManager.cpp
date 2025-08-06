@@ -140,6 +140,25 @@ void BitmapManager::Load(const std::string& name, int resourceID)
    
 }
 
+
+void BitmapManager::LoadCropBitmap(const std::string& name, int resourceID)
+{
+    if (cropbitmapMap.find(name) != cropbitmapMap.end())
+        return;
+
+    HBITMAP bmp = (HBITMAP)LoadImage(
+        GetModuleHandle(NULL),
+        MAKEINTRESOURCE(resourceID),
+        IMAGE_BITMAP,
+        0, 0,
+        LR_CREATEDIBSECTION
+    );
+
+    if (bmp) {
+        cropbitmapMap[name] = bmp;
+    }
+}
+
 HBITMAP BitmapManager::GetBitmap(const std::string& name)
 {
     if (bitmapMap.find(name) != bitmapMap.end()) {
@@ -152,8 +171,21 @@ HBITMAP BitmapManager::GetBitmap(const std::string& name)
 void BitmapManager::LoadAllBitmaps()
 {
     Load("Box", IDB_BITMAP24);
-    Load("Strawberry", IDB_BITMAP10);
-    Load("Onion", IDB_BITMAP2);
+
+  LoadCropBitmap("Strawberry_0", IDB_BITMAP10);
+  LoadCropBitmap("Strawberry_1", IDB_BITMAP11);
+  LoadCropBitmap("Strawberry_2", IDB_BITMAP12);
+  LoadCropBitmap("Strawberry_3", IDB_BITMAP13);
+  LoadCropBitmap("Strawberry_4", IDB_BITMAP14);
+  LoadCropBitmap("Strawberry_5", IDB_BITMAP15);
+
+  LoadCropBitmap("Onion_0", IDB_BITMAP2);
+  LoadCropBitmap("Onion_1", IDB_BITMAP3);
+  LoadCropBitmap("Onion_2", IDB_BITMAP4);
+  LoadCropBitmap("Onion_3", IDB_BITMAP5);
+  LoadCropBitmap("Onion_4", IDB_BITMAP6);
+  LoadCropBitmap("Onion_5", IDB_BITMAP7);
+
     Load("House", IDB_BITMAP38);
     Load("Fence", IDB_BITMAP39);
     //타일
@@ -161,8 +193,13 @@ void BitmapManager::LoadAllBitmaps()
    Load("Path", IDB_BITMAP21);
    Load("Farm", IDB_BITMAP42);
    Load("Water", IDB_BITMAP43);
-    //오브젝트
   
+   //도구
+   Load("Hoe", IDB_BITMAP16);
+   Load("Axe", IDB_BITMAP40);
+   Load("Watering", IDB_BITMAP41);
+      
+
 
     //씨앗봉투들
    Load("딸기씨앗봉투", IDB_BITMAP18);
@@ -195,36 +232,38 @@ HBITMAP BitmapManager::GetTileBitmap(TileType type)
 HBITMAP BitmapManager::GetObjectBitmap(const InventoryItem& item)
 {
     // 1. Crop
-    if (item.GetObjectType() == ObjectType::Crop) {
-        return GetCroptBitmap(item.GetCropType());
+    switch (item.GetCategory())
+    {
+    case ItemCategory::Tool: return GetToolBitmap(item.GetToolType());
+    case ItemCategory::Crop: return GetCroptBitmap(item.GetCropType());
+    case ItemCategory::Seed: return GetSeedBitmap(item.GetSeedType());
+    case ItemCategory::Placeable: return GetObjectBitmap(item.GetPlaceableType());
+    default:
+        break;
     }
 
+  
 
-    // 2. Tool
-    if (item.GetToolType() != ToolType::None) {
-        return GetToolBitmap(item.GetToolType());
-    }
 
-    // 3. 일반 오브젝트
-    return GetObjectBitmap(item.GetObjectType());
+
 
 }
 
-HBITMAP BitmapManager::GetObjectBitmap(ObjectType type) {
+HBITMAP BitmapManager::GetObjectBitmap(PlaceableType type) {
     switch (type) {
-    case ObjectType::Box: return GetBitmap("Box");
-    case ObjectType::Tree: return GetBitmap("Tree");
-    case ObjectType::Fence: return GetBitmap("Fence");
-    case ObjectType::House: return GetBitmap("House");
+    case PlaceableType::Box: return GetBitmap("Box");
+    case PlaceableType::Tree: return GetBitmap("Tree");
+    case PlaceableType::Fence: return GetBitmap("Fence");
+    case PlaceableType::House: return GetBitmap("House");
     default: return nullptr;
     }
 }
 
 HBITMAP BitmapManager::GetToolBitmap(ToolType type) {
     switch (type) {
-    case ToolType::hoe: return GetBitmap("hoe");
+    case ToolType::Hoe: return GetBitmap("Hoe");
     case ToolType::Axe: return GetBitmap("Axe");
-    case ToolType::watering: return GetBitmap("watering");
+    case ToolType::Watering: return GetBitmap("Watering");
     default: return nullptr;
     }
 }
@@ -235,11 +274,42 @@ HBITMAP BitmapManager::GetCroptBitmap(CropType type)
     switch (type) {
     case CropType::Strawberry: return GetBitmap("Strawberry");
     case CropType::Onion: return GetBitmap("Onion");
-    case CropType::strawberryseed: return GetBitmap("딸기씨앗봉투");
-    case CropType::onionseed: return GetBitmap("양파씨앗봉투");
     default: return nullptr;
     }
 }
+
+HBITMAP BitmapManager::GetSeedBitmap(SeedType type)
+{
+    switch (type) {
+    case SeedType::StrawberrySeed: return GetBitmap("딸기씨앗봉투");
+    case SeedType::OnionSeed: return GetBitmap("양파씨앗봉투");
+    default: return nullptr;
+    }
+}
+
+HBITMAP BitmapManager::GetCropGrowthBitmap(CropType type, int stage)
+{
+    std::string name;
+    switch (type) {
+    case CropType::Strawberry: name = "Strawberry"; break;
+    case CropType::Onion: name = "Onion"; break;
+    default: return nullptr;
+    }
+
+    std::string key = name + "_" + std::to_string(stage);
+    return GetBitmapByName(key); // Load할 때 사용한 이름
+}
+
+HBITMAP BitmapManager::GetBitmapByName(const std::string& name)
+{
+    auto it = cropbitmapMap.find(name);
+    if (it != cropbitmapMap.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+
 HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
 {
 
@@ -256,32 +326,36 @@ HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
     return GetBitmap("Player_Down"); ;
 }
 
-HBITMAP BitmapManager::GetAllBitMap(AllType type)
-{
-
-    switch (type) {
-    case AllType::Box:
-        return GetBitmap("Box");
-    case AllType::Crop:
-        return GetBitmap("Crop");
-    case AllType::Tree:
-        return GetBitmap("Tree");
-    case AllType::House:
-        return GetBitmap("House");
-    case AllType::Fence:
-        return GetBitmap("Fence");
-    case AllType::Strawberry:
-        return GetBitmap("Strawberry");
-    case AllType::Onion:
-        return GetBitmap("Onion");
-    case AllType::strawberryseed:
-        return GetBitmap("딸기씨앗봉투");
-    case AllType::onionseed:
-        return GetBitmap("양파씨앗봉투");
-    }
-    return nullptr;
-}
-
+//HBITMAP BitmapManager::GetAllBitMap(AllType type)
+//{
+//
+//    //switch (type) {
+//    //case AllType::None:
+//    //    break;
+//    //case AllType::Crop:
+//    //    return GetBitmap("Crop");
+//    //case AllType::Object:
+//    //    return GetCroptBitmap(item.GetCropType());
+//    //case AllType::Tool:
+//    //    return GetBitmap("Tool");
+//
+// /*   case AllType::Tree:
+//        return GetBitmap("Tree");
+//    case AllType::House:
+//        return GetBitmap("House");
+//    case AllType::Fence:
+//        return GetBitmap("Fence");
+//    case AllType::Strawberry:
+//        return GetBitmap("Strawberry");
+//    case AllType::Onion:
+//        return GetBitmap("Onion");
+//    case AllType::strawberryseed:
+//        return GetBitmap("딸기씨앗봉투");
+//    case AllType::onionseed:
+//        return GetBitmap("양파씨앗봉투");*/
+//    }
+//    return nullptr;
+//}
 
 
 void BitmapManager::Release()
@@ -290,5 +364,11 @@ void BitmapManager::Release()
         DeleteObject(pair.second);
     }
     bitmapMap.clear();
+
+    for (auto& pair : cropbitmapMap) {
+        DeleteObject(pair.second);
+    }
+    cropbitmapMap.clear();
+    
 }
 

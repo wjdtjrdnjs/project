@@ -4,7 +4,7 @@
 #include "Global.h"
 Tree::Tree()
 {
-	bmp = BitmapManager::Instance().GetObjectBitmap(ObjectType::Tree);
+	bmp = BitmapManager::Instance().GetObjectBitmap(PlaceableType::Tree);
 }
 
 void Tree::Render(HDC hdc, int Tilesize)
@@ -70,9 +70,9 @@ void Tree::Render(HDC hdc, int Tilesize)
 
 void Tree::SetTilePosition(int px, int py) { x = px; y = py; }
 
-ObjectType Tree::GetObjectType() const
+PlaceableType Tree::GetPlaceableType() const
 {
-    return ObjectType::Tree;
+    return PlaceableType::Tree;
 }
 
 RECT Tree::GetCollisionRect()

@@ -278,6 +278,9 @@
     <ClCompile Include="UIManager.cpp">
       <Filter>Managers\SingletonT</Filter>
     </ClCompile>
+    <ClCompile Include="InventoryItem.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WindowsProject1.rc">

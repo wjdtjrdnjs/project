@@ -39,15 +39,15 @@ void GameObjectManager::InteractWithTile(int tileX, int tileY, Player& player)
 
     if (currentObject)
     {
-        int currentTypeValue = static_cast<int>(currentObject->GetObjectType());
+        int currentTypeValue = static_cast<int>(currentObject->GetPlaceableType());
 
-        if (currentTypeValue == static_cast<int>(ObjectType::Box) && !player.IsInteracting())
+        if (currentTypeValue == static_cast<int>(PlaceableType::Box) && !player.IsInteracting())
         {
             player.StartInteraction();
-            Box* box = dynamic_cast<Box*>(currentObject.get());  // ¿©±â¼­ .get() ÇÊ¿ä!
+            Box* box = dynamic_cast<Box*>(currentObject.get());  // 
             if (box)
             {
-                UIManager::Instance().OpenBoxUI(box, player.GetInventory());
+               box->OnInteract(&player); // BoxÅ¬·¡½º¸¦ °ÅÃÄ¼­ ui¸Å´ÏÀú·Î ÀÌµ¿
             }
         }
     }
@@ -82,16 +82,16 @@ void GameObjectManager::LoadMap(const std::string& mapName)
     //    {
     //        for (int j = 0; j < 3; j++)
     //        {
-    //            addObjectToCurrentMap(mapName, 10 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Strawberry);
-    //            addObjectToCurrentMap(mapName, 15 + i, 7 + j, TileType::Farmland, ObjectType::Crop, CropType::Onion);
+    //            addObjectToCurrentMap(mapName, 10 + i, 7 + j, TileType::Farmland, PlaceableType::Crop, CropType::Strawberry);
+    //            addObjectToCurrentMap(mapName, 15 + i, 7 + j, TileType::Farmland, PlaceableType::Crop, CropType::Onion);
     //        }
     //    }
 
-    //    addObjectToCurrentMap(mapName, 11, 6, TileType::None, ObjectType::Box);
-    //    addObjectToCurrentMap(mapName, 16, 6, TileType::None, ObjectType::Box);
-    //    addObjectToCurrentMap(mapName, 5, 3, TileType::None, ObjectType::Tree);
-    //    addObjectToCurrentMap(mapName, 3, 10, TileType::None, ObjectType::House);
-    //    addObjectToCurrentMap(mapName, 1, 1, TileType::None, ObjectType::Fence);
+    //    addObjectToCurrentMap(mapName, 11, 6, TileType::None, PlaceableType::Box);
+    //    addObjectToCurrentMap(mapName, 16, 6, TileType::None, PlaceableType::Box);
+    //    addObjectToCurrentMap(mapName, 5, 3, TileType::None, PlaceableType::Tree);
+    //    addObjectToCurrentMap(mapName, 3, 10, TileType::None, PlaceableType::House);
+    //    addObjectToCurrentMap(mapName, 1, 1, TileType::None, PlaceableType::Fence);
 
     //    for (int i = 0; i < 32; i++)
     //    {
@@ -121,6 +121,7 @@ void GameObjectManager::LoadMap(const std::string& mapName)
 void GameObjectManager::Update(float deltaTime)
 {
     player->Update(deltaTime);
+    currentMap().Update(deltaTime);
 }
 
 void GameObjectManager::Render(HDC hdc)
@@ -148,7 +149,7 @@ void GameObjectManager::addMap(const std::string& mapName, int width, int height
         currentMapIndex = 0;
 }
 
-void GameObjectManager::addObjectToCurrentMap(const std::string& mapName, int x, int y, TileType tileType, ObjectType objectType, CropType cropType)
+void GameObjectManager::addObjectToCurrentMap(const std::string& mapName, int x, int y, TileType tileType, PlaceableType placeableType, CropType cropType)
 {
     int mapIndex = GetMapIndexByName(mapName);
     if (mapIndex == -1) return; // ¸ÊÀÌ ¾øÀ¸¸é ¸®ÅÏ
@@ -161,17 +162,46 @@ void GameObjectManager::addObjectToCurrentMap(const std::string& mapName, int x,
     if (tileType != TileType::None)  //Å¸ÀÏ noneÀÌ ¾Æ´Ò ¶§ º¯°æ
         tile.tileType = tileType;
 
-    if (objectType != ObjectType::None && !tile.object)
+    if (placeableType != PlaceableType::None && !tile.object)
     {
         std::shared_ptr<WorldObject> obj;
-        switch (objectType)
+
+        switch (placeableType)
         {
-        case ObjectType::None:break;
-        case ObjectType::Crop:obj = std::make_shared<Crop>(cropType); break;
-        case ObjectType::Box:obj = std::make_shared<Box>(); break;
-        case ObjectType::Tree:obj = std::make_shared<Tree>(); break;
-        case ObjectType::House:obj = std::make_shared<House>(); break;
-        case ObjectType::Fence:obj = std::make_shared<Fence>(); break;
+        case PlaceableType::None:
+            break;
+
+        case PlaceableType::Crop:
+            // ¾¾¾Ñ Å¸ÀÔÀ» ½ÇÁ¦ ÀÛ¹° Å¸ÀÔÀ¸·Î º¯È¯
+            switch (cropType)
+            {
+            case CropType::Strawberry:
+                obj = std::make_shared<Crop>(cropType);
+                break;
+            case CropType::Onion:
+                obj = std::make_shared<Crop>(cropType);
+                break;
+            default:
+                OutputDebugStringA("¾Ë ¼ö ¾ø´Â ¾¾¾Ñ Å¸ÀÔ\n");
+                break;
+            }
+            break;
+
+        case PlaceableType::Box:
+            obj = std::make_shared<Box>();
+            break;
+
+        case PlaceableType::Tree:
+            obj = std::make_shared<Tree>();
+            break;
+
+        case PlaceableType::House:
+            obj = std::make_shared<House>();
+            break;
+
+        case PlaceableType::Fence:
+            obj = std::make_shared<Fence>();
+            break;
         }
 
         if (obj)
@@ -242,7 +272,7 @@ void GameObjectManager::InPortal() //ÇÃ·¹ÀÌ¾î°¡ Æ÷Å» ¿µ¿ª¿¡ ÀÖ´ÂÁö È®ÀÎ ÈÄ ¸ÊÀüÈ
         }
     }
 }
-bool GameObjectManager::CheckTile(int TileX, int TileY, ObjectType type)
+bool GameObjectManager::CheckTile(int TileX, int TileY, ItemCategory type)
 {
     OutputDebugStringA("Å¸ÀÏ °Ë»ç Áß!\n");
     Map map = currentMap();

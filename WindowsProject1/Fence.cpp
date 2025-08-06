@@ -31,7 +31,7 @@
 
 Fence::Fence()
 {
-    hBmp = BitmapManager::Instance().GetObjectBitmap(ObjectType::Fence);
+    hBmp = BitmapManager::Instance().GetObjectBitmap(PlaceableType::Fence);
 }
 
 
@@ -98,9 +98,9 @@ void Fence::Render(HDC hdc, int tilesize)
     DeleteDC(memDC);
 }
 
-ObjectType Fence::GetObjectType() const
+PlaceableType Fence::GetPlaceableType() const
 {
-    return ObjectType::Fence;
+    return PlaceableType::Fence;
 }
 
 RECT Fence::GetCollisionRect()

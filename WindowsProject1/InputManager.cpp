@@ -106,6 +106,33 @@ bool InputManager::IsKeyPressed(int vKey)
     return (currentKeys[vKey] & 0x80) != 0;
 }
 
+void InputManager::ProcessMessage(UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (msg)
+    {
+    case WM_MOUSEWHEEL:
+        wheelDelta += GET_WHEEL_DELTA_WPARAM(wParam);
+        break;
+
+        // 다른 메시지 처리...
+    }
+}
+
+
+int InputManager::GetWheelDirection()
+{
+    if (wheelDelta >= 120) {
+        wheelDelta = 0;
+        return -1; // 아래로 내림
+    }
+    else if (wheelDelta <= -120) {
+        wheelDelta = 0;
+        return 1; // 위로 올림
+    }
+    return 0; // 변화 없음
+}
+
+
 //void InputManager::HandleKey(WPARAM key)
 //{
 //    

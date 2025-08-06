@@ -1,6 +1,7 @@
 #include "PlayerInventory.h"
 #include "ToolType.h"
 #include "TIleData.h"
+#include "BitmapManager.h"
 
 void PlayerInventory::InventoryUIRender(HDC hdc)
 {
@@ -28,7 +29,7 @@ void PlayerInventory::InventoryUIRender(HDC hdc)
             if (item.IsValid())
             {
 
-                HBITMAP bmp = item.GetBitmap();
+                HBITMAP bmp = BitmapManager::Instance().GetObjectBitmap(item);
                 if (!bmp) continue;
 
                 HDC memDC = CreateCompatibleDC(hdc);
@@ -64,6 +65,52 @@ void PlayerInventory::InventoryUIRender(HDC hdc)
         
 }
 
+void PlayerInventory::InventoryBoxUIRender(HDC hdc)
+{
+    const int slotSize = 50;
+    for (int i = 0; i < 9; i++) {
+        int left = 360 + i * (slotSize + 5);
+        int top = 310;
+
+        RECT slotRect = { left, top, left + slotSize, top + slotSize };
+        HBRUSH brush = CreateSolidBrush(RGB(180, 180, 180));
+        FillRect(hdc, &slotRect, brush);
+        FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+        DeleteObject(brush);
+
+        InventoryItem& item = inventorySlots[i];
+        if (!item.IsEmpty()) {
+            HBITMAP bmp = BitmapManager::Instance().GetObjectBitmap(item);
+            if (bmp) {
+                HDC memDC = CreateCompatibleDC(hdc);
+                HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+
+                BITMAP bm;
+                GetObject(bmp, sizeof(BITMAP), &bm);
+
+                int drawSize = 40;
+                int offsetX = left + (slotSize - drawSize) / 2;
+                int offsetY = top + (slotSize - drawSize) / 2;
+
+                TransparentBlt(hdc,
+                    offsetX, offsetY,
+                    drawSize, drawSize,
+                    memDC,
+                    0, 0,
+                    bm.bmWidth, bm.bmHeight,
+                    RGB(255, 255, 255));
+
+                std::string countText = std::to_string(item.GetCount());
+                SetBkMode(hdc, TRANSPARENT);
+                TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), (int)countText.length());
+
+                SelectObject(memDC, oldBmp);
+                DeleteDC(memDC);
+            }
+        }
+    }
+}
+
 
 
 
@@ -84,37 +131,59 @@ void PlayerInventory::DecreaseItem( int delta)
 }
 
 
+void PlayerInventory::MoveSelectedSlot(int direction)
+{
+    selectedSlot += direction;
+
+    if (selectedSlot < 0)
+        selectedSlot = 8;
+    else if (selectedSlot > 8)
+        selectedSlot = 0;
+
+    char msg[100];
+    snprintf(msg, sizeof(msg), "휠로 선택된 슬롯: %d\n", selectedSlot);
+    OutputDebugStringA(msg);
+}
 
 
-
+// 도구 아이템 반환
 ToolType PlayerInventory::GetSelectedTool()
 {
     const InventoryItem& item = inventorySlots[selectedSlot];
-
-    // 도구 아이템만 판단하고 반환
-    if (item.IsValid() && item.GetToolType() != ToolType::None) {
-        return item.GetToolType(); // 예: Tool::hoe
+    if (item.IsValid() && item.GetCategory() == ItemCategory::Tool) {
+        return item.GetToolType();
     }
-
-    return ToolType::None; // 선택된 슬롯에 도구가 없을 때
+    return ToolType::None;
 }
 
-ObjectType PlayerInventory::GetSelectedObjectType()
-{
-    const InventoryItem& item = inventorySlots[selectedSlot];
-
-    if (item.IsValid() && item.GetObjectType() != ObjectType::None) {
-        return item.GetObjectType();
-    }
-
-    return ObjectType::None;
-}
-
+// 작물 반환
 CropType PlayerInventory::GetSelectedCropType()
 {
     const InventoryItem& item = inventorySlots[selectedSlot];
-    if (item.IsValid() && item.GetCropType() != CropType::None) {
+    if (item.IsValid() && item.GetCategory() == ItemCategory::Crop) {
         return item.GetCropType();
     }
     return CropType::None;
+}
+
+SeedType PlayerInventory::GetSelectedSeedType()
+{
+    const InventoryItem& item = inventorySlots[selectedSlot];
+    if (item.IsValid() && item.GetCategory() == ItemCategory::Seed) {
+        return item.GetSeedType();
+    }
+    return SeedType::None;
+}
+
+
+
+
+// 설치물 반환 (기존 PlaceableType 대체)
+PlaceableType PlayerInventory::GetSelectedPlaceable()
+{
+    const InventoryItem& item = inventorySlots[selectedSlot];
+    if (item.IsValid() && item.GetCategory() == ItemCategory::Placeable) {
+        return item.GetPlaceableType();
+    }
+    return PlaceableType::None;
 }

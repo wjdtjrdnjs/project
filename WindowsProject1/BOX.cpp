@@ -1,12 +1,448 @@
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include "Box.h"
 #include "Global.h"
-
 #include "BitmapManager.h"
+#include "InputManager.h"
 #include "WorldObject.h"
 #include "TileData.h"
+#include "UIManager.h"
+#include "InventoryItem.h"
 
 #include <string>
+#include <cstdlib>  // rand()
+#include <ctime> 
+void Box::RenderUI(HDC hdc)
+{
+    const int slotSize = 50;
+    for (int row = 0; row < 3; row++) {
+        for (int col = 0; col < 9; col++) {
+            int left = BOX_BASE_X + col * (slotSize + SLOT_MARGIN);
+            int top = BOX_BASE_Y + row * (slotSize + 1);
+
+            RECT slotRect = { left, top, left + slotSize, top + slotSize };
+            HBRUSH brush = CreateSolidBrush(RGB(200, 200, 200));
+            FillRect(hdc, &slotRect, brush);
+            FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+            DeleteObject(brush);
+
+            InventoryItem& item = items[row * 9 + col];
+            if (!item.IsEmpty()) {
+                HBITMAP bmp = BitmapManager::Instance().GetObjectBitmap(item);
+                if (bmp) {
+                    HDC memDC = CreateCompatibleDC(hdc);
+                    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+
+                    BITMAP bm;
+                    GetObject(bmp, sizeof(BITMAP), &bm);
+
+                    int drawSize = 40;
+                    int offsetX = left + (slotSize - drawSize) / 2;
+                    int offsetY = top + (slotSize - drawSize) / 2;
+
+                    TransparentBlt(hdc,
+                        offsetX, offsetY,
+                        drawSize, drawSize,
+                        memDC,
+                        0, 0,
+                        bm.bmWidth, bm.bmHeight,
+                        RGB(255, 255, 255));
+
+                    std::string countText = std::to_string(item.GetCount());
+                    SetBkMode(hdc, TRANSPARENT);
+                    TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), (int)countText.length());
+
+                    SelectObject(memDC, oldBmp);
+                    DeleteDC(memDC);
+                }
+            }
+        }
+    }
+
+   // RenderCursorItem(hdc);  // ì†ì— ë“  ì•„ì´í…œì€ ë°•ìŠ¤ UIì—ì„œë„ ê·¸ë¦¬ê¸° ìœ ì§€
+}
+
+
+void Box::RenderSlot(HDC hdc, int left, int top, const InventoryItem& item) {
+
+    RECT slotRect = { left, top, left + SLOT_SIZE, top + SLOT_SIZE };
+    HBRUSH brush = CreateSolidBrush(RGB(200, 200, 200));
+
+    FillRect(hdc, &slotRect, brush);
+    FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+    DeleteObject(brush);
+
+    if (item.IsEmpty()) return;
+
+    HBITMAP bmp = BitmapManager::Instance().GetObjectBitmap(item);
+    if (!bmp) return;
+
+    HDC memDC = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+
+    BITMAP bm;
+    GetObject(bmp, sizeof(BITMAP), &bm);
+
+    int drawSize = 40;
+    int offsetX = left + (SLOT_SIZE - drawSize) / 2;
+    int offsetY = top + (SLOT_SIZE - drawSize) / 2;
+
+    TransparentBlt(hdc, offsetX, offsetY, drawSize, drawSize, memDC, 0, 0, bm.bmWidth, bm.bmHeight, RGB(255, 255, 255));
+
+    std::string countText = std::to_string(item.GetCount());
+    TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), (int)countText.length());
+
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
+}
+
+
+void Box::HandleItemSlotLClick(InventoryItem* slot)  //ë°•ìŠ¤ë¥¼ ì˜¤í”ˆí•œ ìƒíƒœì—ì„œ ì¢Œí´ë¦­ 
+{
+    InventoryItem& heldItem = UIManager::Instance().GetHeldItem();
+
+   
+    if (heldItem.IsEmpty()) { // ë¹ˆì†ì´ë©´ ìŠ¬ë¡¯ ì•„ì´í…œì„ ì†ì— ë“ ë‹¤
+        UIManager::Instance().SetHeldItem(*slot);
+        *slot = InventoryItem();  // ìŠ¬ë¡¯ ë¹„ìš°ê¸°
+    }
+    else {
+        
+        if (slot->IsEmpty()) {// ì†ì— ì•„ì´í…œ ìˆê³  ìŠ¬ë¡¯ì´ ë¹„ì–´ ìˆìœ¼ë©´ ì˜®ê¸´ë‹¤
+            *slot = heldItem;
+            UIManager::Instance().ClearHeldItem();
+        }
+        else if (slot->GetCategory() == heldItem.GetCategory()) {// íƒ€ì…ì´ ê°™ì„ ë•Œ
+            
+            bool canStack = false;
+
+            switch (heldItem.GetCategory())// ì„¸ë¶€ íƒ€ì… ë¹„êµ 
+            {
+            case ItemCategory::Tool:   //ë„êµ¬
+                canStack = (slot->GetToolType() == heldItem.GetToolType());
+                break;
+            case ItemCategory::Crop:  //ì‘ë¬¼
+                canStack = (slot->GetCropType() == heldItem.GetCropType());
+                break;
+            case ItemCategory::Seed:  //ì”¨ì•—ë´‰íˆ¬
+                canStack = (slot->GetSeedType() == heldItem.GetSeedType());
+                break;
+            case ItemCategory::Placeable:  //ë°°ì¹˜ ê°€ëŠ¥í•œ ê²ƒë“¤
+                canStack = (slot->GetPlaceableType() == heldItem.GetPlaceableType());
+                break;
+            default:
+                canStack = false;
+                break;
+            }
+
+            if (canStack) {
+                slot->SetCount(slot->GetCount() + heldItem.GetCount());
+                UIManager::Instance().ClearHeldItem();  //ë“¤ê³ ìˆëŠ” ì•„ì´í…œ ì´ˆê¸°í™”// ì† ì´ˆê¸°í™”
+            }
+            else {
+                std::swap(*slot, heldItem);  // ë‹¤ë¥¸ ì„¸ë¶€ íƒ€ì…ì´ë©´ êµí™˜
+            }
+        }
+        else {
+            // ì•„ì´í…œ ì¹´í…Œê³ ë¦¬ê°€ ë‹¤ë¥´ë©´ ê·¸ëƒ¥ êµí™˜
+            std::swap(*slot, heldItem);
+        }
+    }
+}
+
+
+void Box::HandleItemSlotRClick(InventoryItem* slot)  //ë°•ìŠ¤ë¥¼ ì˜¤í”ˆí•œ ìƒíƒœì—ì„œ ìš°í´ë¦­
+{
+    InventoryItem& heldItem = UIManager::Instance().GetHeldItem();
+    if (slot->IsEmpty()) {// ì†ì— ì•„ì´í…œ ìˆê³  ìŠ¬ë¡¯ì´ ë¹„ì–´ ìˆìœ¼ë©´ 1ê°œë¥¼ ì˜®ê¸´ë‹¤
+        /* *slot = heldItem;
+         UIManager::Instance().ClearHeldItem();*/
+        OutputDebugStringA("ì•„ì´í…œ shgrl\n");
+        *slot = heldItem;  //ì•„ì´í…œ ì •ë³´ë¥¼ ë„˜ê²¨ì£¼ê³   ê°œìˆ˜ë¥¼ 1ê°œë¡œ ì„¤ì •
+        if (slot->GetCount() != 0)slot->SetCount(1);
+        else   slot->AddCount(1);
+        heldItem.DecreaseItem(1);
+        if (heldItem.GetCount() <= 0) UIManager::Instance().ClearHeldItem();  //ì†ì— ìˆëŠ” ì•„ì´í…œ ê°œìˆ˜ê°€ 0ì´í•˜ë¡œ ë–¨ì–´ì§€ë©´ ì† ì´ˆê¸°í™” 
+
+    }
+    else if (slot->GetCategory() == heldItem.GetCategory())
+    {
+        bool canStack = false;
+        OutputDebugStringA("gkqclrl rksmd\n");
+
+        switch (heldItem.GetCategory())
+        {
+        case ItemCategory::Tool:   //ë„êµ¬
+            canStack = (slot->GetToolType() == heldItem.GetToolType());
+            break;
+        case ItemCategory::Crop:  //ì‘ë¬¼
+            canStack = (slot->GetCropType() == heldItem.GetCropType());
+            break;
+        case ItemCategory::Seed:  //ì”¨ì•—ë´‰íˆ¬
+            canStack = (slot->GetSeedType() == heldItem.GetSeedType());
+            break;
+        case ItemCategory::Placeable:  //ë°°ì¹˜ ê°€ëŠ¥í•œ ê²ƒë“¤
+            canStack = (slot->GetPlaceableType() == heldItem.GetPlaceableType());
+            break;
+        default:
+            canStack = false;
+            break;
+
+
+          
+        }
+        if (canStack) {
+            slot->AddCount(1);
+            heldItem.DecreaseItem(1);
+
+            if (heldItem.GetCount() <= 0) UIManager::Instance().ClearHeldItem();  //ë“¤ê³ ìˆëŠ” ì•„ì´í…œ ì´ˆê¸°í™”// ì† ì´ˆê¸°í™”
+        }
+
+    }
+        //else if (slot->GetCategory() == heldItem.GetCategory()) {// íƒ€ì…ì´ ê°™ì„ ë•Œ
+
+        //    bool canStack = false;
+
+        //    switch (heldItem.GetCategory())// ì„¸ë¶€ íƒ€ì… ë¹„êµ 
+        //    {
+        //    case ItemCategory::Tool:   //ë„êµ¬
+        //        canStack = (slot->GetToolType() == heldItem.GetToolType());
+        //        break;
+        //    case ItemCategory::Crop:  //ì‘ë¬¼
+        //        canStack = (slot->GetCropType() == heldItem.GetCropType());
+        //        break;
+        //    case ItemCategory::Seed:  //ì”¨ì•—ë´‰íˆ¬
+        //        canStack = (slot->GetSeedType() == heldItem.GetSeedType());
+        //        break;
+        //    case ItemCategory::Placeable:  //ë°°ì¹˜ ê°€ëŠ¥í•œ ê²ƒë“¤
+        //        canStack = (slot->GetPlaceableType() == heldItem.GetPlaceableType());
+        //        break;
+        //    default:
+        //        canStack = false;
+        //        break;
+        //    }
+
+        //    if (canStack) {
+        //        slot->SetCount(slot->GetCount() + heldItem.GetCount());
+        //        UIManager::Instance().ClearHeldItem();  //ë“¤ê³ ìˆëŠ” ì•„ì´í…œ ì´ˆê¸°í™”// ì† ì´ˆê¸°í™”
+        //    }
+        //    else {
+        //        std::swap(*slot, heldItem);  // ë‹¤ë¥¸ ì„¸ë¶€ íƒ€ì…ì´ë©´ êµí™˜
+        //    }
+        //}
+        //else {
+        //    // ì•„ì´í…œ ì¹´í…Œê³ ë¦¬ê°€ ë‹¤ë¥´ë©´ ê·¸ëƒ¥ êµí™˜
+        //    std::swap(*slot, heldItem);
+        //}
+    }
+
+////í´ë¦­ëœ ì•„ì´í…œì´ ì»¤ì„œì— ë¶™ê²Œ í•˜ëŠ” í•¨ìˆ˜
+void Box::RenderCursorItem(HDC hdc) {
+    InventoryItem& heldItem = UIManager::Instance().GetHeldItem();
+    if (heldItem.IsEmpty()) return;
+
+    POINT mouse = InputManager::Instance().GetMousePosition();
+    HBITMAP bmp = BitmapManager::Instance().GetObjectBitmap(heldItem);
+    if (!bmp) return;
+
+    HDC memDC = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+
+    BITMAP bm;
+    GetObject(bmp, sizeof(BITMAP), &bm);
+
+    int drawSize = 40;
+    TransparentBlt(hdc, mouse.x - 20, mouse.y - 20, drawSize, drawSize,
+        memDC, 0, 0, bm.bmWidth, bm.bmHeight, RGB(255, 255, 255));
+
+    if (heldItem.GetCount() > 1) {
+        std::string countText = std::to_string(heldItem.GetCount());
+        TextOutA(hdc, mouse.x + 5, mouse.y + 10, countText.c_str(), (int)countText.length());
+    }
+
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
+}
+
+
+bool Box::HandleClick(int mouseX, int mouseY, int num)
+{
+    // ë°•ìŠ¤ ìŠ¬ë¡¯ í´ë¦­ ì²˜ë¦¬
+    for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col < 9; ++col) {
+            int left = BOX_BASE_X + col * (SLOT_SIZE + SLOT_MARGIN);
+            int top = BOX_BASE_Y + row * (SLOT_SIZE + 1);
+            int right = left + SLOT_SIZE;
+            int bottom = top + SLOT_SIZE;
+
+            if (mouseX >= left && mouseX <= right &&
+                mouseY >= top && mouseY <= bottom) {
+                int index = row * 9 + col;
+                if (num == 1)
+                    HandleItemSlotLClick(&items[index]);
+                else
+                    HandleItemSlotRClick(&items[index]);
+                return true;
+            }
+        }
+    }
+
+    // í”Œë ˆì´ì–´ íˆ´ë°” í´ë¦­ ì˜ì—­ ì²˜ë¦¬ ìœ ì§€
+    if (playerToolbar) {
+        for (int i = 0; i < 9; ++i) {
+            int left = BOX_BASE_X + i * (SLOT_SIZE + SLOT_MARGIN);
+            int top = TOOLBAR_Y;  // í”Œë ˆì´ì–´ íˆ´ë°” Y ìœ„ì¹˜
+            int right = left + SLOT_SIZE;
+            int bottom = top + SLOT_SIZE;
+
+            if (mouseX >= left && mouseX <= right &&
+                mouseY >= top && mouseY <= bottom) {
+                if (num == 1) HandleItemSlotLClick(&playerToolbar[i]);
+                else HandleItemSlotRClick(&playerToolbar[i]);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+Box::Box()
+{
+    bmp = BitmapManager::Instance().GetObjectBitmap(PlaceableType::Box);
+    std::srand(static_cast<unsigned int>(std::time(nullptr))); // ì‹œë“œ ì„¤ì •
+
+    for (int i = 0; i < 27; i++)
+    {
+        int typeIndex = 1 + rand() % 3;     // 1: Tool, 2: Seed, 3: Placeable
+        int count = 1 + rand() % 5;         // 1~5ê°œ
+
+        InventoryItem item;
+
+        switch (typeIndex)
+        {
+        case 1: // ToolType
+        {
+            int max = 3; // Hoe, Axe, Watering
+            ToolType tool = static_cast<ToolType>(1 + rand() % max); // 1~3
+            item = InventoryItem(tool, count);
+            break;
+        }
+        case 2: // SeedType
+        {
+            int max = 2; // StrawberrySeed, OnionSeed
+            SeedType seed = static_cast<SeedType>(1 + rand() % max); // 1~2
+            item = InventoryItem(seed, count);
+            break;
+        }
+        case 3: // PlaceableType
+        {
+            int max = 5; // Box ~ Crop (None ì œì™¸)
+            PlaceableType placeable = static_cast<PlaceableType>(1 + rand() % max); // 1~5
+            item = InventoryItem(placeable, count);
+            break;
+        }
+        }
+
+        AddItem(i, item);
+    }
+}
+
+
+void Box::Render(HDC hdc, int Tilesize)
+{
+    if (!bmp) return;
+    int px = tileX * Tilesize;
+    int py = tileY * Tilesize;
+
+
+    BITMAP bmpInfo;
+    GetObject(bmp, sizeof(bmpInfo), &bmpInfo);
+
+    HDC memDC = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+
+    TransparentBlt(hdc,
+        px, py,
+        Tilesize, Tilesize,
+        memDC,
+        0, 0,
+        bmpInfo.bmWidth, bmpInfo.bmHeight,
+        RGB(255, 255, 255)
+    );
+    //ë°•ìŠ¤ ì¶©ëŒì˜ì—­
+    if (g_bFenceRedFrameOn)
+    {
+        RECT r;
+        r.left = px + 5;
+        r.top = py + 5;
+        r.right = r.left + 20;
+        r.bottom = r.top + 20;
+        HBRUSH red = CreateSolidBrush(RGB(255, 0, 0));
+        FrameRect(hdc, &r, red);
+        DeleteObject(red);
+        //ìƒí˜¸ì‘ìš©
+        r.left = px;
+        r.top = py;
+        r.right = r.left + 32;
+        r.bottom = r.top + 32;
+        HBRUSH green = CreateSolidBrush(RGB(0, 255, 0));
+        FrameRect(hdc, &r, green);
+        DeleteObject(green);
+    }
+
+
+
+    SelectObject(memDC, oldBmp);
+    DeleteDC(memDC);
+}
+
+void Box::SetTilePosition(int px, int py) { x = px; y = py; }
+
+PlaceableType Box::GetPlaceableType() const
+{
+    return PlaceableType::Box;
+}
+
+RECT Box::GetCollisionRect()
+{
+    return RECT();
+}
+
+
+
+
+void Box::AddItem(int slotIndex, const InventoryItem& item) {
+    if (slotIndex >= 0 && slotIndex < 27) {  // 27 ìŠ¬ë¡¯ ë²”ìœ„ ê²€ì‚¬
+        items[slotIndex] = item;
+    }
+}
+
+void Box::SetPlayerToolbar(InventoryItem* toolbar)
+{
+    playerToolbar = toolbar;
+}
+
+void Box::OnInteract(Player* player)
+{
+
+    UIManager::Instance().OpenBoxUI(this, 27, player->GetInventory(), 9);  //  UIManagerëŠ” í‘œí˜„ë§Œ ë‹´ë‹¹
+}
+
+void Box::Open()
+{
+    isOpen = TRUE;
+}
+
+void Box::Close()
+{
+    isOpen = FALSE;
+
+}
+
+bool Box::IsOpen() const
+{
+    return isOpen;
+}
+
 //#include "InputManager.h"
 //#include "InventoryItem.h"
 //#include "GameObjectManager.h"
@@ -14,17 +450,17 @@
 //
 //#include <string>
 //#include <string>
-//#include "Global.h" //Ãæµ¹¿µ¿ª on/off
+//#include "Global.h" //ì¶©ëŒì˜ì—­ on/off
 //
 //Box::Box(int xPos, int yPos) : x(xPos), y(yPos), isOpen(false)
 //{
-//    //À§Ä¡
+//    //ìœ„ì¹˜
 //    iconRect.left = x;
 //    iconRect.top = y;
 //    iconRect.right = x +  tileSize * 3;
 //    iconRect.bottom = y + tileSize * 3;
 //
-//    // ºñÆ®¸Ê ·Îµå 
+//    // ë¹„íŠ¸ë§µ ë¡œë“œ 
 //    hIconBitmap = (HBITMAP)LoadImage(GetModuleHandle(NULL),
 //        MAKEINTRESOURCE(IDB_BITMAP24),
 //        IMAGE_BITMAP,
@@ -41,33 +477,33 @@
 //        }
 //    }
 //    items[0][0].itemType = ItemType::CROP;
-//    items[0][0].cropType = CropType::Strawberry_1; //1¹ø µş±âºÀÅõ¿Í 5°³
+//    items[0][0].cropType = CropType::Strawberry_1; //1ë²ˆ ë”¸ê¸°ë´‰íˆ¬ì™€ 5ê°œ
 //    items[0][0].count = 99;
 //
 //    items[0][1].itemType = ItemType::CROP;
-//    items[0][1].cropType = CropType::Onion_1;      //2¹ø ¾çÆÄºÀÅõ 5°³
+//    items[0][1].cropType = CropType::Onion_1;      //2ë²ˆ ì–‘íŒŒë´‰íˆ¬ 5ê°œ
 //    items[0][1].count = 99;
 //
 //    items[0][2].itemType = ItemType::CROP;
-//    items[0][2].cropType = CropType::Fence;        //¿ïÅ¸¸®
+//    items[0][2].cropType = CropType::Fence;        //ìš¸íƒ€ë¦¬
 //    items[0][2].count = 99;
 //
 //    items[0][3].itemType = ItemType::TOOL;
-//    items[0][3].toolType = Tool::Axe;       //µµ³¢
+//    items[0][3].toolType = Tool::Axe;       //ë„ë¼
 //    items[0][3].count = 1;
 //}
-//bool Box::IsPlayerInRange(int playerX, int playerY) {  //ÇÃ·¹ÀÌ¾î°¡ ¹Ú½º Å¸ÀÏ ÁÖº¯¿¡ ÀÖ´Â Áö È®ÀÎ
+//bool Box::IsPlayerInRange(int playerX, int playerY) {  //í”Œë ˆì´ì–´ê°€ ë°•ìŠ¤ íƒ€ì¼ ì£¼ë³€ì— ìˆëŠ” ì§€ í™•ì¸
 //    int playerTileX = playerX / tileSize;
 //    int playerTileY = playerY / tileSize;
 //    int BoxTileX = x / tileSize;
 //    int BoxTileY = y / tileSize;
 //
-//    return abs(playerTileX - BoxTileX) <= 1 &&   // -1,0,1 ¹üÀ§
+//    return abs(playerTileX - BoxTileX) <= 1 &&   // -1,0,1 ë²”ìœ„
 //        abs(playerTileY - BoxTileY) <= 1;
 //}
 //
 //
-//bool Box::IsMouseOverIcon(int mouseX, int mouseY) { //¸¶¿ì½º Ä¿¼­°¡ »óÀÚ¾ÆÀÌÄÜ À§¿¡ ÀÖ´ÂÁö È®ÀÎ
+//bool Box::IsMouseOverIcon(int mouseX, int mouseY) { //ë§ˆìš°ìŠ¤ ì»¤ì„œê°€ ìƒìì•„ì´ì½˜ ìœ„ì— ìˆëŠ”ì§€ í™•ì¸
 //    return mouseX >= iconRect.left && mouseX <= iconRect.right &&
 //        mouseY >= iconRect.top && mouseY <= iconRect.bottom;
 //}
@@ -85,16 +521,16 @@
 //    return isOpen;
 //}
 //
-//RECT Box::GetBoundingBox()const //»óÀÚ Ãæµ¹ ¹üÀ§
+//RECT Box::GetBoundingBox()const //ìƒì ì¶©ëŒ ë²”ìœ„
 //{
 //    BITMAP bmpInfo;
 //    GetObject(hIconBitmap, sizeof(BITMAP), &bmpInfo);
 //
 //    RECT rect;
-//    rect.left = x + 5;  // ¿Ş
-//    rect.top = y;        //À§
-//    rect.right = rect.left + bmpInfo.bmWidth +10; //¿À¸¥ÂÊ
-//    rect.bottom = rect.top + bmpInfo.bmHeight + 10; //¾Æ·¡
+//    rect.left = x + 5;  // ì™¼
+//    rect.top = y;        //ìœ„
+//    rect.right = rect.left + bmpInfo.bmWidth +10; //ì˜¤ë¥¸ìª½
+//    rect.bottom = rect.top + bmpInfo.bmHeight + 10; //ì•„ë˜
 //
 //    return rect;
 //}
@@ -103,149 +539,84 @@
 //{
 //    for (int i = 0; i < 9; i++)
 //    {
-//        playerToolbar[i] = &toolbar[i];  //¹Ú½º ¾È¿¡¼­ ±³È¯ÀÌ ÀÌ·ç¾îÁö¹Ç·Î ÁÖ¼Ò°ªÀ» °¡Á®¿È
+//        playerToolbar[i] = &toolbar[i];  //ë°•ìŠ¤ ì•ˆì—ì„œ êµí™˜ì´ ì´ë£¨ì–´ì§€ë¯€ë¡œ ì£¼ì†Œê°’ì„ ê°€ì ¸ì˜´
 //    }
 //  
 //}
 //
-//void Box::SetPlayerNear(bool ch) //ÇÃ·¹ÀÌ¾î°¡ ¹Ú½º ±ÙÃ³¿¡ ÀÖÀ» ½Ã
+//void Box::SetPlayerNear(bool ch) //í”Œë ˆì´ì–´ê°€ ë°•ìŠ¤ ê·¼ì²˜ì— ìˆì„ ì‹œ
 //{
 //    playerNear = ch; 
 //}
 //
 //
-//void Box::RenderUI(HDC hdc)
-//{
-//    int startX = 10;
-//    int startY = 100;
-//    for (int y = 0; y < 3; y++) {
-//
-//        for (int i = 0; i < 9; i++) {
-//            HBRUSH brush = nullptr;
-//            brush = CreateSolidBrush(RGB(200, 200, 200)); // ±âº» »ö
-//
-//            RECT slotRect = { startX + i * (slotSize + 5) + 350, startY + y * 51, startX + i * (slotSize + 5) + slotSize + 350, startY + slotSize + y * 51 };
-//
-//            FillRect(hdc, &slotRect, brush);
-//            FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));  // Å×µÎ¸®
-//            if (items[y][i].itemType != ItemType::NONE) {
-//                HBITMAP bmp =  .GetBitmapForCrop(items[y][i]);
-//                if (!bmp)  return;
-//
-//                HDC memDC = CreateCompatibleDC(hdc);
-//                HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
-//                BITMAP bm;
-//                GetObject(bmp, sizeof(BITMAP), &bm);
-//
-//
-//                int drawSize = 40;
-//                int offsetX = slotRect.left + (slotSize - drawSize) / 2;
-//                int offsetY = slotRect.top + (slotSize - drawSize) / 2;
-//
-//
-//                TransparentBlt(hdc,
-//                    offsetX, offsetY,
-//                    drawSize, drawSize,
-//                    memDC,
-//                    0, 0,
-//                    bm.bmWidth,
-//                    bm.bmHeight,
-//                    RGB(255, 255, 255));
-//                std::string countText = std::to_string(items[y][i].count);
-//                TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), countText.length());
-//                SelectObject(memDC, oldBmp);
-//                DeleteDC(memDC);
-//
-//            }
-//            DeleteObject(brush);
-//        }
-//    }
-//         startX = 10;
-//         startY = 100 + 3 * 51 + 10;  // »óÀÚ ¾Æ·¡ ¿©¹é 10
-//
-//        for (int i = 0; i < 9; i++) {
-//            RECT slotRect = {
-//                startX + i * (slotSize + 5) + 350,
-//                startY,
-//                startX + i * (slotSize + 5) + slotSize + 350,
-//                startY + slotSize
-//            };
-//
-//            HBRUSH brush = CreateSolidBrush(RGB(180, 180, 180));
-//            FillRect(hdc, &slotRect, brush);
-//            FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
-//            DeleteObject(brush);
-//            if (playerToolbar[i]->itemType != ItemType::NONE) {
-//                HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(*playerToolbar[i]);
-//
-//                if (!bmp) return;
-//                if (bmp) {
-//                    HDC memDC = CreateCompatibleDC(hdc);
-//                    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
-//                    BITMAP bm;
-//                    GetObject(bmp, sizeof(BITMAP), &bm);
-//
-//                    int drawSize = 40;
-//                    int offsetX = slotRect.left + (slotSize - drawSize) / 2;
-//                    int offsetY = slotRect.top + (slotSize - drawSize) / 2;
-//
-//                    TransparentBlt(hdc, offsetX, offsetY,
-//                        drawSize, drawSize,
-//                        memDC, 0, 0,
-//                        bm.bmWidth, bm.bmHeight,
-//                        RGB(255, 255, 255));
-//
-//                    std::string countText = std::to_string(playerToolbar[i]->count);
-//                    TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), countText.length());
-//                    SelectObject(memDC, oldBmp);
-//                    DeleteDC(memDC);
-//                }
-//            }
-//        }
-//        RenderCursorItem(hdc);
-//
-//    }
-// 
-////Å¬¸¯µÈ ¾ÆÀÌÅÛÀÌ Ä¿¼­¿¡ ºÙ°Ô ÇÏ´Â ÇÔ¼ö
-//void Box::RenderCursorItem(HDC hdc) { 
-//    if (heldItem.itemType == ItemType::NONE) return; // ¾Æ¹«°Íµµ ¾È µé°í ÀÖÀ¸¸é µ¹¾Æ°¨
-//
-//    POINT mouse = InputManager::Instance().GetMousePosition();  //Å¬¸¯ÇÑ ÁÂÇ¥¸¦ °¡Á®¿È
-//    HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(heldItem);
-//    if (!bmp) return;
-//  
-//    HDC memDC = CreateCompatibleDC(hdc);
-//    HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
-//    BITMAP bm;
-//    GetObject(bmp, sizeof(BITMAP), &bm);
-//
-//    int drawSize = 40;
-//    TransparentBlt(
-//        hdc,
-//        mouse.x-20 , mouse.y -20,
-//        drawSize, drawSize,
-//        memDC,
-//        0, 0,
-//        bm.bmWidth, bm.bmHeight,
-//        RGB(255, 255, 255)
-//    );
-//
-//    if (heldItem.count > 0) { //¾ÆÀÌÅÛ ¼ö·®ÀÌ 1°³ ÀÌ»óÀÏ ¶§ ¼ö·® Ç¥½Ã 
-//        std::string countText = std::to_string(heldItem.count);
-//        TextOutA(hdc, mouse.x + 5, mouse.y + 10, countText.c_str(), countText.length());
-//    }
-//
-//    SelectObject(memDC, oldBmp);
-//    DeleteDC(memDC);
+//InventoryItem& UIManager::GetHeldItem() {
+//    return heldItem; // heldItemì€ InventoryItem íƒ€ì…
 //}
 //
-///////////////////ÄÚµå ¼öÁ¤////////////////
-// //¸¶¿ì½º·Î Å¬¸¯ÇÑ ½½·Ô°ú ÇöÀç µé°í ÀÖ´Â ¾ÆÀÌÅÛ Ã³¸® ÇÔ¼ö
-//void Box::HandleItemSlotLClick(InventoryItem* slot)  //ÁÂÅ¬¸¯
+//void UIManager::SetHeldItem(const InventoryItem& item) {
+//    heldItem = item;
+//}
+//
+//void UIManager::ClearHeldItem() {
+//    heldItem = InventoryItem(); // ê¸°ë³¸ ìƒì„±ìë¡œ ë¹„ìš°ê¸°
+//}
+
+
+        // startX = 10;
+        // startY = 100 + 3 * 51 + 10;  // ìƒì ì•„ë˜ ì—¬ë°± 10
+
+        //for (int i = 0; i < 9; i++) {
+        //    RECT slotRect = {
+        //        startX + i * (slotSize + 5) + 350,
+        //        startY,
+        //        startX + i * (slotSize + 5) + slotSize + 350,
+        //        startY + slotSize
+        //    };
+
+        //    HBRUSH brush = CreateSolidBrush(RGB(180, 180, 180));
+        //    FillRect(hdc, &slotRect, brush);
+        //    FrameRect(hdc, &slotRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+        //    DeleteObject(brush);
+        //    if (playerToolbar[i]->itemType != ItemType::NONE) {
+        //        HBITMAP bmp = BitmapManager::Instance().GetBitmapForCrop(*playerToolbar[i]);
+
+        //        if (!bmp) return;
+        //        if (bmp) {
+        //            HDC memDC = CreateCompatibleDC(hdc);
+        //            HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
+        //            BITMAP bm;
+        //            GetObject(bmp, sizeof(BITMAP), &bm);
+
+        //            int drawSize = 40;
+        //            int offsetX = slotRect.left + (slotSize - drawSize) / 2;
+        //            int offsetY = slotRect.top + (slotSize - drawSize) / 2;
+
+        //            TransparentBlt(hdc, offsetX, offsetY,
+        //                drawSize, drawSize,
+        //                memDC, 0, 0,
+        //                bm.bmWidth, bm.bmHeight,
+        //                RGB(255, 255, 255));
+
+        //            std::string countText = std::to_string(playerToolbar[i]->count);
+        //            TextOutA(hdc, offsetX + 25, offsetY + 30, countText.c_str(), countText.length());
+        //            SelectObject(memDC, oldBmp);
+        //            DeleteDC(memDC);
+        //        }
+        //    }
+        //}
+        //RenderCursorItem(hdc);
+
+
+// 
+//
+///////////////////ì½”ë“œ ìˆ˜ì •////////////////
+// //ë§ˆìš°ìŠ¤ë¡œ í´ë¦­í•œ ìŠ¬ë¡¯ê³¼ í˜„ì¬ ë“¤ê³  ìˆëŠ” ì•„ì´í…œ ì²˜ë¦¬ í•¨ìˆ˜
+//void Box::HandleItemSlotLClick(InventoryItem* slot)  //ì¢Œí´ë¦­
 //{
 //
 //    if (heldItem.itemType == ItemType::NONE) {
-//        // ºó¼ÕÀÌ¸é ½½·ÔÀÇ ¾ÆÀÌÅÛÀ» µç´Ù
+//        // ë¹ˆì†ì´ë©´ ìŠ¬ë¡¯ì˜ ì•„ì´í…œì„ ë“ ë‹¤
 //        heldItem = *slot;
 //        slot->itemType = ItemType::NONE;
 //        slot->cropType = CropType::None;
@@ -254,7 +625,7 @@
 //    }
 //    else {
 //        if (slot->itemType == ItemType::NONE) {
-//            // ºó ½½·ÔÀÌ¸é ¾ÆÀÌÅÛÀ» ³Ö´Â´Ù
+//            // ë¹ˆ ìŠ¬ë¡¯ì´ë©´ ì•„ì´í…œì„ ë„£ëŠ”ë‹¤
 //            *slot = heldItem;
 //            heldItem.itemType = ItemType::NONE;
 //            heldItem.cropType = CropType::None;
@@ -262,7 +633,7 @@
 //            heldItem.count = 0;
 //        }
 //        else if (slot->itemType == heldItem.itemType) {
-//            // °°Àº ¾ÆÀÌÅÛÀÌ¸é ÇÕÄ¡±â
+//            // ê°™ì€ ì•„ì´í…œì´ë©´ í•©ì¹˜ê¸°
 //            if (heldItem.itemType == ItemType::TOOL)
 //            {
 //                if (slot->toolType == heldItem.toolType)
@@ -273,7 +644,7 @@
 //                    heldItem.count = 0;
 //                }
 //                else {
-//                    // ¼­·Î ´Ù¸¥ ¾ÆÀÌÅÛÀÌ¸é ±³È¯
+//                    // ì„œë¡œ ë‹¤ë¥¸ ì•„ì´í…œì´ë©´ êµí™˜
 //                    InventoryItem temp = *slot;
 //                    *slot = heldItem;
 //                    heldItem = temp;
@@ -289,7 +660,7 @@
 //                    heldItem.count = 0;
 //                }
 //                else {
-//                    // ¼­·Î ´Ù¸¥ ¾ÆÀÌÅÛÀÌ¸é ±³È¯
+//                    // ì„œë¡œ ë‹¤ë¥¸ ì•„ì´í…œì´ë©´ êµí™˜
 //                    InventoryItem temp = *slot;
 //                    *slot = heldItem;
 //                    heldItem = temp;
@@ -297,7 +668,7 @@
 //            }
 //        }
 //        else {
-//            // ¼­·Î ´Ù¸¥ ¾ÆÀÌÅÛÀÌ¸é ±³È¯
+//            // ì„œë¡œ ë‹¤ë¥¸ ì•„ì´í…œì´ë©´ êµí™˜
 //            InventoryItem temp = *slot;
 //            *slot = heldItem;
 //            heldItem = temp;
@@ -306,52 +677,7 @@
 //  
 //}
 //
-//void Box::HandleItemSlotRClick(InventoryItem* slot) //¹Ú½º ¾ÆÀÌÅÛÃ¢¿¡¼­ ¿ìÅ¬¸¯
-//{
-//    if (heldItem.itemType == ItemType::NONE) return; //¼Õ¿¡ ¾ÆÀÌÅÛÀÌ ¾øÀ¸¸é ¸®ÅÏ
-//    else {
-//        if (slot->itemType == ItemType::NONE) {
-//            // ºó ½½·ÔÀÌ¸é ¾ÆÀÌÅÛÀ» ³Ö°í ¼ö·® +1 µé°íÀÖ´Â ¾ÆÀÌÅÛÀº -1
-//            slot->itemType = heldItem.itemType;
-//            slot->cropType = heldItem.cropType;
-//            slot->toolType = heldItem.toolType;
-//            slot->count++;
-//            heldItem.count--;
-//            if (heldItem.count < 1) //µé°í ÀÖ´Â ¾ÆÀÌÅÛ ¼ö·®ÀÌ 0°³ ÀÌÇÏÀÏ ¶§ ½ÇÇà
-//            {
-//                heldItem.itemType = ItemType::NONE;
-//                heldItem.cropType = CropType::None;
-//                heldItem.toolType = Tool::None;
-//                heldItem.count = 0;
-//            }
-//
-//        }
-//        else if (slot->itemType == heldItem.itemType) { // °°Àº ¾ÆÀÌÅÛÀÌ¸é ÇÕÄ¡±â ½½·Ô¿¡ ÀÖ´Â ¾ÆÀÌÅÛÀº +1 µé°í ÀÖ´Â ¾ÆÀÌÅÛÀº -1
-//            if (heldItem.itemType == ItemType::TOOL)
-//            {
-//                if (slot->toolType == heldItem.toolType)
-//                {
-//                    slot->count++;
-//                    heldItem.count--;
-//                }
-//                else if (heldItem.itemType == ItemType::CROP)
-//                {
-//                    if (slot->cropType == heldItem.cropType)
-//                    {
-//                        slot->count++;
-//                        heldItem.count--;
-//                    }
-//                }
-//                if (heldItem.count < 1) //µé°í ÀÖ´Â ¾ÆÀÌÅÛ ¼ö·®ÀÌ 0°³ ÀÌÇÏÀÏ ¶§ ½ÇÇà
-//                {
-//                    heldItem.itemType = ItemType::NONE;
-//                    heldItem.cropType = CropType::None;
-//                    heldItem.toolType = Tool::None;
-//                    heldItem.count = 0;
-//                }
-//            }
-//        }
-//    }
+
 //}
 //
 //std::vector<RECT> Box::GetCollisionRects() const
@@ -366,121 +692,8 @@
 //
 //
 //
-////¸¶¿ì½º Å¬¸¯ ÁöÁ¡ È®ÀÎ(¹Ú½º or ÇÃ·¹ÀÌ¾î Åø¹Ù)
-//void Box::HandleClick(int mouseX, int mouseY, int num)
-//{
-//    int startX = 10;
-//    int startY = 100;
-//
-//    for (int i = 0; i < 3; ++i)  
-//    {
-//        for (int j = 0; j < 9; ++j)
-//        {
-//            //½½·Ô À§Ä¡
-//            int left = startX + j * (slotSize + 5) + 350;
-//            int top = startY + i * 51;
-//            int right = left + slotSize;
-//            int bottom = top + slotSize;
-//
-//            if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) //Å¬¸¯ÇÑ °÷ÀÌ ¹Ú½º ½½·ÔÀÌ¸é ½ÇÇà
-//            {
-//                if(num == 1)
-//                    HandleItemSlotLClick(&items[i][j]); //¸¶¿ì½º·Î Å¬¸¯ÇÑ ½½·Ô°ú ÇöÀç µé°í ÀÖ´Â ¾ÆÀÌÅÛ Ã³¸® ÇÔ¼ö
-//                else
-//                    HandleItemSlotRClick(&items[i][j]); //¸¶¿ì½º·Î Å¬¸¯ÇÑ ½½·Ô°ú ÇöÀç µé°í ÀÖ´Â ¾ÆÀÌÅÛ Ã³¸® ÇÔ¼ö
-//
-//                return;
-//            }
-//        }
-//    }
-//    if (playerToolbar) {
-//        int toolbarY = 100 + 3 * 51 + 10; // »óÀÚ ¾Æ·¡ ¿©¹é Æ÷ÇÔ
-//        int startX = 10;
-//
-//        for (int i = 0; i < 9; ++i) {  //ÇÃ·¹ÀÌ¾î Åø¹Ù Ãâ·ÂÀ» À§ÇÑ ¹İº¹¹®
-//           
-//            //½½·Ô À§Ä¡
-//            int left = startX + i * (slotSize + 5) + 350;
-//            int top = toolbarY;
-//            int right = left + slotSize;
-//            int bottom = top + slotSize;
-//
-//            if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) { //Å¬¸¯ÇÑ °÷ÀÌ ÇÃ·¹ÀÌ¾î Åø¹ÙÀÌ¸é ½ÇÇà
-//                if (num == 1)
-//                    HandleItemSlotLClick(playerToolbar[i]); //¸¶¿ì½º·Î Å¬¸¯ÇÑ ½½·Ô°ú ÇöÀç µé°í ÀÖ´Â ¾ÆÀÌÅÛ Ã³¸® ÇÔ¼ö
-//                else
-//                    HandleItemSlotRClick(playerToolbar[i]); //¸¶¿ì½º·Î Å¬¸¯ÇÑ ½½·Ô°ú ÇöÀç µé°í ÀÖ´Â ¾ÆÀÌÅÛ Ã³¸® ÇÔ¼ö
-//                return;
-//            }
-//        }
-//    }
-//  
-//}
+//ë§ˆìš°ìŠ¤ í´ë¦­ ì§€ì  í™•ì¸(ë°•ìŠ¤ or í”Œë ˆì´ì–´ íˆ´ë°”)
 
-
-Box::Box()
-{
-     bmp = BitmapManager::Instance().GetObjectBitmap(ObjectType::Box);
-}
-
-void Box::Render(HDC hdc,  int Tilesize)
-{
-      if (!bmp) return;
-        int px = tileX * Tilesize;
-        int py = tileY * Tilesize;
-
-
-        BITMAP bmpInfo;
-        GetObject(bmp, sizeof(bmpInfo), &bmpInfo);
-
-        HDC memDC = CreateCompatibleDC(hdc);
-        HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
-
-        TransparentBlt(hdc,
-            px, py, 
-            Tilesize, Tilesize,
-            memDC,
-            0, 0, 
-            bmpInfo.bmWidth, bmpInfo.bmHeight,
-            RGB(255, 255, 255)
-        );
-        //¹Ú½º Ãæµ¹¿µ¿ª
-        if (g_bFenceRedFrameOn)
-        {     RECT r;
-            r.left = px + 5;
-            r.top = py + 5;
-            r.right = r.left + 20;
-            r.bottom = r.top + 20;
-            HBRUSH red = CreateSolidBrush(RGB(255, 0, 0));
-            FrameRect(hdc, &r, red);
-            DeleteObject(red);
-            //»óÈ£ÀÛ¿ë
-            r.left = px;
-            r.top = py;
-            r.right = r.left + 32;
-            r.bottom = r.top + 32;
-            HBRUSH green = CreateSolidBrush(RGB(0, 255, 0));
-            FrameRect(hdc, &r, green);
-            DeleteObject(green);
-        }
-   
-          
-
-        SelectObject(memDC, oldBmp);
-        DeleteDC(memDC);
-}
-
-void Box::SetTilePosition(int px, int py) { x = px; y = py; }
-
-ObjectType Box::GetObjectType() const
-{
-    return ObjectType::Box;
-}
-
-RECT Box::GetCollisionRect()
-{
-    return RECT();
-}
 
 //std::vector<RECT> Box::GetCollisionRects() const
 //{
@@ -506,27 +719,3 @@ RECT Box::GetCollisionRect()
 //    if (isOpen) Close();
 //    else Open();
 //}
-
-void Box::Open()
-{
-    isOpen = TRUE;
-}
-
-void Box::Close()
-{
-    isOpen = FALSE;
-
-}
-
-bool Box::IsOpen() const
-{
-    return isOpen;
-}
-
-
-void Box::SetPlayerToolbar(const InventoryItem* toolbar)
-{
-    for (int i = 0; i < 9; ++i) {
-        playerToolbar[i] = toolbar[i]; // playerToolbar´Â InventoryItem playerToolbar[9];
-    }
-}

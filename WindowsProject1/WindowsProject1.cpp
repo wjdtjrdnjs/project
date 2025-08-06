@@ -243,6 +243,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
     case WM_LBUTTONDOWN:
     case WM_LBUTTONUP:
+    case WM_MOUSEWHEEL:
         game.Input(message, wParam, lParam);
     break;
 

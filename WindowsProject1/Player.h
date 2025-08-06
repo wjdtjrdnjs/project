@@ -9,6 +9,7 @@
 constexpr int TILE_SIZE = 32;
 
 class Map;
+class Box;
 class Player 
 {
  public:
@@ -40,6 +41,7 @@ class Player
 	void HandleLeftClick();     // 마우스 좌클릭
 	void HandleRightClick();    // 마우스 우클릭
 
+
 	void SetKeyState(Direction dir, bool pressed);
 	void SetDirection(Direction dir);
 
@@ -53,6 +55,9 @@ class Player
 	// --- 상호작용 상태 ---
 	void StartInteraction();   // UI 열기
 	void EndInteraction();     // UI 닫기
+	void OpenBox(Box* box);
+	void CloseBox();
+	void TryPlaceObject();
 
 	// --- 업데이트 ---
 	void Update(float deltaTime);
@@ -82,7 +87,7 @@ private:
 
 	int currentMapIndex = 0;      // 현재 맵 인덱스
 	int selectedSlot = 0;         // 선택된 인벤토리 슬롯 번호
-
+	int wheelDelta = 0; //마우스 휠
 	// --- 컴포넌트 ---
 	PlayerInventory* inventory = nullptr;
 	CollisionManager* collisionManager = nullptr;
@@ -97,7 +102,7 @@ private:
 
 
 //~Player();
-	//ObjectType GetObjectType() const override;
+	//PlaceableType GetPlaceableType() const override;
 	//void LoadSprites();
 
 //Player* GetPlayer() { return this; }

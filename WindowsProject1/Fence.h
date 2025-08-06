@@ -8,7 +8,7 @@ public:
 	Fence();
 	void SetTilePosition(int tileX, int tileY) override;
 	void Render(HDC hdc, int tilesize) override;
-	ObjectType GetObjectType()const override;
+	PlaceableType GetPlaceableType()const override;
 	RECT GetCollisionRect();
 	//int GetX() const { return x; }  //울타리 위치 x
 	//int GetY() const { return y; }  //울타리 위치 y

@@ -135,7 +135,7 @@ RECT Player::GetCollisionRects() const
 void Player::Update(float deltaTime)
 {
     HandleRightClick(); //우클릭
-    HandleLeftClick();
+    HandleLeftClick();  //좌클릭
     HandleInput();  // 방향 입력 상태 갱신
 
     if (isInteracting) return; // UI 열려 있으면 이동 금지
@@ -178,18 +178,52 @@ void Player::HandleLeftClick()
 {
     if (InputManager::Instance().IsLeftClickDown())
     {
+        POINT mousePos = InputManager::Instance().GetMousePosition(); //마우스 좌표
+       
+        int worldX = mousePos.x;
+        int worldY = mousePos.y;
 
-        if (UIManager::Instance().IsBoxUIOpen()) {
-            POINT mousePos = InputManager::Instance().GetMousePosition();
-           // int slotX = mousePos.x / 32;
-            //   int slotY = mousePos.y / 32;
-            
-            // 박스 or 플레이어 슬롯 클릭 시에는 다른 처리 차단
+     
+
+        int tileX = worldX / 32;
+        int tileY = worldY / 32;
+
+        InventoryItem item = inventory->GetSelectedItem();
+        ItemCategory category = item.GetCategory();
+
+        if (UIManager::Instance().IsBoxUIOpen()) {  //박스 열림
+            // int slotX = mousePos.x / 32;
+             //   int slotY = mousePos.y / 32;
+             // 박스 or 플레이어 슬롯 클릭 시에는 다른 처리 차단
             bool clickedOnSlot = UIManager::Instance().GetOpenedBox()->HandleClick(mousePos.x, mousePos.y, 1);
             if (clickedOnSlot) return;
 
             return; // 슬롯 외 클릭이더라도 무조건 차단
         }
+        else
+        {
+            if (!CanInteractAt(worldX, worldY)) //플레이어 작동 범위
+            {
+                OutputDebugStringA("작동 범위 밖입니다.\n");
+                return; // 범위 밖이면 설치 불가
+            }
+            switch (item.GetToolType()) //게임오브젝트 매니저로 이동
+            {
+            case ToolType::Hoe:GameObjectManager::Instance().CheckTile(tileX, tileY, category, ToolType::Hoe); return; //타일 변경
+            case ToolType::Axe:OutputDebugStringA("도끼 !!!!!!!\n"); return;
+            case ToolType::Watering:GameObjectManager::Instance().CheckTile(tileX, tileY, category, ToolType::Watering); return;
+
+            }
+
+            // 도구들고 좌클릭
+            // 툴바 번호를 가져오고 인벤토리[번호] 타입 확인
+            // tool일 때만 상호작용
+            //
+        }
+      
+
+
+        
     }
    
 

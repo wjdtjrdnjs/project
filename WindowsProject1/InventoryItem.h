@@ -15,36 +15,38 @@ class InventoryItem {
 public:
     InventoryItem() = default;
 
-    // Tool 생성자
+    // Tool 
      InventoryItem(ToolType type, int count = 1)
         : category(ItemCategory::Tool), toolType(type), count(count), valid(true) {
     }
 
-    // Seed 생성자
+    // Seed 
      InventoryItem(SeedType type, int count = 1)
         : category(ItemCategory::Seed), seedType(type), count(count), valid(true) {
     }
 
-    // Crop 생성자
+    // Crop 
      InventoryItem(CropType type, int count = 1)
         : category(ItemCategory::Crop), cropType(type), count(count), valid(true) {
     }
 
-    // Placeable 생성자
+    // Placeable 
      InventoryItem(PlaceableType type, int count = 1)
         : category(ItemCategory::Placeable), placeableType(type), count(count), valid(true) {
     }
 
 
-    // 속성 접근자
+    // 속성 접근자 사용xxxx
     std::string GetName() const { return name; }
     HBITMAP GetBitmap() const { return bitmap; }
 
+    //수량
     int GetCount() const { return count; }
     void SetCount(int newCount) { count = newCount; }
     void AddCount(int delta) { count += delta; }
     void DecreaseItem(int delta) { count -= delta; }
 
+    //반환
     ItemCategory GetCategory() const { return category; }
     ToolType GetToolType() const { return toolType; }
     SeedType GetSeedType() const { return seedType; }
@@ -54,7 +56,7 @@ public:
     bool IsValid() const { return valid; }
     bool IsEmpty() const { return category == ItemCategory::None || count <= 0; }
 
-    // 스택 가능 여부
+    // 스택 가능 여부 사용x
     bool CanStackWith(const InventoryItem& other) const;
     void Clear();
 

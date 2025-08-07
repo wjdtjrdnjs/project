@@ -78,12 +78,9 @@ void Crop::Update(float deltaTime)
     int tileX = GetX() / TILE_SIZE;
     int tileY = GetY() / TILE_SIZE;
 
-    //Map& map = GameObjectManager::Instance().currentMap(); //물 뿌리면 성장 시작 구현xxxx
-    //if (!map.getTile(tileX, tileY).IsWatered()) {
-    //    return;
-    //}
-
-    
+    Map& map = GameObjectManager::Instance().currentMap(); //물 뿌리면 성장 시작 구현xxxx
+    TileType type1 = map.SetTile();
+    //OutputDebugStringA("성장 중!!\n");
     growthTimer += deltaTime;
     
    
@@ -91,7 +88,6 @@ void Crop::Update(float deltaTime)
     if (growthTimer >= growthInterval && growthStage < maxGrowthStage - 1) {
         growthStage++;
         growthTimer = 0;
-        OutputDebugStringA("성장 중!!\n");
         bitmap = BitmapManager::Instance().GetCropGrowthBitmap(type, growthStage);
     }
 }

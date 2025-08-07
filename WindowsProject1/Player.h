@@ -50,14 +50,14 @@ class Player
 	std::pair<int, int> GetFacingTilePos() const;                            // 바라보는 방향 타일 좌표
 	bool CanInteractAt(int pixelX, int pixelY);                              // 해당 좌표에 상호작용 가능한지
 
-	RECT GetCollisionRects() const; // 충돌 영역 (구현 여부에 따라 정리 필요)
+	RECT GetCollisionRects() const; // 충돌 영역 (구현 여부에 따라 정리 필요)  사용xxx
 
 	// --- 상호작용 상태 ---
 	void StartInteraction();   // UI 열기
 	void EndInteraction();     // UI 닫기
 	void OpenBox(Box* box);
 	void CloseBox();
-	void TryPlaceObject();
+	void TryPlaceObject();  //사용xxx
 
 	// --- 업데이트 ---
 	void Update(float deltaTime);
@@ -87,8 +87,7 @@ private:
 
 	int currentMapIndex = 0;      // 현재 맵 인덱스
 	int selectedSlot = 0;         // 선택된 인벤토리 슬롯 번호
-	int wheelDelta = 0; //마우스 휠
-	// --- 컴포넌트 ---
+	
 	PlayerInventory* inventory = nullptr;
 	CollisionManager* collisionManager = nullptr;
 

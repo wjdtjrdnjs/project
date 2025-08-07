@@ -53,11 +53,13 @@ public:
 
 	void InPortal(); //포탈 플레이어 충돌
 
-	bool CheckTile(int TileX, int TileY, ItemCategory type); //타일 검사
+	bool CheckTile(int TileX, int TileY, ItemCategory type = ItemCategory::None, ToolType tooltype = ToolType::None); //타일 검사
 
 	//void ChangeMapToNext();
 	void ChangeMap(int index);
-
+	void ChangeTile(int TIleX, int TileY);
+	void  IsWatered(int x, int y);
+	
 	//업데이트
 	//void Update(float deltaTime); //업데이트
 
@@ -68,6 +70,7 @@ private:
 	std::vector<Map> maps;
 	std::shared_ptr<Player> player;
 
+	bool water = false;
 	int playersize = 64;
 	int currentMapIndex = 0;
 };

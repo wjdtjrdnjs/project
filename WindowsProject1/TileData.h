@@ -9,6 +9,7 @@ enum class TileType
     Farmland,
     Water,
     Path
+
 };
 enum class ItemCategory {
     None,

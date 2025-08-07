@@ -14,6 +14,7 @@ public:
 
 	void SetSelectedSlot(int index) { selectedSlot = index; }
 	void MoveSelectedSlot(int dir);
+
 	ToolType GetSelectedTool();//도구반환
 	PlaceableType GetSelectedPlaceable();//배치 가능한 것을 반환
 	CropType GetSelectedCropType();//작물 반환

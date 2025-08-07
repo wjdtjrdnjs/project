@@ -1,26 +1,43 @@
 # project
-Gigagenine 분할 예정 -> Game Scene, Scene Manager
-오브젝트 추상클래스 + 템플릿 
+작물
+	물을 뿌리지 않으면 성장 불가
+	성장이 끝난 작물은 수확이 가능
+
+도구 
+	좌클릭 
+		괭이: 타일변경 
+		도끼: 울타리, 나무 제거
+		물 뿌리개: 작물 성장
+	우클릭 
+	    타일에 설치 불가 
+		
+NPC
+	비트맵 추가
+	상호작용 UI창 구현
+	아이템 구매/판매 
+
+인벤토리
+	수확한 작물 획득
+	제거한 오브젝트 획득
+
+플레이어
+	플레이어 입력
+		우클릭
+			작물 수확
+		Tab or I
+			플레이어 인벤토리 UI오픈
+	재화
+		골드 추가
+
+포탈(위에 먼저하고 구현)
+  집 문
+  맵 왼쪽
+  맵 아래
 
 
-Game Scene
-Update
-Render
-std::vector<Map> maps;
-std::shared_ptr<Player> player;
-int palyersize = 64;
-addMap
-addObjectToCurrentMap
-addPlayer
-addPortal
-GetMapIndexByName
-
-Scene Manager
-HasMaps
-currentMap
-ChangeMap
-int currentMapIndex = 0;
+TileData[3]		아래			중간			위
+   TileType		[0]None		[1]Path     [2]Grass
+   Object		[0]None		[1]None		[2]None
 
 
-
-
+충돌처리는 오래 걸릴 것으로 맨 나중에

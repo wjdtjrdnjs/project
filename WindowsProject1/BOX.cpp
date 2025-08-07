@@ -264,7 +264,7 @@ void Box::RenderCursorItem(HDC hdc) {
 }
 
 
-bool Box::HandleClick(int mouseX, int mouseY, int num)
+bool Box::HandleClick(int mouseX, int mouseY, int num) //num 1 좌클 2 우클
 {
     // 박스 슬롯 클릭 처리
     for (int row = 0; row < 3; ++row) {
@@ -296,8 +296,10 @@ bool Box::HandleClick(int mouseX, int mouseY, int num)
 
             if (mouseX >= left && mouseX <= right &&
                 mouseY >= top && mouseY <= bottom) {
-                if (num == 1) HandleItemSlotLClick(&playerToolbar[i]);
-                else HandleItemSlotRClick(&playerToolbar[i]);
+                if (num == 1)
+                    HandleItemSlotLClick(&playerToolbar[i]);
+                else
+                    HandleItemSlotRClick(&playerToolbar[i]);
                 return true;
             }
         }
@@ -310,7 +312,7 @@ Box::Box()
     bmp = BitmapManager::Instance().GetObjectBitmap(PlaceableType::Box);
     std::srand(static_cast<unsigned int>(std::time(nullptr))); // 시드 설정
 
-    for (int i = 0; i < 27; i++)
+    for (int i = 0; i < 27; i++)  //아이템 랜덤으로 넣음
     {
         int typeIndex = 1 + rand() % 3;     // 1: Tool, 2: Seed, 3: Placeable
         int count = 1 + rand() % 5;         // 1~5개

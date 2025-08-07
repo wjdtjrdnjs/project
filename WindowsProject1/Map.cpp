@@ -105,20 +105,24 @@ void Map::Render(HDC hdc)
     DeleteDC(memDC);
 }
 
-void Map::SetTile(int tileX, int tileY, TileType type)
+TileType Map::SetTile()
 {
-    //여기는 좌표 타일에 타입을 변경해주는 함수~
+    return tiletype;
 }
 
-void Map::GetTile(int tileX, int tileY)
+TileData Map::GetTile(TileData type)
 {
-    //여기는 좌표 타일을 반환해주는 함수~
+    tiletype = type.tileType;
+    return type;
 }
 
-void Map::WaterTile(int tileX, int tileY) //작물 성장
+bool Map::WaterTile()
 {
-    //여기는 타일 Farmland에 물을 뿌리면 작물이 성장하는 함수~
+    if (tiletype == TileType::Water)
+        return TRUE;
+    return FALSE;
 }
+
 
 bool Map::HasFenceAt(int tileX, int tileY)
 {

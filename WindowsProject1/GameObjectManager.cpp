@@ -176,13 +176,8 @@ void GameObjectManager::addObjectToCurrentMap(const std::string& mapName, int x,
             switch (cropType)
             {
             case CropType::Strawberry:
-                obj = std::make_shared<Crop>(cropType);
-                break;
             case CropType::Onion:
                 obj = std::make_shared<Crop>(cropType);
-                break;
-            default:
-                OutputDebugStringA("¾Ë ¼ö ¾ø´Â ¾¾¾Ñ Å¸ÀÔ\n");
                 break;
             }
             break;
@@ -252,6 +247,32 @@ void GameObjectManager::ChangeMap(int index) //¸Ê°ú ÇÃ·¹ÀÌ¾î ½ÃÀÛ À§Ä¡ º¯°æ
     }
 }
 
+void GameObjectManager::ChangeTile(int x, int y)  //Å¸ÀÏ º¯°æ
+{
+    Map& map = currentMap();
+    TileData& tiledata = map.getTile(x, y);
+    switch (tiledata.tileType)
+    {
+    case TileType::Grass: tiledata.tileType = TileType::Path; break;
+    case TileType::Path: tiledata.tileType = TileType::Farmland; break;
+    }
+
+
+}
+
+void GameObjectManager::IsWatered(int x, int y) //¹°»Ñ¸²
+{
+    Map& map = currentMap();
+    TileData& tiledata = map.getTile(x, y);
+    switch (tiledata.tileType)
+    {
+    case TileType::Farmland: 
+        tiledata.tileType = TileType::Water;
+        map.GetTile(tiledata);
+        break;
+    }
+}
+
 
 void GameObjectManager::InPortal() //ÇÃ·¹ÀÌ¾î°¡ Æ÷Å» ¿µ¿ª¿¡ ÀÖ´ÂÁö È®ÀÎ ÈÄ ¸ÊÀüÈ¯
 {
@@ -272,18 +293,40 @@ void GameObjectManager::InPortal() //ÇÃ·¹ÀÌ¾î°¡ Æ÷Å» ¿µ¿ª¿¡ ÀÖ´ÂÁö È®ÀÎ ÈÄ ¸ÊÀüÈ
         }
     }
 }
-bool GameObjectManager::CheckTile(int TileX, int TileY, ItemCategory type)
+bool GameObjectManager::CheckTile(int TileX, int TileY, ItemCategory type, ToolType tooltype)
 {
     OutputDebugStringA("Å¸ÀÏ °Ë»ç Áß!\n");
     Map map = currentMap();
     TileData tiledata = map.getTile(TileX, TileY);
-    if (tiledata.object == nullptr)
-    {
-        OutputDebugStringA("¼³Ä¡°¡ °¡´ÉÇÕ´Ï´Ù!\n");
-        return true;
-     }
-    OutputDebugStringA("¼³Ä¡ ºÒ°¡!\n");
 
+    switch (type)
+    {
+    case ItemCategory::Tool:
+        switch (tooltype)
+        {
+        case ToolType::Hoe:
+            if (tiledata.tileType != TileType::None)
+            {
+                OutputDebugStringA("Å¸ÀÏ º¯°æÀÌ °¡´ÉÇÕ´Ï´Ù!\n");
+                ChangeTile(TileX, TileY);
+            }
+            break;
+        case ToolType::Watering:
+            IsWatered(TileX, TileY);
+            OutputDebugStringA("¹° »Ñ¸®´Â Áß!!\n");
+            break;
+        }
+        break;
+
+    case ItemCategory::Placeable:
+    case ItemCategory::Seed:
+        if (tiledata.object == nullptr)
+        {
+            OutputDebugStringA("¼³Ä¡°¡ °¡´ÉÇÕ´Ï´Ù!\n");
+            return true;
+        }
+        OutputDebugStringA("¼³Ä¡ ºÒ°¡!\n"); break;
+    }
     return false;
 }
 //#include "GameObjectManager.h"

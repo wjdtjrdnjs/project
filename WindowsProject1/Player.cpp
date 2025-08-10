@@ -43,7 +43,19 @@ Player::Player()
 }
 void Player::Render(HDC hdc)
 {
-    HBITMAP hPlayerBmp = BitmapManager::Instance().GetPlayerBitmap(lastPressedDirection);
+    HBITMAP hPlayerBmp = nullptr;
+
+    if (isUsingTool)
+    {
+        hPlayerBmp = BitmapManager::Instance().GetPlayerBitmap(
+            lastPressedDirection, currentToolType, toolUseFrame
+        );
+    }
+    else
+    {
+        hPlayerBmp = BitmapManager::Instance().GetPlayerBitmap(lastPressedDirection);
+    }
+  
     if (hPlayerBmp) {
         HDC memDC = CreateCompatibleDC(hdc);
         HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, hPlayerBmp);
@@ -134,6 +146,25 @@ RECT Player::GetCollisionRects() const
 
 void Player::Update(float deltaTime)
 {
+    if (isUsingTool) {
+        //행동이 끝나기 전까지 클릭, 이동 불가
+        toolUseTimer -= deltaTime;
+        toolFrameTimer += deltaTime;
+
+        if (toolFrameTimer >= toolFrameDuration) {
+            toolFrameTimer = 0.0f;
+            toolUseFrame++;
+            if (toolUseFrame > 1) toolUseFrame = 1; // 프레임 0 → 1까지만
+        }
+
+        if (toolUseTimer <= 0.0f) {
+            isUsingTool = false;
+        }
+
+        // 클릭 및 이동 모두 하지 않음
+        return;
+    }
+
     HandleRightClick(); //우클릭
     HandleLeftClick();  //좌클릭
     HandleInput();  // 방향 입력 상태 갱신
@@ -141,9 +172,6 @@ void Player::Update(float deltaTime)
     if (isInteracting) return; // UI 열려 있으면 이동 금지
         MovePlayer(deltaTime);
 
-    //여기에 플레이어 마지막 움직임과 좌표를 가져옴
-    //-------위치 점검-------해야함
-   //HandleLeftClick(map); //좌클릭
 
 
 }
@@ -153,12 +181,10 @@ void Player::MovePlayer(float deltaTime)
     float speed = 7.0f; // px/sec
     float dx = 0.0f, dy = 0.0f;
 
-
     if (keyUp)    dy -= 1.0f;
     if (keyDown)  dy += 1.0f;
     if (keyLeft)  dx -= 1.0f;
     if (keyRight) dx += 1.0f;
-
     // 대각선 이동 시 속도 보정 (정규화)
     if (dx != 0.0f && dy != 0.0f)
     {
@@ -176,15 +202,24 @@ void Player::MovePlayer(float deltaTime)
 
 void Player::HandleLeftClick()
 {
+    InventoryItem item = inventory->GetSelectedItem();
+
     if (InputManager::Instance().IsLeftClickDown())
     {
+        if (item.GetCategory() == ItemCategory::Tool) {
+            currentToolType = item.GetToolType();
+            isUsingTool = true;
+            toolUseTimer = 0.3f;       // 총 지속 시간
+            toolFrameDuration = 0.15f; // 프레임 전환 간격
+            toolFrameTimer = 0.0f;
+            toolUseFrame = 0;
+        }
+
         POINT mousePos = InputManager::Instance().GetMousePosition(); //마우스 좌표
        
         int worldX = mousePos.x;
         int worldY = mousePos.y;
-
      
-
         int tileX = worldX / 32;
         int tileY = worldY / 32;
 
@@ -256,11 +291,10 @@ void Player::HandleInput()
     keyLeft = InputManager::Instance().IsKeyHeld('A');
     keyRight = InputManager::Instance().IsKeyHeld('D');
 
-    // 마지막으로 눌린 키 방향 저장 (애니메이션 등에 활용 가능)
-    if (keyUp)        lastPressedDirection = Direction::UP; 
+    if (keyUp) lastPressedDirection = Direction::UP;
     else if (keyDown) lastPressedDirection = Direction::DOWN;
     else if (keyLeft) lastPressedDirection = Direction::LEFT;
-    else if (keyRight)lastPressedDirection = Direction::RIGHT;
+    else if (keyRight) lastPressedDirection = Direction::RIGHT;
 
 
     if ((InputManager::Instance().IsKeyDown('E') || InputManager::Instance().IsKeyDown(VK_ESCAPE))
@@ -506,6 +540,10 @@ void Player::SetKeyState(Direction dir, bool pressed)
 
     SetDirection(lastPressedDirection);  // 방향 갱신
 
+}
+
+bool Player::IsKeyState(Direction dir) {
+    return keyStates[dir];
 }
 
 void Player::SetDirection(Direction dir)//플레이어 방향 전환을 위한 함수

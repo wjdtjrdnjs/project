@@ -196,9 +196,26 @@ void BitmapManager::LoadAllBitmaps()
   
    //도구
    Load("Hoe", IDB_BITMAP16);
+   Load("Player_Hoe_Down_0", IDB_BITMAP45);
+   Load("Player_Hoe_Down_1", IDB_BITMAP54);
+   Load("Player_Hoe_Up_0", IDB_BITMAP46);
+   Load("Player_Hoe_Up_1", IDB_BITMAP55);
+   Load("Player_Hoe_Right_0", IDB_BITMAP47);
+   Load("Player_Hoe_Right_1", IDB_BITMAP56);
+   Load("Player_Hoe_Left_0", IDB_BITMAP48);
+   Load("Player_Hoe_Left_1", IDB_BITMAP57);
+   //
    Load("Axe", IDB_BITMAP40);
+   //
    Load("Watering", IDB_BITMAP41);
-      
+   Load("Player_Watering_Down_0", IDB_BITMAP31);
+   Load("Player_Watering_Down_1", IDB_BITMAP50);
+   Load("Player_Watering_Up_0", IDB_BITMAP32);
+   Load("Player_Watering_Up_1", IDB_BITMAP51);
+   Load("Player_Watering_Right_0", IDB_BITMAP33);
+   Load("Player_Watering_Right_1", IDB_BITMAP52);
+   Load("Player_Watering_Left_0", IDB_BITMAP34);
+   Load("Player_Watering_Left_1", IDB_BITMAP53);
 
 
     //씨앗봉투들
@@ -212,6 +229,17 @@ void BitmapManager::LoadAllBitmaps()
    Load("Player_RIGHT", IDB_BITMAP29);
 
     Load("Tree", IDB_BITMAP49);
+}
+
+HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
+{
+    switch (dir) {
+    case Direction::DOWN:  return GetBitmap("Player_Down");
+    case Direction::UP:    return GetBitmap("Player_UP");
+    case Direction::LEFT:  return GetBitmap("Player_LEFT");
+    case Direction::RIGHT: return GetBitmap("Player_RIGHT");
+    default:               return GetBitmap("Player_Down");
+    }
 }
 
 HBITMAP BitmapManager::GetTileBitmap(TileType type)
@@ -309,22 +337,36 @@ HBITMAP BitmapManager::GetBitmapByName(const std::string& name)
     return nullptr;
 }
 
-
-HBITMAP BitmapManager::GetPlayerBitmap(Direction dir)
+HBITMAP BitmapManager::GetPlayerBitmap(Direction dir, ToolType toolType, int frame)
 {
-
+    std::string directionStr;
     switch (dir) {
-    case Direction::DOWN:
-        return GetBitmap("Player_Down");
-    case Direction::UP:
-        return GetBitmap("Player_UP");
-    case Direction::LEFT:
-        return GetBitmap("Player_LEFT");
-    case Direction::RIGHT:
-        return GetBitmap("Player_RIGHT");
+    case Direction::DOWN:  directionStr = "Down"; break;
+    case Direction::UP:    directionStr = "Up"; break;
+    case Direction::LEFT:  directionStr = "Left"; break;
+    case Direction::RIGHT: directionStr = "Right"; break;
     }
-    return GetBitmap("Player_Down"); ;
+
+    std::string toolStr;
+    switch (toolType) {
+    case ToolType::Hoe:      toolStr = "Hoe"; break;
+    case ToolType::Axe:      toolStr = "Axe"; break;
+    case ToolType::Watering: toolStr = "Watering"; break;
+    default:                 toolStr = "Hoe"; break;
+    }
+
+    std::string key = "Player_" + toolStr + "_" + directionStr + "_" + std::to_string(frame);
+
+    HBITMAP bmp = GetBitmap(key);
+    if (!bmp)
+    {
+        OutputDebugStringA(("비트맵 없음: " + key + "\n").c_str());
+        return GetBitmap("Player_Down");
+    }
+
+    return bmp;
 }
+
 
 //HBITMAP BitmapManager::GetAllBitMap(AllType type)
 //{

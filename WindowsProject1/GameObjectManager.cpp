@@ -136,6 +136,13 @@ void GameObjectManager::Render(HDC hdc)
     }
 }
 
+bool GameObjectManager::IsFarmlandTile(int x, int y)
+{
+    Map& map = currentMap();
+    TileData& tile = map.getTile(x, y);
+    return tile.tileType == TileType::Farmland;
+}
+
 
 void GameObjectManager::addMap(const std::string& mapName, int width, int height, TileType type)
 {
@@ -253,23 +260,32 @@ void GameObjectManager::ChangeTile(int x, int y)  //Å¸ÀÏ º¯°æ
     TileData& tiledata = map.getTile(x, y);
     switch (tiledata.tileType)
     {
-    case TileType::Grass: tiledata.tileType = TileType::Path; break;
-    case TileType::Path: tiledata.tileType = TileType::Farmland; break;
+    case TileType::Path:tiledata.tileType = TileType::Grass; break;
+    case TileType::Grass:tiledata.tileType = TileType::Path; break;
     }
-
 
 }
 
-void GameObjectManager::IsWatered(int x, int y) //¹°»Ñ¸²
-{
-    Map& map = currentMap();
-    TileData& tiledata = map.getTile(x, y);
-    switch (tiledata.tileType)
-    {
-    case TileType::Farmland: 
-        tiledata.tileType = TileType::Water;
-        map.GetTile(tiledata);
-        break;
+void GameObjectManager::WaterTile(int x, int y) {
+    Map& map = maps[currentMapIndex];  // ÇöÀç ¸Ê °¡Á®¿À±â
+
+    int tileIndex = y * map.getWidth() + x;
+    if (tileIndex < 0 || tileIndex >= (int)map.mapTiles.size())
+        return;
+
+    TileData& tile = map.mapTiles[tileIndex];
+
+    // PathÀÌ¸é Farmland·Î ¹Ù²Ù°í, Farmland¸é ±×´ë·Î
+    if (tile.tileType == TileType::Path) {
+        tile.tileType = TileType::Farmland;
+    }
+
+    // ÀÛ¹°ÀÌ ÀÖÀ¸¸é ¹° ÁØ »óÅÂ·Î ¼³Á¤
+    if (tile.object) {
+        Crop* crop = dynamic_cast<Crop*>(tile.object.get());
+        if (crop) {
+            crop->SetWatered(true);
+        }
     }
 }
 
@@ -293,6 +309,7 @@ void GameObjectManager::InPortal() //ÇÃ·¹ÀÌ¾î°¡ Æ÷Å» ¿µ¿ª¿¡ ÀÖ´ÂÁö È®ÀÎ ÈÄ ¸ÊÀüÈ
         }
     }
 }
+
 bool GameObjectManager::CheckTile(int TileX, int TileY, ItemCategory type, ToolType tooltype)
 {
     OutputDebugStringA("Å¸ÀÏ °Ë»ç Áß!\n");
@@ -312,8 +329,13 @@ bool GameObjectManager::CheckTile(int TileX, int TileY, ItemCategory type, ToolT
             }
             break;
         case ToolType::Watering:
-            IsWatered(TileX, TileY);
-            OutputDebugStringA("¹° »Ñ¸®´Â Áß!!\n");
+            if (tiledata.tileType == TileType::Path || tiledata.tileType == TileType::Farmland) {
+                OutputDebugStringA("¹° »Ñ¸®´Â Áß!!\n");
+               WaterTile(TileX, TileY);
+            }
+            else {
+                OutputDebugStringA("¹° ¸ø »Ñ¸²!!\n");
+            }
             break;
         }
         break;

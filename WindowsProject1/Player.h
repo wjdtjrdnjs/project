@@ -44,6 +44,7 @@ class Player
 
 	void SetKeyState(Direction dir, bool pressed);
 	void SetDirection(Direction dir);
+	bool IsKeyState(Direction dir);
 
 	// --- 상호작용 범위 및 조건 ---
 	std::vector<RECT> GetPlayerPlusRangeRects(int pixelX, int pixelY) const; // 현재 위치 기준 범위 박스
@@ -79,6 +80,14 @@ private:
 	bool keyDown = false;
 	bool keyLeft = false;
 	bool keyRight = false;
+	//모션
+	bool isUsingTool = false;
+	float toolUseTimer = 0.0f;
+	int toolUseFrame = 0;
+	float toolFrameDuration = 0.15f; // 각 프레임의 지속 시간
+	float toolFrameTimer = 0.0f;
+
+	ToolType currentToolType;
 
 	std::map<Direction, bool> keyStates;  // 각 방향의 키 상태 저장 (SetKeyState 사용)
 

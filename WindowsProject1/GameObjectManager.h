@@ -34,7 +34,7 @@ public:
 
 	void Update(float deltaTime);
 	void Render(HDC hdc);
-
+	bool IsFarmlandTile(int x, int y);
 	//맵 생성
 	void addMap(const std::string& mapName, int width, int heightm, TileType tileType);
 
@@ -58,7 +58,7 @@ public:
 	//void ChangeMapToNext();
 	void ChangeMap(int index);
 	void ChangeTile(int TIleX, int TileY);
-	void  IsWatered(int x, int y);
+	void  WaterTile(int x, int y);
 	
 	//업데이트
 	//void Update(float deltaTime); //업데이트

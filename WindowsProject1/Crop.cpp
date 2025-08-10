@@ -73,18 +73,17 @@ RECT Crop::GetCollisionRect()
     return RECT();
 }
 
-void Crop::Update(float deltaTime)
+void Crop::Update(float deltaTime)  //작물 업데이터
 {
-    int tileX = GetX() / TILE_SIZE;
-    int tileY = GetY() / TILE_SIZE;
 
-    Map& map = GameObjectManager::Instance().currentMap(); //물 뿌리면 성장 시작 구현xxxx
-    TileType type1 = map.SetTile();
-    //OutputDebugStringA("성장 중!!\n");
-    growthTimer += deltaTime;
+    int px = tileX ;
+    int py = tileY ;
+
+    if (!GameObjectManager::Instance().IsFarmlandTile(px, py))
+        return;
     
-   
-
+    growthTimer += deltaTime;
+  
     if (growthTimer >= growthInterval && growthStage < maxGrowthStage - 1) {
         growthStage++;
         growthTimer = 0;
@@ -92,6 +91,9 @@ void Crop::Update(float deltaTime)
     }
 }
 
+void Crop::SetWatered(bool watered) {
+    isWatered = watered;
+}
 
 //void Crop::Interact(Player& player)  {
 //   // if (isRipe) {

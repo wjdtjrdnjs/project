@@ -67,6 +67,12 @@
     <Filter Include="TileData">
       <UniqueIdentifier>{a05cbaf6-06f1-4017-9374-b1b6b838eed2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="리소스 파일\Character\Watering">
+      <UniqueIdentifier>{eaf9d34e-34c7-4f98-9b3a-ae07b4cd2a01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="리소스 파일\Character\Hoe">
+      <UniqueIdentifier>{08113370-96c5-483b-88f9-05df4c6e1622}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -411,18 +417,6 @@
     <Image Include="..\..\Users\정석원\Desktop\Idle_3.bmp">
       <Filter>리소스 파일\Character</Filter>
     </Image>
-    <Image Include="res\Character\Player_Actions.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="res\Character\Player_Actions1.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="res\Character\Player_Actions2.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="res\Character\Player_Actions3.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
     <Image Include="res\Character\Idle.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
@@ -466,6 +460,45 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\House\Interior.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Player_Actions3_1.bmp">
+      <Filter>리소스 파일\Character\Watering</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions.bmp">
+      <Filter>리소스 파일\Character\Watering</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Player_Actions0_1.bmp">
+      <Filter>리소스 파일\Character\Watering</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions1.bmp">
+      <Filter>리소스 파일\Character\Watering</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Player_Actions1_1.bmp">
+      <Filter>리소스 파일\Character\Watering</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions2.bmp">
+      <Filter>리소스 파일\Character\Watering</Filter>
+    </Image>
+    <Image Include="..\..\Users\정석원\Desktop\Player_Actions2_1.bmp">
+      <Filter>리소스 파일\Character\Watering</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions3.bmp">
+      <Filter>리소스 파일\Character\Watering</Filter>
+    </Image>
+    <Image Include="res\Objects\Tree.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Hoe_Actions0_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Hoe_Actions1_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Hoe_Actions2_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Hoe_Actions3_1.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

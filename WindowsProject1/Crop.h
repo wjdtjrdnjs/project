@@ -15,6 +15,9 @@ public:
     PlaceableType GetPlaceableType() const override;
     RECT GetCollisionRect();
     void Update(float deltaTime) override;
+
+    void SetWatered(bool watered);
+
     //void Interact(Player& player) override;
     // IsRipe() const { return ripe; }
 
@@ -44,10 +47,10 @@ private:
     int x = 0, y = 0;  //작물 심은 위치
     int growthStage = 0;
     float growthTimer = 0.0f;
-    const int maxGrowthStage = 5;
+    const int maxGrowthStage = 6;
     float growthInterval = 10.0f;
     std::vector<HBITMAP> growthBitmaps;
-
+    bool isWatered = false;
 
     bool ripe = FALSE;
     HBITMAP bitmap; 

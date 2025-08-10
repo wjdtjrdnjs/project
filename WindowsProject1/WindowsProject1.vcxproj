@@ -308,6 +308,10 @@
     <Image Include="..\..\Users\정석원\Desktop\Idle_2.bmp" />
     <Image Include="..\..\Users\정석원\Desktop\Idle_3.bmp" />
     <Image Include="..\..\Users\정석원\Desktop\Interior.bmp" />
+    <Image Include="..\..\Users\정석원\Desktop\Player_Actions0_1.bmp" />
+    <Image Include="..\..\Users\정석원\Desktop\Player_Actions1_1.bmp" />
+    <Image Include="..\..\Users\정석원\Desktop\Player_Actions2_1.bmp" />
+    <Image Include="..\..\Users\정석원\Desktop\Player_Actions3_1.bmp" />
     <Image Include="..\..\Users\정석원\Desktop\Tree.bmp" />
     <Image Include="..\..\Users\정석원\Desktop\Walls and Floors copiar.bmp" />
     <Image Include="res\Character\Axe_Actions.bmp" />
@@ -315,9 +319,13 @@
     <Image Include="res\Character\Axe_Actions2.bmp" />
     <Image Include="res\Character\Axe_Actions3.bmp" />
     <Image Include="res\Character\Hoe_Actions.bmp" />
+    <Image Include="res\Character\Hoe_Actions0_1.bmp" />
     <Image Include="res\Character\Hoe_Actions1.bmp" />
+    <Image Include="res\Character\Hoe_Actions1_1.bmp" />
     <Image Include="res\Character\Hoe_Actions2.bmp" />
+    <Image Include="res\Character\Hoe_Actions2_1.bmp" />
     <Image Include="res\Character\Hoe_Actions3.bmp" />
+    <Image Include="res\Character\Hoe_Actions3_1.bmp" />
     <Image Include="res\Character\Idle.bmp" />
     <Image Include="res\Character\Idle_1.bmp" />
     <Image Include="res\Character\Idle_2.bmp" />
@@ -349,6 +357,7 @@
     <Image Include="res\Objects\Strawberry\2_6.bmp" />
     <Image Include="res\Objects\Strawberry\st.bmp" />
     <Image Include="res\Objects\Strawberry\str.bmp" />
+    <Image Include="res\Objects\Tree.bmp" />
     <Image Include="res\Objects\watering.bmp" />
     <Image Include="res\Tileset\FarmLand_Tile.bmp" />
     <Image Include="res\Tileset\t1.bmp" />

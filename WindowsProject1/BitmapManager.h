@@ -31,11 +31,14 @@ public:
      HBITMAP GetObjectBitmap(const InventoryItem& item);
      HBITMAP GetObjectBitmap(PlaceableType type);;
      HBITMAP GetCroptBitmap(CropType type);
-     HBITMAP GetPlayerBitmap(Direction dir);
+     HBITMAP GetPlayerBitmap(Direction dir, ToolType toolType, int frame);
+    HBITMAP GetPlayerBitmap(Direction  dir);
+
      HBITMAP GetToolBitmap(ToolType type);
      HBITMAP GetSeedBitmap(SeedType type);
      HBITMAP GetCropGrowthBitmap(CropType type, int stage);
      HBITMAP GetBitmapByName(const std::string& name);
+
     // HBITMAP GetAllBitMap(AllType type);
     // HBITMAP GetBitmapForCrop(InventoryItem type);
     // HBITMAP GetBitmapFence();

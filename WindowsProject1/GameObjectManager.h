@@ -18,17 +18,14 @@ public:
 	//맵
 	Map& currentMap() { return maps[currentMapIndex]; }
 
-	//사용xx
-	//const std::vector<Map>& GetMaps() const { return maps; }// 전체 맵 리스트 (읽기 전용)
+
 	int GetCurrentMapIndex() const { return currentMapIndex; }// 현재 맵 인덱스 확인  
 
 	bool HasMaps() const { return !maps.empty(); } //맵 존재 여부
 	/////
 	void InteractWithTile(int tileX, int tileY, Player& player);
 		
-	//플레이어 데이터 함수
-	//std::shared_ptr<Player> GetPlayer() const {return player;}
-	//void SetPlayer(std::shared_ptr<Player> p) { player = p; }
+
 
 	void LoadMap(const std::string& mapName);
 
@@ -60,12 +57,7 @@ public:
 	void ChangeTile(int TIleX, int TileY);
 	void  WaterTile(int x, int y);
 	
-	//업데이트
-	//void Update(float deltaTime); //업데이트
-
-	//void TryHarvestCrop(int x, int y); //작물 수확
-
-	//void OnKeyDown();
+	
 private:
 	std::vector<Map> maps;
 	std::shared_ptr<Player> player;
@@ -75,3 +67,19 @@ private:
 	int currentMapIndex = 0;
 };
 
+
+//publice
+//플레이어 데이터 함수
+//std::shared_ptr<Player> GetPlayer() const {return player;}
+//void SetPlayer(std::shared_ptr<Player> p) { player = p; }
+	//사용xx
+	//const std::vector<Map>& GetMaps() const { return maps; }// 전체 맵 리스트 (읽기 전용)
+	// 
+	// 
+//private
+//업데이트
+	//void Update(float deltaTime); //업데이트
+
+	//void TryHarvestCrop(int x, int y); //작물 수확
+
+	//void OnKeyDown();

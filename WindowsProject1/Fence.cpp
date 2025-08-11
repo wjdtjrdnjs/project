@@ -3,43 +3,17 @@
 #include "InputManager.h"
 #include "TileData.h"
 #include "WorldObject.h"
-
-
 #include "Global.h" //충돌영역 on/off
-
-//RECT Fence::GetBoundingBox() const //울타리 충돌 범위
-//{
-//    BITMAP bmpInfo;
-//    GetObject(hBmp, sizeof(BITMAP), &bmpInfo);
-//
-//    RECT rect;
-//    rect.left = x + 10;  // 왼
-//    rect.top = y;        //위
-//    rect.right = rect.left + bmpInfo.bmWidth + Fencesize; //오른쪽
-//    rect.bottom = rect.top + bmpInfo.bmHeight + Fencesize; //아래
-//
-//    return rect;
-//}
-
-//std::vector<RECT> Fence::GetCollisionRects() const
-//{
-//    std::vector<RECT> rect;
-//    rect.push_back(GetBoundingBox());
-//    return rect;
-//}
-
 
 Fence::Fence()
 {
     hBmp = BitmapManager::Instance().GetObjectBitmap(PlaceableType::Fence);
 }
 
-
 void Fence::SetTilePosition(int tileX, int tileY)
 {
     x = tileX;
     y = tileY;
-  
 }
 
 void Fence::Render(HDC hdc, int tilesize)
@@ -54,9 +28,6 @@ void Fence::Render(HDC hdc, int tilesize)
 
     BITMAP bmp;
     GetObject(hBmp, sizeof(BITMAP), &bmp);
-
-  
-
     TransparentBlt(hdc,
         px+ 8, py+10,
         15, 15,
@@ -65,14 +36,7 @@ void Fence::Render(HDC hdc, int tilesize)
         bmp.bmWidth, bmp.bmHeight,
         RGB(255, 255, 255)
     );
-    // 울타리 충돌 범위 (빨간 테두리)
-   /* if (g_bFenceRedFrameOn)
-    {
-        RECT r = GetBoundingBox();
-        HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
-        FrameRect(hdc, &r, b);
-        DeleteObject(b);
-    }*/
+   
     if (g_bFenceRedFrameOn)
     {
         RECT r;
@@ -117,6 +81,37 @@ RECT Fence::GetCollisionRect()
     return RECT(r);
 }
 
+
+// 울타리 충돌 범위 (빨간 테두리)
+  /* if (g_bFenceRedFrameOn)
+   {
+       RECT r = GetBoundingBox();
+       HBRUSH b = CreateSolidBrush(RGB(255, 0, 0));
+       FrameRect(hdc, &r, b);
+       DeleteObject(b);
+   }*/
+
+//RECT Fence::GetBoundingBox() const //울타리 충돌 범위
+//{
+//    BITMAP bmpInfo;
+//    GetObject(hBmp, sizeof(BITMAP), &bmpInfo);
+//
+//    RECT rect;
+//    rect.left = x + 10;  // 왼
+//    rect.top = y;        //위
+//    rect.right = rect.left + bmpInfo.bmWidth + Fencesize; //오른쪽
+//    rect.bottom = rect.top + bmpInfo.bmHeight + Fencesize; //아래
+//
+//    return rect;
+//}
+
+//std::vector<RECT> Fence::GetCollisionRects() const
+//{
+//    std::vector<RECT> rect;
+//    rect.push_back(GetBoundingBox());
+//    return rect;
+//}
+// 
 //void Fence::Install(int tileX, int tileY, InventoryComponent& inventory)
 //{
 //    int tool = inventory.GetSelectedTool();

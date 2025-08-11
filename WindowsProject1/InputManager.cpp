@@ -114,7 +114,6 @@ void InputManager::ProcessMessage(UINT msg, WPARAM wParam, LPARAM lParam)
         wheelDelta += GET_WHEEL_DELTA_WPARAM(wParam);
         break;
 
-        // 다른 메시지 처리...
     }
 }
 
@@ -132,6 +131,10 @@ int InputManager::GetWheelDirection()
     return 0; // 변화 없음
 }
 
+
+bool InputManager::IsKeyPressedOnce(int key) {
+    return (GetAsyncKeyState(key) & 0x0001); // ← 딱 한 번만 true
+}
 
 //void InputManager::HandleKey(WPARAM key)
 //{
@@ -153,8 +156,3 @@ int InputManager::GetWheelDirection()
 //        break;
 //    }
 //}
-
-bool InputManager::IsKeyPressedOnce(int key) {
-    return (GetAsyncKeyState(key) & 0x0001); // ← 딱 한 번만 true
-}
-

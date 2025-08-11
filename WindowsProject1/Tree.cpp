@@ -19,8 +19,6 @@ void Tree::Render(HDC hdc, int Tilesize)
     int py = tileY * Tilesize;
 
     // 출력 위치 보정
-    // 비트맵이 타일보다 크면 중심이 어긋나기 때문에 보정 필요
-    // 중심 정렬: 비트맵 중심이 타일 중앙에 오도록
     px -= (drawSize - Tilesize) / 2;
     py -= (drawSize - Tilesize);  // 발이 타일 아래쪽에 맞게
 
@@ -54,16 +52,6 @@ void Tree::Render(HDC hdc, int Tilesize)
         DeleteObject(green);
     }
 
-   
-
-  /*  TransparentBlt(hdc,
-        px, py,
-        Tilesize+35, Tilesize+35,
-        memDC,
-        0, 0,
-        bmpInfo.bmWidth, bmpInfo.bmHeight,
-        RGB(255, 255, 255)
-    );*/
     SelectObject(memDC, oldBmp);
     DeleteDC(memDC);
 }
@@ -79,3 +67,12 @@ RECT Tree::GetCollisionRect()
 {
     return RECT();
 }
+
+/*  TransparentBlt(hdc,
+      px, py,
+      Tilesize+35, Tilesize+35,
+      memDC,
+      0, 0,
+      bmpInfo.bmWidth, bmpInfo.bmHeight,
+      RGB(255, 255, 255)
+  );*/

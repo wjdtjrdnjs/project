@@ -27,6 +27,10 @@ private:
 	int selectedSlot = 0; // 아무것도 선택되지 않은 상태
 };
 
+
+
+
+
 //void InventoryUIController::Render(HDC hdc)  //인벤토리UI렌더링
 //{
 //    int slotSize = 50;

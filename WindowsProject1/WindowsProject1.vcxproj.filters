@@ -16,9 +16,6 @@
     <Filter Include="Objects">
       <UniqueIdentifier>{8704dfe1-b6bb-414e-a880-264a89858eec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game">
-      <UniqueIdentifier>{2306836b-f994-4439-a1e0-17376b153122}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Managers">
       <UniqueIdentifier>{468354fa-f72e-4c2f-970f-9c1da3ab052f}</UniqueIdentifier>
     </Filter>
@@ -40,9 +37,6 @@
     <Filter Include="Managers\SingletonT">
       <UniqueIdentifier>{e246a08d-0a21-4731-8801-06865ffc6a75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CollisionManager">
-      <UniqueIdentifier>{c5f46239-4786-41a5-a2bb-d8bd3c0c4ef4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Inventory">
       <UniqueIdentifier>{841e5e87-03ba-4615-a0b6-3ecc4c84883d}</UniqueIdentifier>
     </Filter>
@@ -51,9 +45,6 @@
     </Filter>
     <Filter Include="Player">
       <UniqueIdentifier>{d16b38e1-e4c7-425a-bac9-472d589be637}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameObject">
-      <UniqueIdentifier>{bc0b06c2-7404-4dc5-874c-5a1058d807a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Gigagenie">
       <UniqueIdentifier>{87b86496-259d-43a4-87ab-3b024971e7b1}</UniqueIdentifier>
@@ -73,6 +64,27 @@
     <Filter Include="리소스 파일\Character\Hoe">
       <UniqueIdentifier>{08113370-96c5-483b-88f9-05df4c6e1622}</UniqueIdentifier>
     </Filter>
+    <Filter Include="_archive">
+      <UniqueIdentifier>{6416baed-29c7-40e5-9961-6d6f4bf6a516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_archive\_Player">
+      <UniqueIdentifier>{e70025ab-ea1a-41e3-8c3d-cab81cfde30f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_archive\_Objects">
+      <UniqueIdentifier>{4ee3d58f-4bf9-4cc2-91d7-6900970db4cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_archive\_Managers">
+      <UniqueIdentifier>{887a9760-512b-4166-846d-3094fdfa9743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_archive\_Game">
+      <UniqueIdentifier>{2306836b-f994-4439-a1e0-17376b153122}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_archive\_GameObject">
+      <UniqueIdentifier>{bc0b06c2-7404-4dc5-874c-5a1058d807a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_archive\_Inventory">
+      <UniqueIdentifier>{4f33b61c-be43-4146-942a-b051c5265def}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -90,20 +102,14 @@
     <ClInclude Include="Crop.h">
       <Filter>Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Animal.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Fence.h">
       <Filter>Objects</Filter>
     </ClInclude>
     <ClInclude Include="Box.h">
       <Filter>Objects</Filter>
     </ClInclude>
-    <ClInclude Include="CropType.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
     <ClInclude Include="MyRoomMap.h">
-      <Filter>Game</Filter>
+      <Filter>_archive\_Game</Filter>
     </ClInclude>
     <ClInclude Include="House.h">
       <Filter>Objects</Filter>
@@ -114,23 +120,14 @@
     <ClInclude Include="InputManager.h">
       <Filter>Managers\SingletonT</Filter>
     </ClInclude>
-    <ClInclude Include="RenderManager.h">
-      <Filter>Managers\SingletonT</Filter>
-    </ClInclude>
     <ClInclude Include="SingletonT.h">
       <Filter>Managers\SingletonT</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeManager.h">
-      <Filter>Managers\SingletonT</Filter>
-    </ClInclude>
-    <ClInclude Include="UpdateManager.h">
-      <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="GameObjectManager.h">
       <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="WorldMap.h">
-      <Filter>Game</Filter>
+      <Filter>_archive\_Game</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Player</Filter>
@@ -138,29 +135,14 @@
     <ClInclude Include="CollisionManager.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="PlaceableObject.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerController.h">
-      <Filter>Player</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerGraphics.h">
-      <Filter>Player</Filter>
-    </ClInclude>
     <ClInclude Include="InventoryItem.h">
-      <Filter>Inventory</Filter>
-    </ClInclude>
-    <ClInclude Include="InventoryComponent.h">
       <Filter>Inventory</Filter>
     </ClInclude>
     <ClInclude Include="Direction.h">
       <Filter>Player</Filter>
     </ClInclude>
-    <ClInclude Include="InventoryUIController.h">
-      <Filter>Inventory</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>GameObject</Filter>
+      <Filter>_archive\_GameObject</Filter>
     </ClInclude>
     <ClInclude Include="ToolType.h">
       <Filter>Player</Filter>
@@ -195,12 +177,42 @@
     <ClInclude Include="UIManager.h">
       <Filter>Managers\SingletonT</Filter>
     </ClInclude>
+    <ClInclude Include="NPC.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>_archive\_Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerGraphics.h">
+      <Filter>_archive\_Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Animal.h">
+      <Filter>_archive\_Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="CropType.h">
+      <Filter>_archive\_Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaceableObject.h">
+      <Filter>_archive\_Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateManager.h">
+      <Filter>_archive\_Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderManager.h">
+      <Filter>_archive\_Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeManager.h">
+      <Filter>_archive\_Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="InventoryComponent.h">
+      <Filter>_archive\_Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="InventoryUIController.h">
+      <Filter>_archive\_Inventory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Crop.cpp">
-      <Filter>Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Animal.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
     <ClCompile Include="Fence.cpp">
@@ -210,7 +222,7 @@
       <Filter>Objects</Filter>
     </ClCompile>
     <ClCompile Include="MyRoomMap.cpp">
-      <Filter>Game</Filter>
+      <Filter>_archive\_Game</Filter>
     </ClCompile>
     <ClCompile Include="House.cpp">
       <Filter>Objects</Filter>
@@ -221,20 +233,11 @@
     <ClCompile Include="InputManager.cpp">
       <Filter>Managers\SingletonT</Filter>
     </ClCompile>
-    <ClCompile Include="RenderManager.cpp">
-      <Filter>Managers\SingletonT</Filter>
-    </ClCompile>
-    <ClCompile Include="TimeManager.cpp">
-      <Filter>Managers\SingletonT</Filter>
-    </ClCompile>
-    <ClCompile Include="UpdateManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="GameObjectManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
     <ClCompile Include="WorldMap.cpp">
-      <Filter>Game</Filter>
+      <Filter>_archive\_Game</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Player</Filter>
@@ -242,20 +245,8 @@
     <ClCompile Include="CollisionManager.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerController.cpp">
-      <Filter>Player</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerGraphics.cpp">
-      <Filter>Player</Filter>
-    </ClCompile>
-    <ClCompile Include="InventoryComponent.cpp">
-      <Filter>Inventory</Filter>
-    </ClCompile>
-    <ClCompile Include="InventoryUIController.cpp">
-      <Filter>Inventory</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
-      <Filter>GameObject</Filter>
+      <Filter>_archive\_GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Global.cpp">
       <Filter>Objects</Filter>
@@ -284,8 +275,35 @@
     <ClCompile Include="UIManager.cpp">
       <Filter>Managers\SingletonT</Filter>
     </ClCompile>
+    <ClCompile Include="NPC.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
+      <Filter>_archive\_Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerGraphics.cpp">
+      <Filter>_archive\_Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Animal.cpp">
+      <Filter>_archive\_Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateManager.cpp">
+      <Filter>_archive\_Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderManager.cpp">
+      <Filter>_archive\_Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeManager.cpp">
+      <Filter>_archive\_Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="InventoryComponent.cpp">
+      <Filter>_archive\_Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="InventoryUIController.cpp">
+      <Filter>_archive\_Inventory</Filter>
+    </ClCompile>
     <ClCompile Include="InventoryItem.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Inventory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

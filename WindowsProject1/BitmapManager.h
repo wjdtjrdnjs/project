@@ -26,31 +26,37 @@ public:
      void LoadAllBitmaps();
 
      void Release();                              // 메모리 해제
-     HBITMAP GetTileBitmap(TileType type);
 
      HBITMAP GetObjectBitmap(const InventoryItem& item);
-     HBITMAP GetObjectBitmap(PlaceableType type);;
-     HBITMAP GetCroptBitmap(CropType type);
+     HBITMAP GetObjectBitmap(PlaceableType type);;  //설치
+     HBITMAP GetCroptBitmap(CropType type);     //작물
+     HBITMAP GetTileBitmap(TileType type);  //타일
+
+     //---플레이어 방향--
      HBITMAP GetPlayerBitmap(Direction dir, ToolType toolType, int frame);
-    HBITMAP GetPlayerBitmap(Direction  dir);
+     HBITMAP GetPlayerBitmap(Direction  dir);
 
-     HBITMAP GetToolBitmap(ToolType type);
-     HBITMAP GetSeedBitmap(SeedType type);
-     HBITMAP GetCropGrowthBitmap(CropType type, int stage);
-     HBITMAP GetBitmapByName(const std::string& name);
+     HBITMAP GetToolBitmap(ToolType type); //도구
+     HBITMAP GetSeedBitmap(SeedType type); //씨앗봉투
+     HBITMAP GetCropGrowthBitmap(CropType type, int stage);  //작물 성장
+     HBITMAP GetBitmapByName(const std::string& name);  //
 
-    // HBITMAP GetAllBitMap(AllType type);
+    
+private:
+     std::unordered_map<std::string, HBITMAP> bitmapMap;
+     std::map<std::string, HBITMAP> cropbitmapMap;
+};
+
+//public
+// HBITMAP GetAllBitMap(AllType type);
     // HBITMAP GetBitmapForCrop(InventoryItem type);
     // HBITMAP GetBitmapFence();
      /*const std::vector<HBITMAP>& GetGrowthBitmaps(CropType type);
      const std::map<Direction, std::vector<HBITMAP>>& GetPlayerBitmaps() {
         return PLY;
     }*/
-private:
-     //std::map<int, HBITMAP> bitmapMap;            // 비트맵 저장소
+
+//private
+ //std::map<int, HBITMAP> bitmapMap;            // 비트맵 저장소
      //std::map<CropType, std::vector<HBITMAP>> growthBitmaps;
      //std::map<Direction, std::vector<HBITMAP>> PLY;
-    
-     std::unordered_map<std::string, HBITMAP> bitmapMap;
-     std::map<std::string, HBITMAP> cropbitmapMap;
-};

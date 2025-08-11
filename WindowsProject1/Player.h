@@ -22,10 +22,10 @@ class Player
 	// 플레이어 좌표 
 	float GetX() const { return x; }
 	float GetY() const { return y; }
-
+	//타일
 	int GetTileX() const { return static_cast<int>(floor(x)); }
 	int GetTileY() const { return static_cast<int>(floor(y)); }
-
+	//픽셀
 	int GetPixelX() const { return static_cast<int>(x * TILE_SIZE); }
 	int GetPixelY() const { return static_cast<int>(y * TILE_SIZE); }
 
@@ -68,13 +68,13 @@ private:
 	float x = 0.0f;
 	float y = 0.0f;
 	float speed = 1.0f;
-	int playerSize = 35;          // 플레이어 크기 (픽셀 단위)
+	int playerSize = 35;          // 플레이어 크기
 	//int tileSize = 64;            // 현재 사용 중인 타일 크기
 	bool isMoving = false;        // 플레이어 이동 상태
 
 	// --- 방향 및 입력 ---
 	Direction lastPressedDirection = Direction::DOWN; // 기본 방향
-	Direction playerDirection = Direction::DOWN;       // 현재 방향 (애니메이션 등에서 사용 가능)
+	Direction playerDirection = Direction::DOWN;       // 현재 방향 
 
 	bool keyUp = false;
 	bool keyDown = false;
@@ -89,10 +89,10 @@ private:
 
 	ToolType currentToolType;
 
-	std::map<Direction, bool> keyStates;  // 각 방향의 키 상태 저장 (SetKeyState 사용)
+	std::map<Direction, bool> keyStates;  // 각 방향의 키 상태 저장
 
 	// --- 상태 및 상호작용 ---
-	bool isInteracting = false;   // 상호작용 중이면 true (움직임 제한 등)
+	bool isInteracting = false;   // 상호작용 중이면 true 
 
 	int currentMapIndex = 0;      // 현재 맵 인덱스
 	int selectedSlot = 0;         // 선택된 인벤토리 슬롯 번호
@@ -102,8 +102,10 @@ private:
 
 	// --- 렌더링 자원 ---
 	HBITMAP hBmp = nullptr;       // 플레이어 스프라이트 비트맵
-	HDC memDC = nullptr;          // 메모리 DC (더블 버퍼링용)
+	HDC memDC = nullptr;          // 메모리 DC 
 };
+
+
 
 //void ReleaseResources();  // 필요 시 구현
 	//void SetTilePosition(int px, int py) override;

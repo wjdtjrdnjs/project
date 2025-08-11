@@ -250,10 +250,7 @@ void Player::HandleLeftClick()
 
             }
 
-            // 도구들고 좌클릭
-            // 툴바 번호를 가져오고 인벤토리[번호] 타입 확인
-            // tool일 때만 상호작용
-            //
+        
         }
       
 
@@ -262,8 +259,6 @@ void Player::HandleLeftClick()
     }
    
 
-    // 상자가 안 열렸으면 일반 클릭 처리
-    //TryPlaceObject();
 }
 
 void Player::OpenBox(Box* box)
@@ -413,14 +408,12 @@ void Player::StartInteraction()
     isInteracting = true;
     OutputDebugStringA("상자와 상호작용 시작\n");
 
-    // TODO: UI 열기 로직 추가
 }
 
 void Player::EndInteraction()
 {
     isInteracting = false;
     OutputDebugStringA("상호작용 종료\n");
-    // TODO: UI 닫기 로직 추가
 }
 
 
@@ -432,26 +425,21 @@ void Player::HandleRightClick() //우클릭으로 사용
     if (InputManager::Instance().IsRightClickUp())
     {
      
-        
+        POINT p = InputManager::Instance().GetMousePosition();
+
             ///xxxxxxxxxxxxxxxxxxxxxx임시xxxxxxxxxxxxxxxxxxx
             if (UIManager::Instance().IsBoxUIOpen()) {
-                POINT mousePos = InputManager::Instance().GetMousePosition();
-                // int slotX = mousePos.x / 32;
-                 //   int slotY = mousePos.y / 32;
 
                  // 박스 or 플레이어 슬롯 클릭 시에는 다른 처리 차단
-                bool clickedOnSlot = UIManager::Instance().GetOpenedBox()->HandleClick(mousePos.x, mousePos.y, 2);
+                bool clickedOnSlot = UIManager::Instance().GetOpenedBox()->HandleClick(p.x, p.y, 2);
                 if (clickedOnSlot) return;
 
                 return; // 슬롯 외 클릭이더라도 무조건 차단
             }
-        // 상자가 안 열렸으면 일반 클릭 처리
-        //TryPlaceObject();
 
         InventoryItem selectedItem = inventory->GetSelectedItem();
         ItemCategory category = selectedItem.GetCategory();
 
-        POINT p = InputManager::Instance().GetMousePosition();
 
 
         int worldX = p.x;
@@ -497,31 +485,7 @@ void Player::HandleRightClick() //우클릭으로 사용
 
         }
 
-        //switch (type)
-        //{
-        //case PlaceableType::Fence:
-        //{
-        //    if (GameObjectManager::Instance().CheckTile(tileX, tileY, type))
-        //    {//타일체크함수
-        //        OutputDebugStringA("울타리 설치\n");
-        //        GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, PlaceableType::Fence);
-        //        inventory->DecreaseItem(1);
-        //    }
-        //    break;
-        //}
-        //case PlaceableType::Crop:
-        //{
-        //    if (GameObjectManager::Instance().CheckTile(tileX, tileY, type)) //클릭한 타일의 오브젝트가 nuLL인지 확인
-        //    {
-        //        OutputDebugStringA("작물 설치\n");
-        //        GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, PlaceableType::Crop, croptype);
-        //        inventory->DecreaseItem(1); //아이템 수량 감소
-        //    }
-
-        //    break;
-        //}
-
-        //}
+       
 
 
     }
@@ -554,7 +518,31 @@ void Player::SetDirection(Direction dir)//플레이어 방향 전환을 위한 �
 
 
 
+//switch (type)
+       //{
+       //case PlaceableType::Fence:
+       //{
+       //    if (GameObjectManager::Instance().CheckTile(tileX, tileY, type))
+       //    {//타일체크함수
+       //        OutputDebugStringA("울타리 설치\n");
+       //        GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, PlaceableType::Fence);
+       //        inventory->DecreaseItem(1);
+       //    }
+       //    break;
+       //}
+       //case PlaceableType::Crop:
+       //{
+       //    if (GameObjectManager::Instance().CheckTile(tileX, tileY, type)) //클릭한 타일의 오브젝트가 nuLL인지 확인
+       //    {
+       //        OutputDebugStringA("작물 설치\n");
+       //        GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, PlaceableType::Crop, croptype);
+       //        inventory->DecreaseItem(1); //아이템 수량 감소
+       //    }
 
+       //    break;
+       //}
+
+       //}
 
 //void Player::HandleLeftClick() //좌클릭 사용
 //{

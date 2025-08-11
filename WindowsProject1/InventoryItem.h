@@ -3,13 +3,6 @@
 #include <string>
 #include "ToolType.h"
 #include "TileData.h"
-//enum class ItemCategory {
-//    None,
-//    Tool,
-//    Seed,
-//    Crop,
-//    Placeable
-//};
 
 class InventoryItem {
 public:

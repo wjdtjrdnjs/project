@@ -62,60 +62,7 @@ void GameObjectManager::InteractWithTile(int tileX, int tileY, Player& player)
 }
 
 
-void GameObjectManager::LoadMap(const std::string& mapName)
-{
-    //addPlayer(10, 10);
-    //addMap(mapName, 40, 19, TileType::Grass);
 
-    //// 맵에 따라 다른 오브젝트와 설정 추가
-
-    //    RECT portalToMyroom = { 1260, 350, 1280, 416 }; //포탈 z위치 지정
-    //    addPortal(mapName, portalToMyroom, 1); //포탈 생성
-
-    //    // 230, 580, 320, 600
-    //    // 
-    //    //(포탈이름, x,y) 포탈 입장 후 플레이어 위치 설정 -진행 중-
-    //    //포탈에 입장했을 때 플레이어 위치 설정 -- 나중에 추가 현재 
-
-
-    //    for (int i = 0; i < 3; i++)
-    //    {
-    //        for (int j = 0; j < 3; j++)
-    //        {
-    //            addObjectToCurrentMap(mapName, 10 + i, 7 + j, TileType::Farmland, PlaceableType::Crop, CropType::Strawberry);
-    //            addObjectToCurrentMap(mapName, 15 + i, 7 + j, TileType::Farmland, PlaceableType::Crop, CropType::Onion);
-    //        }
-    //    }
-
-    //    addObjectToCurrentMap(mapName, 11, 6, TileType::None, PlaceableType::Box);
-    //    addObjectToCurrentMap(mapName, 16, 6, TileType::None, PlaceableType::Box);
-    //    addObjectToCurrentMap(mapName, 5, 3, TileType::None, PlaceableType::Tree);
-    //    addObjectToCurrentMap(mapName, 3, 10, TileType::None, PlaceableType::House);
-    //    addObjectToCurrentMap(mapName, 1, 1, TileType::None, PlaceableType::Fence);
-
-    //    for (int i = 0; i < 32; i++)
-    //    {
-    //        for (int j = 0; j < 2; j++)
-    //        {
-    //            addObjectToCurrentMap(mapName, 8 + i, 11 + j, TileType::Path);
-    //        }
-    //    }
-    //    for (int i = 0; i < 8; i++)
-    //    {
-    //        for (int j = 0; j < 2; j++)
-    //        {
-    //            addObjectToCurrentMap(mapName, 13 + j, 10 - i, TileType::Path);
-
-    //        }
-    //    }
-    //    for (int i = 0; i < 6; i++)
-    //    {
-    //        addObjectToCurrentMap(mapName, 12 - i, 13 + i, TileType::Path);
-    //        addObjectToCurrentMap(mapName, 13 - i, 13 + i, TileType::Path);
-    //        addObjectToCurrentMap(mapName, 14 - i, 13 + i, TileType::Path);
-
-    //    }
-}
  
 
 void GameObjectManager::Update(float deltaTime)
@@ -184,36 +131,20 @@ void GameObjectManager::addObjectToCurrentMap(const std::string& mapName, int x,
             {
             case CropType::Strawberry:
             case CropType::Onion:
-                obj = std::make_shared<Crop>(cropType);
-                break;
+                obj = std::make_shared<Crop>(cropType); break;
             }
             break;
-
-        case PlaceableType::Box:
-            obj = std::make_shared<Box>();
-            break;
-
-        case PlaceableType::Tree:
-            obj = std::make_shared<Tree>();
-            break;
-
-        case PlaceableType::House:
-            obj = std::make_shared<House>();
-            break;
-
-        case PlaceableType::Fence:
-            obj = std::make_shared<Fence>();
-            break;
+        case PlaceableType::Box:obj = std::make_shared<Box>(); break;
+        case PlaceableType::Tree:obj = std::make_shared<Tree>(); break;
+        case PlaceableType::House: obj = std::make_shared<House>();  break;
+        case PlaceableType::Fence:obj = std::make_shared<Fence>(); break;
         }
 
         if (obj)
         {
             tile.object = obj;
             obj->SetPosition(x, y);
-
             OutputDebugStringA("오브젝트 생성\n");
-
-
         }
     }
 }
@@ -270,22 +201,17 @@ void GameObjectManager::WaterTile(int x, int y) {
     Map& map = maps[currentMapIndex];  // 현재 맵 가져오기
 
     int tileIndex = y * map.getWidth() + x;
-    if (tileIndex < 0 || tileIndex >= (int)map.mapTiles.size())
-        return;
+    if (tileIndex < 0 || tileIndex >= (int)map.mapTiles.size()) return;
 
     TileData& tile = map.mapTiles[tileIndex];
 
     // Path이면 Farmland로 바꾸고, Farmland면 그대로
-    if (tile.tileType == TileType::Path) {
-        tile.tileType = TileType::Farmland;
-    }
+    if (tile.tileType == TileType::Path) tile.tileType = TileType::Farmland;
 
     // 작물이 있으면 물 준 상태로 설정
     if (tile.object) {
         Crop* crop = dynamic_cast<Crop*>(tile.object.get());
-        if (crop) {
-            crop->SetWatered(true);
-        }
+        if (crop) crop->SetWatered(true);
     }
 }
 
@@ -351,6 +277,65 @@ bool GameObjectManager::CheckTile(int TileX, int TileY, ItemCategory type, ToolT
     }
     return false;
 }
+
+
+
+
+//void GameObjectManager::LoadMap(const std::string& mapName)
+//{
+//    addPlayer(10, 10);
+//    addMap(mapName, 40, 19, TileType::Grass);
+//
+//    // 맵에 따라 다른 오브젝트와 설정 추가
+//
+//        RECT portalToMyroom = { 1260, 350, 1280, 416 }; //포탈 z위치 지정
+//        addPortal(mapName, portalToMyroom, 1); //포탈 생성
+//
+//        // 230, 580, 320, 600
+//        // 
+//        //(포탈이름, x,y) 포탈 입장 후 플레이어 위치 설정 -진행 중-
+//        //포탈에 입장했을 때 플레이어 위치 설정 -- 나중에 추가 현재 
+//
+//
+//        for (int i = 0; i < 3; i++)
+//        {
+//            for (int j = 0; j < 3; j++)
+//            {
+//                addObjectToCurrentMap(mapName, 10 + i, 7 + j, TileType::Farmland, PlaceableType::Crop, CropType::Strawberry);
+//                addObjectToCurrentMap(mapName, 15 + i, 7 + j, TileType::Farmland, PlaceableType::Crop, CropType::Onion);
+//            }
+//        }
+//
+//        addObjectToCurrentMap(mapName, 11, 6, TileType::None, PlaceableType::Box);
+//        addObjectToCurrentMap(mapName, 16, 6, TileType::None, PlaceableType::Box);
+//        addObjectToCurrentMap(mapName, 5, 3, TileType::None, PlaceableType::Tree);
+//        addObjectToCurrentMap(mapName, 3, 10, TileType::None, PlaceableType::House);
+//        addObjectToCurrentMap(mapName, 1, 1, TileType::None, PlaceableType::Fence);
+//
+//        for (int i = 0; i < 32; i++)
+//        {
+//            for (int j = 0; j < 2; j++)
+//            {
+//                addObjectToCurrentMap(mapName, 8 + i, 11 + j, TileType::Path);
+//            }
+//        }
+//        for (int i = 0; i < 8; i++)
+//        {
+//            for (int j = 0; j < 2; j++)
+//            {
+//                addObjectToCurrentMap(mapName, 13 + j, 10 - i, TileType::Path);
+//
+//            }
+//        }
+//        for (int i = 0; i < 6; i++)
+//        {
+//            addObjectToCurrentMap(mapName, 12 - i, 13 + i, TileType::Path);
+//            addObjectToCurrentMap(mapName, 13 - i, 13 + i, TileType::Path);
+//            addObjectToCurrentMap(mapName, 14 - i, 13 + i, TileType::Path);
+//
+//        }
+//}
+// 
 //#include "GameObjectManager.h"
 //#include "Player.h"
 //#include "Box.h"

@@ -63,14 +63,14 @@ HBITMAP BitmapManager::GetBitmap(const std::string& name)
 void BitmapManager::LoadAllBitmaps()
 {
     Load("Box", IDB_BITMAP24);
-
+    //딸기
   LoadCropBitmap("Strawberry_0", IDB_BITMAP10);
   LoadCropBitmap("Strawberry_1", IDB_BITMAP11);
   LoadCropBitmap("Strawberry_2", IDB_BITMAP12);
   LoadCropBitmap("Strawberry_3", IDB_BITMAP13);
   LoadCropBitmap("Strawberry_4", IDB_BITMAP14);
   LoadCropBitmap("Strawberry_5", IDB_BITMAP15);
-
+    //양파
   LoadCropBitmap("Onion_0", IDB_BITMAP2);
   LoadCropBitmap("Onion_1", IDB_BITMAP3);
   LoadCropBitmap("Onion_2", IDB_BITMAP4);
@@ -86,7 +86,7 @@ void BitmapManager::LoadAllBitmaps()
    Load("Farm", IDB_BITMAP42);
    Load("Water", IDB_BITMAP43);
   
-   //도구
+   //괭이
    Load("Hoe", IDB_BITMAP16);
    Load("Player_Hoe_Down_0", IDB_BITMAP45);
    Load("Player_Hoe_Down_1", IDB_BITMAP54);
@@ -96,9 +96,9 @@ void BitmapManager::LoadAllBitmaps()
    Load("Player_Hoe_Right_1", IDB_BITMAP56);
    Load("Player_Hoe_Left_0", IDB_BITMAP48);
    Load("Player_Hoe_Left_1", IDB_BITMAP57);
-   //
+   //도끼
    Load("Axe", IDB_BITMAP40);
-   //
+   //물뿌리개
    Load("Watering", IDB_BITMAP41);
    Load("Player_Watering_Down_0", IDB_BITMAP31);
    Load("Player_Watering_Down_1", IDB_BITMAP50);
@@ -119,6 +119,8 @@ void BitmapManager::LoadAllBitmaps()
    Load("Player_UP", IDB_BITMAP28);
    Load("Player_LEFT", IDB_BITMAP30);
    Load("Player_RIGHT", IDB_BITMAP29);
+   //NPC
+   Load("Npc", IDB_BITMAP58);
 
     Load("Tree", IDB_BITMAP49);
 }
@@ -165,6 +167,7 @@ HBITMAP BitmapManager::GetObjectBitmap(PlaceableType type) {
     case PlaceableType::Tree:    return GetBitmap("Tree");
     case PlaceableType::Fence:   return GetBitmap("Fence");
     case PlaceableType::House:   return GetBitmap("House");
+    case PlaceableType::NPC:     return GetBitmap("Npc");
     default:                     return nullptr;
     }
 }

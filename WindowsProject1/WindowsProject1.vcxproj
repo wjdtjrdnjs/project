@@ -333,12 +333,17 @@
     <Image Include="res\Character\Idle_2.bmp" />
     <Image Include="res\Character\Idle_3.bmp" />
     <Image Include="res\Character\Player_Actions.bmp" />
+    <Image Include="res\Character\Player_Actions0_1.bmp" />
     <Image Include="res\Character\Player_Actions1.bmp" />
+    <Image Include="res\Character\Player_Actions1_1.bmp" />
     <Image Include="res\Character\Player_Actions2.bmp" />
+    <Image Include="res\Character\Player_Actions2_1.bmp" />
     <Image Include="res\Character\Player_Actions3.bmp" />
+    <Image Include="res\Character\Player_Actions3_1.bmp" />
     <Image Include="res\Farm Animals\Chicken\Chicken Blonde  Green.bmp" />
     <Image Include="res\House\House.bmp" />
     <Image Include="res\House\Interior.bmp" />
+    <Image Include="res\NPC\Woman_Idle.bmp" />
     <Image Include="res\Objects\Box\box.bmp" />
     <Image Include="res\Objects\Diamond Axe.bmp" />
     <Image Include="res\Objects\Fence\fences.bmp" />

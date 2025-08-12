@@ -1,51 +1,30 @@
-//#pragma once
-//#include "WorldObject.h"
-//#include "InventoryItem.h"
-//#include <Windows.h>
-//
-////#define tileSize 32
-//class Player;
-//class NPC : public WorldObject
-//{
-//public:
-//    NPC();
-//    void Render(HDC hdc, int tileSize) override;
-//    void SetTilePosition(int px, int py) override;
-//    PlaceableType GetPlaceableType() const override;
-//    RECT GetCollisionRect();
-//
-//    void Open();
-//    void Close();
-//    bool IsOpen() const;
-//
-//    void RenderUI(HDC hdc);
-//    void RenderSlot(HDC hdc, int left, int top, const InventoryItem& item);
-//    void RenderCursorItem(HDC hdc);
-//
-//    bool HandleClick(int mouseX, int mouseY, int button); // button: 1=left, 2=right
-//    void HandleItemSlotLClick(InventoryItem* slot);
-//    void HandleItemSlotRClick(InventoryItem* slot);
-//
-//    void AddItem(int slotIndex, const InventoryItem& item);
-//    InventoryItem* GetItems() { return items; }
-//
-//    void SetPlayerToolbar(InventoryItem* toolbar);
-//    void OnInteract(Player* player);  // 플레이어와 상호작용 (UI 열기)
-//
-//private:
-//    int x, y;
-//    bool isOpen = false;
-//
-//    const int SLOT_ROWS = 3;
-//    const int SLOT_COLS = 9;
-//    const int SLOT_SIZE = 50;
-//    const int SLOT_MARGIN = 5;
-//
-//    const int UI_BASE_X = 360;
-//    const int UI_BASE_Y = 150;
-//    const int TOOLBAR_Y = 330;
-//
-//    HBITMAP bmp;
-//    InventoryItem items[27];
-//    InventoryItem* playerToolbar;
-//};
+#pragma once
+#include <windows.h>
+#include "Global.h" //충돌영역 on/off
+#include "WorldObject.h"
+#include "InventoryItem.h"
+class Player;
+class NPC :public WorldObject
+{
+public:
+	NPC();
+	void SetTilePosition(int tileX, int tileY) override;
+	void Render(HDC hdc, int tilesize) override;
+	void RenderUI(HDC hdc);
+	PlaceableType GetPlaceableType()const override;
+	void SetPlayerToolbar(InventoryItem* toolbar);
+	void OnInteract(Player* player);
+	RECT GetCollisionRect();
+
+	bool HandleClick(int mouseX, int mouseY, int num);//마우스 좌클릭 지점 확인(박스 칸 or 플레이어 툴바)
+	void HandleItemSlotLClick(InventoryItem* slot);//마우스 좌클릭으로 슬롯과 현재 들고 있는 아이템 처리 함수
+	void HandleItemSlotRClick(InventoryItem* slot);
+
+private:
+	int x, y;
+	int Fencesize = 10;
+	InventoryItem items[27];   // 3x9 인벤토리 슬롯(임시)
+	InventoryItem* playerToolbar;
+
+	HBITMAP hBmp; // 비트맵 핸들 저장용
+};

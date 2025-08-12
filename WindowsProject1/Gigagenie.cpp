@@ -33,6 +33,7 @@ void Gigagenie::init()
 	//(포탈이름, x,y) 포탈 입장 후 플레이어 위치 설정 -진행 중-
 	//포탈에 입장했을 때 플레이어 위치 설정 -- 나중에 추가 현재 
 
+	objectManager.addObjectToCurrentMap("Farm", 20, 6, TileType::None, PlaceableType::NPC);
 
 
 	for (int i = 0; i < 3; i++)
@@ -72,6 +73,7 @@ void Gigagenie::init()
 		objectManager.addObjectToCurrentMap("Farm", 14 - i, 13 + i, TileType::Path);
 
 	}
+	objectManager.addMap("MyRoom", 40, 19, TileType::Grass); //맵 생성
 
 
 

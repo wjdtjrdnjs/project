@@ -6,9 +6,7 @@
 #include "Global.h"
 #include "BitmapManager.h"
 #include "WorldObject.h"
-#include "TileData.h"
 #include "Player.h"
-#include <windows.h>
 #include <algorithm>
 #include<functional>
 using namespace std;

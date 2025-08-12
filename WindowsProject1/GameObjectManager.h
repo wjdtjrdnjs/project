@@ -52,7 +52,7 @@ public:
 
 	bool CheckTile(int TileX, int TileY, ItemCategory type = ItemCategory::None, ToolType tooltype = ToolType::None); //타일 검사
 
-	//void ChangeMapToNext();
+	//void 
 	void ChangeMap(int index);
 	void ChangeTile(int TIleX, int TileY);
 	void  WaterTile(int x, int y);
@@ -66,6 +66,10 @@ private:
 	int playersize = 64;
 	int currentMapIndex = 0;
 };
+
+
+//포탈, NPC, 몬스터, 공격모션
+
 
 
 //publice

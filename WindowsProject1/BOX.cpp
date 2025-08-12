@@ -337,7 +337,7 @@ Box::Box()
         }
         case 3: // PlaceableType
         {
-            int max = 5; // Box ~ Crop (None 제외)
+            int max = 6; // Box ~ Crop (None 제외)
             PlaceableType placeable = static_cast<PlaceableType>(1 + rand() % max); // 1~5
             item = InventoryItem(placeable, count);
             break;
@@ -425,7 +425,6 @@ void Box::SetPlayerToolbar(InventoryItem* toolbar)
 
 void Box::OnInteract(Player* player)
 {
-
     UIManager::Instance().OpenBoxUI(this, 27, player->GetInventory(), 9);  //  UIManager는 표현만 담당
 }
 

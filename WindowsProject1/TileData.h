@@ -45,7 +45,8 @@ enum class PlaceableType {
     Fence,
     Tree,
     House,
-    Crop
+    Crop,
+    NPC
 };
 
 

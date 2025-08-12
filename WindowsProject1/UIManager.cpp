@@ -17,6 +17,26 @@ void UIManager::OpenBoxUI(Box* boxItems, int boxSlotCount, PlayerInventory* play
     isBoxUIOpen = true;
 }
 
+void UIManager::OpenNpcUI(NPC* npcItems, int boxSlotCount, PlayerInventory* playerItems, int playerSlotCount)
+{
+    openednpc = npcItems;
+    openedBoxSlotCount = boxSlotCount;
+
+    player = playerItems;
+    playerInventorySlotCount = playerSlotCount;
+
+    if (openednpc && player)
+        openednpc->SetPlayerToolbar(player->GetInventory());  // ← box 내부에 포인터 전달
+
+   isNpcUIOpen = true;
+}
+
+void UIManager::CloseNpcUI()
+{
+    openednpc = nullptr;
+    isNpcUIOpen = false;
+}
+
 void UIManager::CloseBoxUI()
 {
     openedBox = nullptr;
@@ -27,7 +47,6 @@ void UIManager::Update(float deltaTime)
 {
     if (!isBoxUIOpen) return;
 
-    // 추후 드래그, 호버, 툴팁 처리 등 구현 예정
 }
 
 void UIManager::Render(HDC hdc)
@@ -39,14 +58,26 @@ void UIManager::Render(HDC hdc)
     {
         RenderBoxUI(hdc, openedBox, player); // 박스 UI 및 플레이어 인벤토리 함께 렌더링
         RenderHeldItem(hdc); // 마우스 커서에 들고 있는 아이템 렌더링
-
+    }
+    else if (openednpc)
+    {
+        OutputDebugStringA("NPC 상호작용중!!!!!!!!\n");
+        RenderNpcUI(hdc, openednpc, player); // 박스 UI 및 플레이어 인벤토리 함께 렌더링
+        RenderHeldItem(hdc); // 마우스 커서에 들고 있는 아이템 렌더링
     }
 
 }
 
-void UIManager::RenderBoxUI(HDC hdc, Box* box, PlayerInventory* playerInv)
+void UIManager::RenderBoxUI(HDC hdc, Box* box, PlayerInventory* playerInv)  //박스 UI오픈
 {
     box->RenderUI(hdc);
+    playerInv->InventoryBoxUIRender(hdc);
+}
+
+
+void UIManager::RenderNpcUI(HDC hdc, NPC* npc, PlayerInventory* playerInv) //NPC UI오픈
+{
+    npc->RenderUI(hdc);
     playerInv->InventoryBoxUIRender(hdc);
 }
 

@@ -166,6 +166,7 @@ CropType PlayerInventory::GetSelectedCropType()
     return CropType::None;
 }
 
+//씨앗 반환
 SeedType PlayerInventory::GetSelectedSeedType()
 {
     const InventoryItem& item = inventorySlots[selectedSlot];
@@ -178,7 +179,7 @@ SeedType PlayerInventory::GetSelectedSeedType()
 
 
 
-// 설치물 반환 (기존 PlaceableType 대체)
+// 설치물 반환
 PlaceableType PlayerInventory::GetSelectedPlaceable()
 {
     const InventoryItem& item = inventorySlots[selectedSlot];

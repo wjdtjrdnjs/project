@@ -6,7 +6,7 @@
 #include "House.h"
 #include "Fence.h"
 #include "Player.h"
-#include "Map.h"
+#include "NPC.h"
 #include "TileData.h"
 #include "UIManager.h"
 #include <memory>
@@ -50,6 +50,15 @@ void GameObjectManager::InteractWithTile(int tileX, int tileY, Player& player)
                box->OnInteract(&player); // Box클래스를 거쳐서 ui매니저로 이동
             }
         }
+        else if (currentTypeValue == static_cast<int>(PlaceableType::NPC) && !player.IsInteracting())
+        {
+            player.StartInteraction();
+            NPC* box = dynamic_cast<NPC*>(currentObject.get());  // 
+            if (box)
+            {
+                box->OnInteract(&player); // Box클래스를 거쳐서 ui매니저로 이동
+            }
+        }
     }
     else
     {
@@ -69,6 +78,10 @@ void GameObjectManager::Update(float deltaTime)
 {
     player->Update(deltaTime);
     currentMap().Update(deltaTime);
+
+    //쓰지않음
+    InPortal();
+
 }
 
 void GameObjectManager::Render(HDC hdc)
@@ -138,6 +151,7 @@ void GameObjectManager::addObjectToCurrentMap(const std::string& mapName, int x,
         case PlaceableType::Tree:obj = std::make_shared<Tree>(); break;
         case PlaceableType::House: obj = std::make_shared<House>();  break;
         case PlaceableType::Fence:obj = std::make_shared<Fence>(); break;
+        case PlaceableType::NPC:obj = std::make_shared<NPC>(); break;
         }
 
         if (obj)
@@ -189,6 +203,7 @@ void GameObjectManager::ChangeTile(int x, int y)  //타일 변경
 {
     Map& map = currentMap();
     TileData& tiledata = map.getTile(x, y);
+    //나중에 if로 변경
     switch (tiledata.tileType)
     {
     case TileType::Path:tiledata.tileType = TileType::Grass; break;
@@ -201,6 +216,7 @@ void GameObjectManager::WaterTile(int x, int y) {
     Map& map = maps[currentMapIndex];  // 현재 맵 가져오기
 
     int tileIndex = y * map.getWidth() + x;
+
     if (tileIndex < 0 || tileIndex >= (int)map.mapTiles.size()) return;
 
     TileData& tile = map.mapTiles[tileIndex];
@@ -268,7 +284,7 @@ bool GameObjectManager::CheckTile(int TileX, int TileY, ItemCategory type, ToolT
 
     case ItemCategory::Placeable:
     case ItemCategory::Seed:
-        if (tiledata.object == nullptr)
+        if (tiledata.object == nullptr) 
         {
             OutputDebugStringA("설치가 가능합니다!\n");
             return true;

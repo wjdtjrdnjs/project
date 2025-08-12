@@ -154,7 +154,7 @@ void Player::Update(float deltaTime)
         if (toolFrameTimer >= toolFrameDuration) {
             toolFrameTimer = 0.0f;
             toolUseFrame++;
-            if (toolUseFrame > 1) toolUseFrame = 1; // 프레임 0 → 1까지만
+            if (toolUseFrame > 1) toolUseFrame = 1;  
         }
 
         if (toolUseTimer <= 0.0f) {
@@ -227,10 +227,15 @@ void Player::HandleLeftClick()
         ItemCategory category = item.GetCategory();
 
         if (UIManager::Instance().IsBoxUIOpen()) {  //박스 열림
-            // int slotX = mousePos.x / 32;
-             //   int slotY = mousePos.y / 32;
              // 박스 or 플레이어 슬롯 클릭 시에는 다른 처리 차단
             bool clickedOnSlot = UIManager::Instance().GetOpenedBox()->HandleClick(mousePos.x, mousePos.y, 1);
+            if (clickedOnSlot) return;
+
+            return; // 슬롯 외 클릭이더라도 무조건 차단
+        }
+        else if (UIManager::Instance().IsNpcUIOpen())
+        {
+            bool clickedOnSlot = UIManager::Instance().GetOpenedNpc()->HandleClick(mousePos.x, mousePos.y, 1);
             if (clickedOnSlot) return;
 
             return; // 슬롯 외 클릭이더라도 무조건 차단
@@ -250,7 +255,6 @@ void Player::HandleLeftClick()
 
             }
 
-        
         }
       
 
@@ -292,11 +296,20 @@ void Player::HandleInput()
     else if (keyRight) lastPressedDirection = Direction::RIGHT;
 
 
-    if ((InputManager::Instance().IsKeyDown('E') || InputManager::Instance().IsKeyDown(VK_ESCAPE))
+    if ((InputManager::Instance().IsKeyDown('E') || InputManager::Instance().IsKeyDown(VK_ESCAPE))  //박스
         && UIManager::Instance().IsBoxUIOpen())
     {
         OutputDebugStringA("상자 닫음!!!!!!!!!!");
         UIManager::Instance().CloseBoxUI();
+        EndInteraction();
+        return;
+    }
+
+    if ((InputManager::Instance().IsKeyDown('E') || InputManager::Instance().IsKeyDown(VK_ESCAPE)) //Npc
+        && UIManager::Instance().IsNpcUIOpen())
+    {
+        OutputDebugStringA("상자 닫음!!!!!!!!!!");
+        UIManager::Instance().CloseNpcUI();
         EndInteraction();
         return;
     }
@@ -310,8 +323,6 @@ void Player::HandleInput()
 
         if (tileX != -1 && tileY != -1)
         {
-            OutputDebugStringA("상자 열림!!!!!!!!!!");
-
             GameObjectManager::Instance().InteractWithTile(tileX, tileY, *this);
         }
     }
@@ -436,6 +447,13 @@ void Player::HandleRightClick() //우클릭으로 사용
 
                 return; // 슬롯 외 클릭이더라도 무조건 차단
             }
+            else if (UIManager::Instance().IsNpcUIOpen())
+            {
+                bool clickedOnSlot = UIManager::Instance().GetOpenedBox()->HandleClick(p.x, p.y, 2);
+                if (clickedOnSlot) return;
+
+                return;
+            }
 
         InventoryItem selectedItem = inventory->GetSelectedItem();
         ItemCategory category = selectedItem.GetCategory();
@@ -460,8 +478,8 @@ void Player::HandleRightClick() //우클릭으로 사용
             case ItemCategory::Placeable: //설치 가능한 오브젝트
             {
                 PlaceableType placeable = inventory->GetSelectedPlaceable();
+                //오브젝트 설치 시  플레이어가 있는 맵으로 바뀌어야 함(현재 Farm에 고정되어있음)
                  GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, placeable);
-                // 필요한 설치물 처리...
                 break;
             }
             case ItemCategory::Seed:  //씨앗봉투 
@@ -474,12 +492,12 @@ void Player::HandleRightClick() //우클릭으로 사용
                 case SeedType::StrawberrySeed:  type = CropType::Strawberry; break;
                 case SeedType::OnionSeed:  type = CropType::Onion; break;
                 }
+                //오브젝트 설치 시  플레이어가 있는 맵으로 바뀌어야 함(현재 Farm에 고정되어있음)
                 GameObjectManager::Instance().addObjectToCurrentMap("Farm", tileX, tileY, TileType::None, PlaceableType::Crop, type);
                
                 // 작물 설치 처리
                 break;
             }
-            // Tool 등 다른 카테고리도 처리 가능
             }
             inventory->DecreaseItem(1);
 

@@ -85,6 +85,9 @@
     <Filter Include="_archive\_Inventory">
       <UniqueIdentifier>{4f33b61c-be43-4146-942a-b051c5265def}</UniqueIdentifier>
     </Filter>
+    <Filter Include="리소스 파일\NPC">
+      <UniqueIdentifier>{ee1f79b1-13c2-423b-add2-d9fcdeb4cfcd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -517,6 +520,21 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\Character\Hoe_Actions3_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\NPC\Woman_Idle.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions0_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions1_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions2_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Character\Player_Actions3_1.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>
